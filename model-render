@@ -1,0 +1,272 @@
+#!/bin/bash
+
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+
+shopt -s extglob globstar nullglob
+
+# model render #
+
+black= red= green= yellow= blue= magenta= cyan= white= reset=
+
+if [[ -t 1 ]]
+then
+	black=$(tput setaf 0)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	yellow=$(tput setaf 3)
+	blue=$(tput setaf 4)
+	magenta=$(tput setaf 5)
+	cyan=$(tput setaf 6)
+	white=$(tput setaf 7)
+	reset=$(tput sgr0)
+fi
+
+version="13-05-2016"
+script=$(basename -- "$0")
+
+while (($#))
+do
+	case "$1" in
+		-l|--ldr)
+			extension_filter="ldr"
+			;;
+		-m|--mpd)
+			extension_filter="mpd"
+			;;
+		-f|--fixed)
+			option="fixed"
+			;;
+		-a|--animated)
+			option="animated"
+			;;
+		-h|--help)
+			echo -e "Usage:"
+			echo -e "./$script [EXTENSION] [OPTION]"
+			echo -e ""
+			echo -e "Utility options:"
+			echo -e "-l, --ldr \t\t Selects ldr file format as target."
+			echo -e "-m, --mpd \t\t Selects mpd file format as target."
+			echo -e "-f, --fixed \t\t Renders series of images according to fixed view presets."
+			echo -e "-a, --animated \t Renders series of images to combine into a 360 degree rotational animation."
+			echo -e "-h, --help \t\t Show help options."
+			echo -e "-v, --version \t Print version."
+			exit
+			;;
+		-v|--version)
+			echo -e "$script $version"
+			exit
+			;;
+		*)
+			echo -e "$script: Unknown option $1"
+			echo -e "Try '$script --help' for options information."
+			exit
+			;;
+		esac
+	shift
+done
+
+if [[ "$extension_filter" == "ldr" ]]
+then
+	extension_filter="ldr"
+	extension="ldr"
+
+elif [[ "$extension_filter" == "mpd" ]]
+then
+	extension_filter="mpd"
+	extension="mpd"
+else
+	extension_filter="mpd"
+	extension="mpd"
+
+	echo "${yellow}Defaulting to mpd file format option.${reset}"
+	echo ""
+fi
+
+if [[ "$option" == "preset" ]]
+then
+	preset="fixed"
+
+elif [[ "$option" == "animated" ]]
+then
+	preset="animated"
+else
+	preset="fixed"
+
+	echo "${yellow}Defaulting to fixed render preset options.${reset}"
+	echo ""
+fi
+
+# Confirm options being used before processing
+
+echo "${cyan}Utility started using the $extension file format option.${reset}"
+echo "${cyan}Utility started using the $preset render preset options.${reset}"
+echo ""
+
+directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2&1> /dev/null || exit
+
+IFS=$'\n'
+selection=($directory)
+
+for directory in "${selection[@]}"
+do
+	for model in "${directory%/}"/**/*."$extension_filter"
+	do
+		IFS='/'
+		read -r -a path <<< "$directory"
+
+		media_directory=${path[1]}
+		disk_directory=${path[2]}
+		dropbox_directory=${path[3]}
+		lego_directory=${path[4]}
+		models_directory=${path[5]}
+		model_type_directory=${path[6]}
+		model_directory=${path[7]}
+
+		if [[ "$preset" == "fixed" ]]
+		then
+			# Define directory and render parameters for standard preset
+
+			renders_directory="/media/Disk/Dropbox/Public/models" # Define model renders top directory for standard preset
+
+			coordinates=(
+				"30,-135"
+				"30,45"
+#				"30,180"
+#				"30,0"
+			)
+
+			view=(
+				"Quarter Back"
+				"Quarter Front"
+#				"Back"
+#				"Front"
+			)
+
+			radius="" # Radius value as null: no need to specify the radius value on standard latitude + longitude camera preset (automatic zoom)
+
+			height="1440"
+			width="1440"
+			background_color=""
+			save_alpha="1"
+			zoom_to_fit="1" # Forces centering of model when coupled with zoom value
+			zoom="0.9" # Bug: cannot go over 0.5 zoom value due to canvas stitching bug
+		fi
+
+		if [[ "$preset" == "animated" ]] # animated preset conditional
+		then
+			# Define directory and render parameters for animated preset
+
+			renders_directory="/media/Disk/Dropbox/Public/models/360" # Define model renders top directory for animated preset
+
+			coordinates=(0,{0..359})	# Define coordinates array using degree range as longitude:
+							# cannot use variable string substitution into array for iteration
+
+			view=({0..359})			# Define view array using degree range as longitude:
+							# cannot use variable string substitution into array for iteration
+
+			height="360"
+			width="360"
+			background_color="0xffffff"
+			save_alpha="0"
+			zoom_to_fit="0"
+			zoom="0.5"
+		fi
+
+		range=${#coordinates[@]} # Define range as coordinates array positional values
+
+		for (( position=0; position < $range; position++ ))
+		do
+			# Define file and extension variables
+
+			model_render="${model##*/}"
+			model_render_name="${model_render%.*}"
+			model_render_name_clean="${model_render_name:5}"
+
+			current_file="$renders_directory/$model_type_directory/$model_render_name_clean/$model_render_name"
+			final_file="$renders_directory/$model_type_directory/$model_render_name_clean/$model_render_name_clean"
+			position_file="$renders_directory/$model_type_directory/$model_render_name_clean/$model_render_name_clean (${view[position]})"
+
+			fov="45"
+			render_extension="png"
+
+			# Check for the renders directory existence
+
+			if [ ! -d "$renders_directory" ]
+			then
+				mkdir -p "$renders_directory"
+			fi
+
+			cd "$renders_directory" || exit
+
+			if [ ! -d "$renders_directory/$model_type_directory/$model_render_name_clean" ]
+			then
+				mkdir -p "$renders_directory/$model_type_directory/$model_render_name_clean"
+			fi
+
+			# Render model using specified parameters according to rendering preset
+
+			echo "${cyan}Rendering $model_render_name_clean (${view[position]})...${reset}"
+
+			ldview \
+			-FOV="$fov" \
+			-ModelCenter=0.0,0.0,0.0 \
+			-BackgroundColor3="$background_color" \
+			-SaveAlpha="$save_alpha" \
+			-ProcessLDConfig=1 \
+			-SaveSnapshots=1 \
+			-SaveZoomToFit="$zoom_to_fit" \
+			-DefaultZoom="$zoom" \
+			-SnapshotSuffix=."$render_extension" \
+			-SaveDir="$renders_directory/$model_type_directory/$model_render_name_clean" \
+			-SnapshotsDir="$renders_directory/$model_type_directory/$model_render_name_clean" \
+			-SnapshotsDirMode=2 \
+			-SaveHeight="$height" \
+			-SaveWidth="$width" \
+			-DefaultLatLong=${coordinates[position]} "$model"
+
+			wait
+
+			mv "$current_file.$render_extension" "$position_file.$render_extension"
+
+			# Generate Dropbox public URL for renders and append to file
+
+			url=$(dropbox puburl "$position_file.$render_extension")
+			url_file="$renders_directory/$model_type_directory/url"
+
+			echo "${yellow}Generating public URL...${reset}"
+			echo ""
+
+			echo "<img src=\"$url\"/>" >> "$url_file"
+
+			wait
+		done
+
+	# Compile snapshots 0 to 359 into animated gif using ImageMagick 'convert'
+
+	if [[ "$preset" == "animated" ]]
+	then
+		frames_directory="$renders_directory/$model_type_directory/$model_render_name_clean/frames"
+
+		echo "${cyan}Compiling animation...${reset}"
+
+		convert \
+			-delay 5 \
+			-layers OptimizePlus \
+			-quality 99 \
+			-loop 0 "$final_file (%d).$render_extension[0-359]" "$final_file (Animated).gif"
+
+		if [[ ! -d "$frames_directory" ]] # Generate 'frames' directory for cleanup if it does not exist
+		then
+			mkdir -p "$frames_directory"
+		fi
+
+		echo "${cyan}Cleaning up...${reset}"
+
+		mv "${renders_directory%/}"/**/*."$render_extension" "$frames_directory" # Cleanup
+	fi
+
+	echo "${cyan}Done.${reset}"
+	echo ""
+
+	done
+done

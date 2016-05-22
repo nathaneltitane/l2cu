@@ -1,0 +1,280 @@
+#!/bin/bash
+
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+
+shopt -s extglob globstar nullglob
+
+# model export #
+
+black= red= green= yellow= blue= magenta= cyan= white= reset=
+
+if [[ -t 1 ]]
+then
+	black=$(tput setaf 0)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	yellow=$(tput setaf 3)
+	blue=$(tput setaf 4)
+	magenta=$(tput setaf 5)
+	cyan=$(tput setaf 6)
+	white=$(tput setaf 7)
+	reset=$(tput sgr0)
+fi
+
+version="15-05-2016"
+script=$(basename -- "$0")
+
+while (($#))
+do
+	case "$1" in
+		-l|--ldr)
+			extension_filter="ldr";;
+		-m|--mpd)
+			extension_filter="mpd";;
+		-3ds)
+			option="3ds";;
+		-wf|--wavefront)
+			option="wavefront";;
+		-h|--help)
+			echo -e "Usage:"
+			echo -e "./$script [EXTENSION] [OPTION]"
+			echo -e ""
+			echo -e "Utility options:"
+			echo -e "-l, --ldr \t\t Selects ldr file format as target."
+			echo -e "-m, --mpd \t\t Selects mpd file format as target."
+			echo -e "-3ds \t\t\t Export 3ds file format only."
+			echo -e "-wf, --wavefront \t Export wavefront (obj and mtl as zip archive) file format only."
+			echo -e "-h, --help \t\t Show help options."
+			echo -e "-v, --version \t Print version."
+			exit
+			;;
+		-v|--version)
+			echo -e "$script $version"
+			exit
+			;;
+		*)
+			echo -e "$script: Unknown option $1"
+			echo -e "Try '$script --help' for options information."
+			exit
+			;;
+		esac
+	shift
+done
+
+if [[ "$extension_filter" == "ldr" ]]
+then
+	extension_filter="ldr"
+	extension="ldr"
+
+elif [[ "$extension_filter" == "mpd" ]]
+then
+	extension_filter="mpd"
+	extension="mpd"
+else
+	extension_filter="mpd"
+	extension="mpd"
+
+	echo "${yellow}Defaulting to mpd file format option.${reset}"
+	echo""
+fi
+
+if [[ "$option" == "3ds" ]]
+then
+	export_option="-3ds"
+	export_extension="3ds"
+
+elif [[ "$option" == "wavefront" ]]
+then
+	export_option="-wf"
+	export_extension="obj"
+else
+	export_option="-3ds"
+	export_extension="3ds"
+
+	echo "${yellow}Defaulting to 3ds file format option.${reset}" # Warning when no option set for file type
+	echo ""
+fi
+
+# Confirm options being used before processing
+
+echo "${cyan}Utility started using the $extension file format option.${reset}"
+echo "${cyan}Utility started using the $option file format option.${reset}"
+echo ""
+
+leocad=$(which leocad) # Define current portable 'leocad' binary location on system
+
+if [[ -z "$leocad" ]] # If 'leocad' binary is not found or unspecified
+then
+	echo "${yellow}The 'leocad' binary does not seem to be present on your system.${reset}"
+	echo "${yellow}Would you like to manually specify its location?${reset}"
+
+	read reply
+
+	if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+	then
+		leocad=$(zenity --file-selection  --multiple --separator=$'\n' --title="Select binary location") 2> /dev/null || exit # Specify binary location or exit on 'Cancel'
+	else
+		echo "${red}Could not specify or did not find the binary location.${reset}"
+		echo "${red}Cannot continue with the specified binary...${reset}"
+		echo "${red}Please install the package containing the 'leocad' binary on your system and restart this utility.${reset}"
+		exit 1
+	fi
+fi
+
+echo "${cyan}Please specify the directory in which you would like the ldraw model files to the be exported to the specified format.${reset}"
+
+directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit # Specify directory location or exit on 'Cancel'
+
+IFS=$'\n'
+selection=($directory)
+
+for directory in "${selection[@]}"
+do
+	cd "$directory" || exit
+
+	for model in "${directory%/}"/**/*."$extension_filter"
+	do
+		IFS='/'
+		read -r -a path <<< "$directory"
+
+		media_directory=${path[1]}
+		disk_directory=${path[2]}
+		dropbox_directory=${path[3]}
+		lego_directory=${path[4]}
+		models_directory=${path[5]}
+		model_type_directory=${path[6]}
+		model_directory=${path[7]}
+
+		# Define directory and file variables
+
+		exports_directory="/media/Disk/Dropbox/Lego/exports"
+		uid_list="/media/Disk/Dropbox/Linux/scripts/ldraw/sketchfab/uid-list"
+
+		model_beautifier="/media/Disk/Dropbox/Linux/scripts/ldraw/beautifier.py"
+		model_file_log="/tmp/model_file"
+
+		model_export="${model##*/}"
+		model_export_name="${model_export%.*}"
+		model_export_name_clean="${model_export_name:5}"
+
+		current_directory="$exports_directory/$model_type_directory/$model_export_name_clean/"
+		current_file="$exports_directory/$model_type_directory/$model_export_name_clean/$model_export_name_clean.$export_extension"
+
+		# Explicit file types
+
+		current_file_3ds="$exports_directory/$model_type_directory/$model_export_name_clean/$model_export_name_clean.3ds"
+		current_file_blend="$exports_directory/$model_type_directory/$model_export_name_clean/$model_export_name_clean.blend"
+
+		# Check for the exports directory existence
+
+		if [ ! -d "$exports_directory/$model_type_directory/$model_export_name_clean" ]
+		then
+			mkdir -p "$exports_directory/$model_type_directory/$model_export_name_clean"
+		fi
+
+		echo "${cyan}Exporting $model ("$export_extension")...${reset}"
+
+		"$leocad" "$model" "$export_option" "$current_file" &> /dev/null
+
+		# Append current file to temporary log for confirmation
+
+		echo "$current_file" > "$model_file_log"
+
+		# Run blender beautifier to smooth surfaces and recalculate normals
+
+		echo "${cyan}Converting $model (blender)...${reset}"
+
+		blender --background --python "$model_beautifier" >> /dev/null
+
+		wait
+
+		echo ""
+
+		# Archive .obj and respective .mtl files for exported model when using the wavefront file export option for easy model upload or update
+
+		if [[ mode="wavefront" ]] && [[ -e *.obj ]] && [[ -e *.mtl ]]
+		then
+			cd "$exports_directory/$model_path" || exit
+
+			zip "${model_export_name}.zip" {*.obj,*.mtl}
+			rm -rf {*.obj,*.mtl}
+		fi
+
+		# Compare model name to uid list model entry and generate uid token file under model's export directory for proper update authentication
+
+		while IFS=$'\t'
+		read -r uid model_name
+		do
+			if [[ "$model_name" == "$model_export_name_clean" ]] # If model export name matches list entry
+			then
+				if [[ -s "$current_directory"/uid ]]
+				then
+					read_uid=$(cat "$current_directory"/uid)
+				fi
+
+				echo "${green}Model export name matches UID list entry - Generating UID token...${reset}"
+
+				if [[ ! -e "$current_directory/uid" ]] # If UID file does not exist in export model directory
+				then
+					message="${red}No UID file detected for $model_name - Generating UID token...${reset}"
+					confirmation="${green}Found match..: [ $model_name - $model_export_name_clean ]${reset}"
+
+				elif [[ ! -s "$current_directory/uid" ]] # If UID file exists in export model directory but is empty
+				then
+					uid="$read_uid"
+					message="${yellow}UID file already exists [ empty ] - Writing UID token...${reset}"
+					confirmation="${yellow}Write confirmation:${reset} Model ID from file: $uid" # Confirm write
+
+				elif [[ -s "$current_directory/uid" ]] # If UID file exists in export model directory
+				then
+					uid="$read_uid"
+					message="${yellow}UID file already exists for $model_name...${reset}"
+					confirmation="${yellow}Model ID from file:${reset} $uid"
+				fi
+
+				uid=$uid
+				model_name=$model_export_name_clean
+
+				# Verify exported file size and display message accordingly (Free account model upload limit: 50MB)
+
+				model_size=$(ls -s --block-size=MB "$current_file_blend" | awk '{print $1}')
+
+				model_size_threshold="50"
+				model_size_number="${model_size%MB}"
+
+				if [[ "$model_size_number" -le "$model_size_threshold" ]]
+				then
+					model_size_message="${green}Model file size is below ${model_size_threshold}MB [ $model_size ]- File size threshold not exceeded.${reset}"
+					color=$(tput setaf 2) # green
+
+				elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
+				then
+					model_size_message="${red}Warning: Model file size is above ${model_size_threshold}MB [ $model_size ] - Model cannot be uploaded to free subscription account due to maximum size limitation.${reset}"
+					color=$(tput setaf 1) # red
+				fi
+
+				echo "$uid" > "$current_directory/uid"
+
+				echo "${message}"
+				echo "${confirmation}"
+				echo ""
+				echo "Model ID.....: $uid"
+				echo "Model name...: $model_name"
+				echo "${color}Model size...:${reset} $model_size"
+				echo ""
+				echo "${model_size_message}"
+				echo ""
+			else
+				: #pass
+			fi
+
+		done < "$uid_list"
+
+		echo "${cyan}Done.${reset}"
+		echo ""
+	done
+done
+
+# Clean log file
+
+rm -rf "$model_file_log"

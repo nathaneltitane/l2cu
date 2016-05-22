@@ -1,0 +1,151 @@
+#!/bin/bash
+
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+
+shopt -s extglob globstar nullglob
+
+# make-list #
+
+black= red= green= yellow= blue= magenta= cyan= white= reset=
+
+if [[ -t 1 ]]
+then
+	black=$(tput setaf 0)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	yellow=$(tput setaf 3)
+	blue=$(tput setaf 4)
+	magenta=$(tput setaf 5)
+	cyan=$(tput setaf 6)
+	white=$(tput setaf 7)
+	reset=$(tput sgr0)
+fi
+
+version="08-05-2016"
+script=$(basename -- "$0")
+
+while (($#))
+do
+	case "$1" in
+		-d|--description)
+			mode="description";;
+		-n|--number)
+			mode="number";;
+		-h|--help)
+			echo -e "Usage:"
+			echo -e "./$script [OPTION]"
+			echo -e "Utility options:"
+			echo -e "-d, --description \t Sort list by part description."
+			echo -e "-n, --number \t\t Sort list by part number."
+			echo -e "-h, --help \t\t Show help options."
+			echo -e "-v, --version \t\t Print version."
+			exit
+			;;
+		-v|--version)
+			echo -e "$script $version"
+			exit
+			;;
+		*)
+			echo -e "$script: Unknown option $1"
+			echo -e "Try '$script --help' for options information."
+			exit
+			;;
+		esac
+	shift
+done
+
+# LDraw parts library directory check
+
+if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
+then
+	echo "${green}Operating within the LDraw parts library directory. Continuing...${reset}"
+
+	directory="parts"
+else
+	echo "${yellow}LDraw parts library directory not found.${reset}"
+	echo "${yellow}Please specify the LDraw parts library directory location.${reset}"
+
+	browse=$(zenity --file-selection --directory --title="Select the LDraw parts directory location") 2> /dev/null || exit # Specify directory location or exit on 'Cancel'
+
+	cd "$browse" || exit
+
+	directory="$browse/parts"
+fi
+
+# Parts list verification and backup
+
+if [[ -e parts.lst ]]
+then
+	mv parts.lst parts.lst.old
+fi
+
+# Mode verification
+
+if [[ "$mode" == "description" ]]
+then
+	echo "${cyan}Utility started with [d]escription sorting option flag.${reset}"
+
+elif [[ "$mode" == "number" ]]
+then
+	echo "${cyan}Utility started with [n]number sorting option flag.${reset}"
+else
+	echo "${cyan}Would you like to sort the parts list by [d]escription or by part [n]umber?${reset}"
+
+	read reply
+fi
+
+# Parsing
+
+echo "${cyan}Processing...${reset}"
+
+count=1
+
+for part in "$directory"/*.dat
+do
+	filename="${part##*/}"
+	header="$(head -n 1 "$part")"
+	description="${header:2}"
+
+	if [[ "$description" == *~Moved* ]]
+	then
+		: # pass
+	else
+		if [[ "$description" == *_* ]]
+		then
+			printf '%-30s %-s\n' "$filename" "$description" >> "._.lst"
+
+		elif [[ "$description" == *~* ]]
+		then
+			printf '%-30s %-s\n' "$filename" "$description" >> ".~.lst"
+
+		else
+			printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
+		fi
+
+		echo -ne "${cyan}Parts in list: ${reset}" "$((count++))"'\r'
+	fi
+done
+
+echo "" # Keep counter visible after loop
+
+# Apply sorting method according to mode/reply
+
+for list in "._.lst" ".~.lst" parts.lst
+do
+	if [[ "$reply" = [dD] ]] || [[ "$mode" == "description" ]]
+	then
+		sort -b -d -k 2 -t ' ' -o "$list" "$list"
+
+	elif [[ "$reply" = [nN] ]] || [[ "$mode" == "number" ]]
+	then
+		sort -b -n -k 1 -t ' ' -o "$list" "$list"
+	fi
+done
+
+# Merge files and clean
+
+cat "._.lst" ".~.lst" >> parts.lst
+rm -rf "._.lst" ".~.lst"
+
+echo "${cyan}Done.${reset}"
+echo ""

@@ -1,0 +1,432 @@
+#!/bin/bash
+
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+
+shopt -s extglob globstar nullglob
+
+# model upload #
+
+black= red= green= yellow= blue= magenta= cyan= white= reset=
+
+if [[ -t 1 ]]
+then
+	black=$(tput setaf 0)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	yellow=$(tput setaf 3)
+	blue=$(tput setaf 4)
+	magenta=$(tput setaf 5)
+	cyan=$(tput setaf 6)
+	white=$(tput setaf 7)
+	reset=$(tput sgr0)
+fi
+
+version="14-05-2016"
+script=$(basename -- "$0")
+
+while (($#))
+do
+	case "$1" in
+		-3ds)
+			option="3ds"
+			;;
+		-b)
+			option="blend"
+			;;
+		-wf|--wavefront)
+			option="wavefront"
+			;;
+		-d|--default)
+			setup="default"
+			;;
+		-m|--manual)
+			setup="manual"
+			;;
+		-a|--about)
+			setting="about"
+			;;
+		-e|--environment)
+			setting="environment"
+			;;
+		-h|--help)
+			echo -e "Usage:"
+			echo -e "./$script [OPTION] [SETUP] [SETTING]"
+			echo -e "Utility options:"
+			echo -e "-3ds \t\t\t Upload 3ds file format only."
+			echo -e "-b, --blend \t Upload blend file format only."
+			echo -e "-wf, --wavefront \t Upload wavefront (obj and mtl as zip archive) file format only."
+			echo -e "-d, --default \t\t Use default settings for description and tags."
+			echo -e "-m, --manual \t\t Use maual input settings for description and tags."
+			echo -e "-a, --about \t Apply description and tag string settings for specified model(s)."
+			echo -e "-e, --environment \t Bypass upload and apply environment settings for specified model(s)."
+			echo -e "-h, --help \t\t Show help options."
+			echo -e "-v, --version \t Print version."
+			exit
+			;;
+		-v|--version)
+			echo -e "$script $version"
+			exit
+			;;
+		*)
+			echo -e "$script: Unknown option $1"
+			echo -e "Try '$script --help' for options information."
+			exit
+			;;
+		esac
+	shift
+done
+
+if [[ "$option" == "3ds" ]]
+then
+	extension_filter="3ds"
+	extension="3ds"
+
+elif [[ "$option" == "blend" ]]
+then
+	extension_filter="blend"
+	extension="blend"
+
+elif [[ "$option" == "wavefront" ]]
+then
+	extension_filter="zip"
+	extension="wavefront"
+
+else
+	extension_filter="3ds"
+	extension="3ds"
+
+	echo "${yellow}Defaulting to $extension file format option.${reset}"
+	echo ""
+fi
+
+if [[ "$setup" == "default" ]]
+then
+	setup_option="default"
+
+elif [[ "$setup" == "manual" ]]
+then
+	setup_option="manual"
+else
+	setup_option="default"
+
+	echo "${yellow}Utility started using the $setting_option setup option.${reset}"
+	echo ""
+fi
+
+if [[ "$setting" = "about" ]]
+then
+	setting_option="about"
+
+	echo "${yellow}Utility started using the $setting_option setup option.${reset}"
+	echo ""
+
+elif [[ "$setting" = "environment" ]]
+then
+	setting_option="environment"
+
+	echo "${yellow}Utility started using the $setting_option setup option.${reset}"
+	echo ""
+fi
+
+# Confirm options being used before processing
+
+echo "${cyan}Utility started using the $extension file format option.${reset}"
+echo "${cyan}Utility started using the $setup_option setup options.${reset}"
+echo ""
+
+# Generate temporary directory
+
+temporary_file=( )
+id_file="$(mktemp -t sketchfab-return_XXXXXXXXX)"
+temporary_file+=("$id_file")
+
+# Define cleanup routine
+
+cleanup() {
+rm "${temporary_file[@]}"
+}
+trap cleanup EXIT
+
+# Define upload routine
+
+upload () {
+	curl -# -k -X POST \
+		-F "source=bash" \
+		-F "modelFile=@${file}" \
+		-F "name=${filename}" \
+		-F "description=${description}" \
+		-F "password=${password}" \
+		-F "private=${private}" \
+		-F "tags=${tags}" \
+		-F "token=${token}" \
+				"${server_url}" > "${id_file}"
+}
+
+# Define update routine
+
+update () {
+	curl -# -k -X PATCH \
+		-F "modelFile=@${file}" \
+		-F "name=${filename}" \
+		-F "description=${description}" \
+		-F "password=${password}" \
+		-F "private=${private}" \
+		-F "tags=${tags}" \
+				"${api_server_url}" > "${id_file}"
+}
+
+# Define environment setup routine
+
+environment () {
+	environment_data=$(cat './sketchfab/environment-data-new.json')
+
+	curl -# -k -X PATCH \
+		-H "Content-Type: application/json" \
+		-d "$environment_data" \
+				"${api_server_url}" > "${id_file}"
+}
+
+# Define model information update routine
+
+about () {
+	curl -# -k -X PATCH \
+		-F "description=${description}" \
+		-F "tags=${tags}" \
+				"${api_server_url}" > "${id_file}"
+}
+
+uid_list="./sketchfab/uid-list"
+
+token_file="./sketchfab/token"
+token=$(cat "$token_file")
+
+# Define setup defaults
+
+description_default="This model has been created by Nathanel Titane. </br> For more information, please visit </br> http://www.nathaneltitane.blogspot.com </br> or e-mail me at </br> nathanel.titane@gmail.com"
+tags_default="3d 3ds 3dsmax armogyres armor armored armoredcore armoredknights armors arms armsframe assault battle battleplatforms blender cad cataphract cataphracts combat core design fortresses frame frames gear ghost ghostintheshell gundam heavy heavygear in knights labors ldd ldraw ldview lego leocad lpub macross mech mecha mechanical mechanicalminions micro micropowerarmors microveritechs minions mlcad mobile mobileassaultframes mobilefortresses mobilesuit mobilesuits mobilethrusterframes moc nathanel nathaneltitane orbital orbitalframes platforms pod pods power powerarmor powerarmors reframe shell skeletal skeletalassaultpods suit suits the thruster titane transformer transformers variablefighter veritech veritechs"
+
+
+if [[ "$setting_option" = "about" ]]
+then
+	while IFS=$'\t'
+		read -r uid model_name
+		do
+			description=$description_default
+			tags=$tags_default
+
+			uid="$uid"
+			api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
+			status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+			model_url="https://sketchfab.com/models/${uid}"
+			message="${cyan}Setting description and tags for $model_name...${reset}"
+			transfer=about
+
+			echo "${message}"
+			echo ""
+			"${transfer}"
+			echo ""
+			echo "${green}Model...:${reset} $model_name"
+			echo "${green}UID.....:${reset} $uid"
+			echo "${green}URL.....:${reset} $model_url"
+
+			wait
+
+			sleep 15
+
+			echo "${cyan}Done.${reset}"
+			echo ""
+
+		done < "$uid_list"
+
+elif [[ "$setting_option" = "environment" ]]
+then
+	while IFS=$'\t'
+	read -r uid model_name
+	do
+		uid="$uid"
+		api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
+		status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+		model_url="https://sketchfab.com/models/${uid}"
+		message="${cyan}Setting ennvironment for $model_name...${reset}"
+		transfer=environment
+
+		echo "${message}"
+		echo "${cyan}Transfering environment parameters for $model_name...${reset}"
+		echo ""
+		"${transfer}"
+		echo ""
+		echo "${green}Model...:${reset} $model_name"
+		echo "${green}UID.....:${reset} $uid"
+		echo "${green}URL.....:${reset} $model_url"
+
+		wait
+
+		sleep 15
+
+		echo "${cyan}Done.${reset}"
+		echo ""
+
+	done < "$uid_list"
+else
+	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
+
+	IFS=$'\n'
+	selection=($directory)
+
+	for directory in "${selection[@]}"
+	do
+		cd "$directory" || exit
+
+		for model in "${directory%/}"/**/*."$extension_filter"
+		do
+			# Define directory and file variables
+
+			path=${model%/*}
+			model_path=${path#"${path%/*/*}"}
+			model_upload="${model##*/}"
+			model_upload_name="${model_upload%.*}"
+
+			# Define Sketchfab API variables
+
+			source="bash"
+			file="${path}/${model_upload}"
+			filename="${model_upload_name}"
+
+			password=""
+			private=0
+
+			server_url="https://sketchfab.com/v2/models"
+
+			uid_file="$path/uid"
+
+			# Verify UID file existence and process model transfer accordingly
+
+			if [[ ! -e "$uid_file" ]]
+			then
+				uid=$(cat $id_file | sed 's/{"uid":"//g;s/"}//g')
+				api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
+				status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+				model_url="https://sketchfab.com/models/${uid}"
+				message="${red}UID file does not exist under $path - Generating UID file - Uploading...${reset}"
+				transfer=upload
+
+			elif [[ ! -s "$uid_file" ]]
+			then
+				uid=$(cat $id_file | sed 's/{"uid":"//g;s/"}//g')
+				api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
+				status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+				model_url="https://sketchfab.com/models/${uid}"
+				message="${yellow}UID file already exists [ empty ] - Writing UID token - Uploading...${reset}"
+				transfer=upload
+
+			elif [[ -s "$uid_file" ]]
+			then
+				uid=$(cat "$uid_file")
+				api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
+				status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+				model_url="https://sketchfab.com/models/${uid}"
+				message="${green}UID file exists under $path - Continuing - Updating...${reset}"
+				transfer=update
+			fi
+
+			if [[ "$setup_option" == "default" ]]
+			then
+				description="$description_default"
+				tags="$tags_default"
+
+			elif [[ "$setup_option" == "manual" ]]
+			then
+				echo "${cyan}Please specify a description for your model.${reset}"
+				read description_input
+
+				if [[ "$description_input" == "" ]]
+				then
+					description="$description_default"
+				fi
+
+				echo "${cyan}Please specify tags for your model.${reset}"
+				read tags_input
+
+				if [[ "$tags_input" == "" ]]
+				then
+					tags="$tags_default"
+				fi
+			else
+				description="$description_default"
+				tags="$tags_default"
+			fi
+
+			# Process model transfer
+
+			echo "${message}"
+			echo "${cyan}Transfering $model_upload_name...${reset}"
+			echo ""
+			"${transfer}"
+
+			wait
+
+			echo "$uid" > "$path/uid"
+			wait
+
+			echo ""
+			echo "${green}Model...:${reset} $model_upload_name"
+			echo "${green}UID.....:${reset} $uid"
+			echo ""
+
+			# Define parsing counter
+
+			seconds="5"
+
+			while [[ "$seconds" != 0 ]]
+			do
+				echo -ne "${yellow}Parsing...${reset} [ $seconds ]"'\r'
+				sleep 1
+
+				: $(( seconds-- ))
+			done
+
+			sleep "$seconds" # Let servers start processing. Solution to curl not resolving host on getting the status for the model because the query follows too quickly after the model transfer
+
+			echo -ne "" # Swap parsing counter for status poll timeout counter
+
+			# Define counter variables
+
+			iteration="0"
+			timeout="320"
+
+			while [[ "${status}" != *SUCCEEDED* ]]
+			do
+				status=$(curl -k -s "${status_url}")
+
+				if [[ "$iteration" == "$timeout" ]] && [[ "${status}" != *SUCCEEDED* ]]
+				then
+					echo ""
+					echo "${red}Processing error: Timeout threshold reached while polling status.${reset}"
+					echo "${red}Model...:${reset} $model_upload_name"
+					echo "${red}URL.....:${reset} $status_url"
+
+					break
+				fi
+
+				iteration=$(( iteration+1 ))
+
+				echo -ne "${yellow}Processing: Timeout threshold in $timeout seconds...${reset} [ $iteration ]"'\r'
+				sleep 1
+			done
+
+			if [[ "${status}" = *"SUCCEEDED"* ]]
+			then
+				echo ""
+				echo "${green}Model transfer and processing successful.${reset}"
+				echo ""
+				echo "${green}Model...:${reset} $model_upload_name"
+				echo "${green}UID.....:${reset} $uid"
+				echo "${green}URL.....:${reset} $model_url"
+				echo ""
+			fi
+
+			echo "${cyan}Done.${reset}"
+			echo ""
+		done
+	done
+fi

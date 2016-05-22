@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+
+shopt -s extglob globstar nullglob
+
+# sign-instructions #
+
+black= red= green= yellow= blue= magenta= cyan= white= reset=
+
+if [[ -t 1 ]]
+then
+	black=$(tput setaf 0)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	yellow=$(tput setaf 3)
+	blue=$(tput setaf 4)
+	magenta=$(tput setaf 5)
+	cyan=$(tput setaf 6)
+	white=$(tput setaf 7)
+	reset=$(tput sgr0)
+fi
+
+directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
+password="$(cat '/media/Disk/.password' | base64 -d)"
+
+cd "$directory" || exit
+
+if [ -d "qrcode" ]
+then
+	echo "${cyan}Cleaning up previous signature directory (qrcode)...${reset}"
+	rm -rf "qrcode" &&
+	mkdir "qrcode"
+else
+	echo "${cyan}Generating signature parsing directory (qrcode)...${reset}"
+	mkdir "qrcode"
+fi
+
+echo "${cyan}Applying QR Code signature to instruction pages...${reset}"
+
+for page in ./**/[pP]ages/*.png
+do
+	composite \
+	-compose atop \
+	-geometry x150+10+10 \
+	-gravity southeast \
+	-background none \
+	"/media/Disk/Dropbox/Lego/kits/QR/qrcode.svg" "$page" "qrcode/$(basename "${page// /_/}")"
+done
+
+cd "qrcode" || exit
+
+rename 's/\(/_/g' *
+rename 's/\)/_/g' *
+
+file=$(ls *.png | sort -V)
+
+echo "${cyan}Generating instruction document...${reset}"
+
+convert $file  "qrcode.pdf"
+
+echo "${cyan}Signing instruction document...${reset}"
+
+pdftk qrcode.pdf output qrcode_signed.pdf owner_pw "$password" encrypt_128bit allow Printing ScreenReaders
+
+mv qrcode_signed.pdf "$directory"/"$(basename "$directory").pdf"
+
+echo "${cyan}Cleaning up...${reset}"
+
+rm -rf "$directory"/qrcode
