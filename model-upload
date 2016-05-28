@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2016
 
 shopt -s extglob globstar nullglob
 
@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="14-05-2016"
+version="28-05-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -74,6 +74,47 @@ do
 			;;
 		esac
 	shift
+done
+
+# Test for utility dependencies and requirements
+
+echo "${yellow}Verifying utility requirements...${reset}"
+echo ""
+
+for binary in \
+"curl"
+do
+	binary=$(which $binary)
+
+	if [[ -z "$binary" ]] # If binary is not found or unspecified
+	then
+		echo "${yellow}The '$binary' binary does not seem to be installed or present on your system.${reset}"
+		echo "${yellow}Would you like to specify its location manually? [ Yes | No ]${reset}"
+
+		read reply
+
+		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		then
+			# Specify binary location or exit on 'Cancel'
+
+			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+
+			binary="$bnary_path/$binary"
+		else
+			echo "${red}Could not specify '$binary' binary installed on system.${reset}"
+			echo "${red}Please install '$binary' using your system's package manager${reset}"
+			echo "${red}and restart this utility when you are done.${reset}"
+			echo ""
+			exit 1
+		fi
+
+	elif [[ ! -z "$binary" ]] # If binary exists
+	then
+		echo "${green}'$binary' binary found on system - Continuing...${reset}"
+		echo ""
+	fi
+
+	sleep 1
 done
 
 if [[ "$option" == "3ds" ]]
@@ -134,18 +175,33 @@ echo "${cyan}Utility started using the $extension file format option.${reset}"
 echo "${cyan}Utility started using the $setup_option setup options.${reset}"
 echo ""
 
-# Generate temporary directory
+# Generate temporary return file for server IDs
 
-temporary_file=( )
-id_file="$(mktemp -t sketchfab-return_XXXXXXXXX)"
+temporary_file=()
+id_file=$(mktemp -t sketchfab-id-file.XXXXXX)
 temporary_file+=("$id_file")
 
 # Define cleanup routine
 
 cleanup() {
-rm "${temporary_file[@]}"
+	rm "${temporary_file[@]}"
 }
+
 trap cleanup EXIT
+
+parse_input () {
+	while true
+	do
+		read input
+
+		if [[ -z $input ]]
+		then
+			echo "${yellow}Warning: Empty value. Please try again...${reset}"
+		else
+			break
+		fi
+	done
+}
 
 # Define upload routine
 
@@ -195,16 +251,81 @@ about () {
 				"${api_server_url}" > "${id_file}"
 }
 
-uid_list="./sketchfab/uid-list"
+# Verify work environment requirements
 
-token_file="./sketchfab/token"
+sketchfab_directory="$(pwd)/sketchfab"
+
+token_url="https://sketchfab.com/settings/password"
+token_file="$sketchfab_directory/token"
 token=$(cat "$token_file")
+
+uid_list="$sketchfab_directory/uid-list"
+
+
+if [[ ! -d "$sketchfab_directory" ]]
+then
+	mkdir "$sketchfab_directory"
+else
+	echo "${green}Sketchfab work directory exists - Continuing...${reset}"
+
+	if [[ ! -e "$token_file" ]]
+	then
+		echo "${yellow}Token file not found.${reset}"
+		echo "${yellow}Please input your API token from the Sketchfab settings page under 'Password & API'.${reset}"
+		echo "${yellow}Please use copy + paste to prevent errors during input.${reset}"
+		echo ""
+
+		sleep 1
+
+		echo "${cyan}Opening settings page:${reset} $token_url"
+		echo ""
+
+		sleep 1
+
+		xdg-open "$token_url" > /dev/null
+		touch "$token_file"
+		parse_input
+		token_input="$?"
+
+		echo "$token_input" > $token_file
+	else
+		echo "${green}Token file exists - Continuing...${reset}"
+		echo "${green}Token...:${reset} $token"
+		echo ""
+	fi
+
+	if [[ ! -e "$uid_list" ]]
+	then
+		echo "${yellow}UIDs list file not found - Creating.${reset}"
+		echo ""
+
+		touch "$uid_list"
+	else
+		echo "${green}UIDs list file file exists - Continuing...${reset}"
+
+		if [[-s "$uid_list" ]]
+		then
+			echo "${green}UIDs list file is populated.${reset}"
+			echo "${green}Entries...:${reset} $(wc -l $uid_list | awk '{print $1}')"
+		else
+			: # pass
+		fi
+	fi
+fi
 
 # Define setup defaults
 
-description_default="This model has been created by Nathanel Titane. </br> For more information, please visit </br> http://www.nathaneltitane.blogspot.com </br> or e-mail me at </br> nathanel.titane@gmail.com"
-tags_default="3d 3ds 3dsmax armogyres armor armored armoredcore armoredknights armors arms armsframe assault battle battleplatforms blender cad cataphract cataphracts combat core design fortresses frame frames gear ghost ghostintheshell gundam heavy heavygear in knights labors ldd ldraw ldview lego leocad lpub macross mech mecha mechanical mechanicalminions micro micropowerarmors microveritechs minions mlcad mobile mobileassaultframes mobilefortresses mobilesuit mobilesuits mobilethrusterframes moc nathanel nathaneltitane orbital orbitalframes platforms pod pods power powerarmor powerarmors reframe shell skeletal skeletalassaultpods suit suits the thruster titane transformer transformers variablefighter veritech veritechs"
+# Format description using HTML line break to prevent words cutting off on  website description panel
 
+full_name="Nathanel Titane"
+website_url="http://www.nathaneltitane.blogspot.com"
+email_address="nathanel.titane@gmail.com"
+
+description_default="This model has been created by $full_name. </br> For more information, please visit </br> $website_url </br> or e-mail me at </br> $email_address"
+
+# Maximum allowed number of tags: 42
+
+tags_default="3d armogyres armoredcore armoredknights armsframe battleplatforms blender cad cataphract design fortresses frames ghostintheshell gundam heavygear labors ldd ldraw ldview lego leocad lpub macross mecha mechanicalminions micropowerarmors microveritechs mlcad mobileassaultframes mobilefortresses mobilesuits mobilethrusterframes moc nathaneltitane nathanel titane orbitalframes powerarmors skeletalassaultpods transformers variablefighters veritechs"
 
 if [[ "$setting_option" = "about" ]]
 then
@@ -268,7 +389,9 @@ then
 
 	done < "$uid_list"
 else
-	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
+	# Specify directory location or exit on 'Cancel'
+
+	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
 
 	IFS=$'\n'
 	selection=($directory)

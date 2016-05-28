@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2016
 
 shopt -s extglob globstar nullglob
 
@@ -21,16 +21,18 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="08-05-2016"
+version="26-05-2016"
 script=$(basename -- "$0")
 
 while (($#))
 do
 	case "$1" in
 		-d|--description)
-			mode="description";;
+			mode="description"
+			;;
 		-n|--number)
-			mode="number";;
+			mode="number"
+			;;
 		-h|--help)
 			echo -e "Usage:"
 			echo -e "./$script [OPTION]"
@@ -54,22 +56,112 @@ do
 	shift
 done
 
+# Test for utility dependencies and requirements
+
+for binary in \
+"curl" \
+"wget" \
+"unzip" \
+"zip"
+do
+	binary=$(which $binary)
+
+	if [[ -z "$binary" ]] # If binary is not found or unspecified
+	then
+		echo "${yellow}The '$binary' binary does not seem to be installed or present on your system.${reset}"
+		echo "${yellow}Would you like to specify its location manually? [ Yes | No ]${reset}"
+
+		read reply
+
+		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		then
+			# Specify binary location or exit on 'Cancel'
+
+			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+
+			binary="$bnary_path/$binary"
+		else
+			echo "${red}Could not specify '$binary' binary installed on system.${reset}"
+			echo "${red}Please install '$binary' using your system's package manager${reset}"
+			echo "${red}and restart this utility when you are done.${reset}"
+			echo ""
+			exit 1
+		fi
+
+	elif [[ ! -z "$binary" ]] # If binary exists
+	then
+		echo "${green}'$binary' binary found on system - Continuing...${reset}"
+		echo ""
+	fi
+
+	sleep 1
+done
+
 # LDraw parts library directory check
 
 if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 then
-	echo "${green}Operating within the LDraw parts library directory. Continuing...${reset}"
+	echo "${green}Operating within the LDraw parts directory. Continuing...${reset}"
 
 	directory="parts"
-else
-	echo "${yellow}LDraw parts library directory not found.${reset}"
+elif [[ "$(basename $(pwd))" != [lL][dD][rR][aA][wW] ]]
+then
+	echo "${yellow}LDraw parts directory not found.${reset}"
 	echo "${yellow}Please specify the LDraw parts library directory location.${reset}"
 
-	browse=$(zenity --file-selection --directory --title="Select the LDraw parts directory location") 2> /dev/null || exit # Specify directory location or exit on 'Cancel'
+	# Specify directory location or exit on 'Cancel'
+
+	browse=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
 
 	cd "$browse" || exit
 
 	directory="$browse/parts"
+else
+	echo "${yellow}LDraw parts directory not found or not setup on this system.${reset}"
+	echo "${yellow}Would you like to have the latest LDraw parts library downloaded and setup on your system?${reset}"
+
+	read reply
+
+	if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+	then
+		echo "${yellow}Please specify the LDraw parts library directory setup location.${reset}"
+
+		# Specify directory location or exit on 'Cancel'
+
+		setup_directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+
+		cd "$setup_directory" || exit
+
+		parts_url="http://www.ldraw.org/library/updates/complete.zip"
+		parts_archive=$(basename "$parts_url")
+
+		if [[ ! -z $(which wget) ]]
+		then
+			get_parts=$(wget --show-progress "$parts_url")
+
+		elif [[ ! -z $(which curl ) ]]
+		then
+			get_parts=$(curl -# "$parts_url" > "$parts_archive")
+		else
+			echo "${red}Cannot find suitable utility to fetch the LDraw parts archive - Aborting...${reset}"
+		fi
+
+		echo "${cyan}Downloading...${reset}"
+		echo ""
+		"$get_parts"
+
+		echo "${cyan}Extracting...${reset}"
+		echo ""
+		unzip "$parts_archive"
+
+		cd $setup_directory/[lL][dD][rR][aA][wW]/parts || exit
+	else
+		echo "${red}LDraw parts directory not setup on system - Exiting...${reset}"
+		echo "${cyan}Please visit http://www.ldraw.org to get started.${reset}"
+		echo "${cyan}You may restart this utility to generate the parts list needed for some editors to function${reset}"
+		echo "${cyan}once the LDraw parts library has been downloaded and extracted on your system.${reset}"
+		exit 1
+	fi
 fi
 
 # Parts list verification and backup

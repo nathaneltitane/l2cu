@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2014
+# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2016
 
 shopt -s extglob globstar nullglob
 
@@ -28,13 +28,17 @@ while (($#))
 do
 	case "$1" in
 		-l|--ldr)
-			extension_filter="ldr";;
+			extension_filter="ldr"
+			;;
 		-m|--mpd)
-			extension_filter="mpd";;
+			extension_filter="mpd"
+			;;
 		-3ds)
-			option="3ds";;
+			option="3ds"
+			;;
 		-wf|--wavefront)
-			option="wavefront";;
+			option="wavefront"
+			;;
 		-h|--help)
 			echo -e "Usage:"
 			echo -e "./$script [EXTENSION] [OPTION]"
@@ -59,6 +63,45 @@ do
 			;;
 		esac
 	shift
+done
+
+# Test for utility dependencies and requirements
+
+for binary in \
+"leocad" \
+"blender"
+do
+	binary=$(which $binary)
+
+	if [[ -z "$binary" ]] # If binary is not found or unspecified
+	then
+		echo "${yellow}The '$binary' binary does not seem to be installed or present on your system.${reset}"
+		echo "${yellow}Would you like to specify its location manually? [ Yes | No ]${reset}"
+
+		read reply
+
+		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		then
+			# Specify binary location or exit on 'Cancel'
+
+			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+
+			binary="$bnary_path/$binary"
+		else
+			echo "${red}Could not specify '$binary' binary installed on system.${reset}"
+			echo "${red}Please install '$binary' using your system's package manager${reset}"
+			echo "${red}and restart this utility when you are done.${reset}"
+			echo ""
+			exit 1
+		fi
+
+	elif [[ ! -z "$binary" ]] # If binary exists
+	then
+		echo "${green}'$binary' binary found on system - Continuing...${reset}"
+		echo ""
+	fi
+
+	sleep 1
 done
 
 if [[ "$extension_filter" == "ldr" ]]
@@ -95,35 +138,88 @@ else
 	echo ""
 fi
 
+# Generate temporary directory
+
+beautify=$(mktemp /tmp/beautify.XXXXXX)
+trap 'rm -rf "$beautify"' EXIT
+
+# Push python blender beautifier conversion script to temporary file
+
+cat > "$beautify" << 'PYTHON'
+#!/usr/bin/env python3
+
+import os
+import bpy
+context = bpy.context
+
+# prepare scene #
+
+for obj in context.scene.objects:
+	obj.select = True
+
+bpy.ops.object.delete()
+
+# read file path from file #
+
+with open("/tmp/model_file", "r") as file:
+	export_model = file.read().rstrip()
+
+# import #
+
+bpy.ops.import_scene.autodesk_3ds(filepath=export_model)
+
+# join objects #
+
+context.scene.objects.active = context.selected_objects[0]
+bpy.ops.object.join()
+
+# normalize transforms #
+bpy.ops.object.transform_apply(
+	location = True,
+	rotation = True,
+	scale = True
+)
+
+# add smooth shade and edge split modifiers #
+
+bpy.ops.object.shade_smooth()
+bpy.ops.object.modifier_add(
+	type = "EDGE_SPLIT"
+)
+
+# remove doubles #
+
+bpy.ops.object.editmode_toggle()
+bpy.ops.mesh.remove_doubles()
+bpy.ops.mesh.normals_make_consistent(
+	inside = False
+)
+bpy.ops.object.editmode_toggle()
+
+# save #
+
+blend_file = export_model.replace(".3ds",".blend")
+bpy.ops.wm.save_as_mainfile(
+	filepath = blend_file,
+	compress = True
+)
+
+# print output #
+
+print("saved as:", blend_file)
+PYTHON
+
 # Confirm options being used before processing
 
 echo "${cyan}Utility started using the $extension file format option.${reset}"
 echo "${cyan}Utility started using the $option file format option.${reset}"
 echo ""
 
-leocad=$(which leocad) # Define current portable 'leocad' binary location on system
-
-if [[ -z "$leocad" ]] # If 'leocad' binary is not found or unspecified
-then
-	echo "${yellow}The 'leocad' binary does not seem to be present on your system.${reset}"
-	echo "${yellow}Would you like to manually specify its location?${reset}"
-
-	read reply
-
-	if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-	then
-		leocad=$(zenity --file-selection  --multiple --separator=$'\n' --title="Select binary location") 2> /dev/null || exit # Specify binary location or exit on 'Cancel'
-	else
-		echo "${red}Could not specify or did not find the binary location.${reset}"
-		echo "${red}Cannot continue with the specified binary...${reset}"
-		echo "${red}Please install the package containing the 'leocad' binary on your system and restart this utility.${reset}"
-		exit 1
-	fi
-fi
-
 echo "${cyan}Please specify the directory in which you would like the ldraw model files to the be exported to the specified format.${reset}"
 
-directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit # Specify directory location or exit on 'Cancel'
+# Specify directory location or exit on 'Cancel'
+
+directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
 
 IFS=$'\n'
 selection=($directory)
@@ -150,8 +246,8 @@ do
 		exports_directory="/media/Disk/Dropbox/Lego/exports"
 		uid_list="/media/Disk/Dropbox/Linux/scripts/ldraw/sketchfab/uid-list"
 
-		model_beautifier="/media/Disk/Dropbox/Linux/scripts/ldraw/beautifier.py"
-		model_file_log="/tmp/model_file"
+		model_file_log=$(mktemp /tmp/model_file)
+		trap 'rm -rf "$model_file_log"' EXIT
 
 		model_export="${model##*/}"
 		model_export_name="${model_export%.*}"
@@ -184,7 +280,7 @@ do
 
 		echo "${cyan}Converting $model (blender)...${reset}"
 
-		blender --background --python "$model_beautifier" >> /dev/null
+		blender --background --python "$beautify" >> /dev/null
 
 		wait
 
@@ -274,7 +370,3 @@ do
 		echo ""
 	done
 done
-
-# Clean log file
-
-rm -rf "$model_file_log"
