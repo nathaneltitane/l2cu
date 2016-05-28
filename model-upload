@@ -234,12 +234,17 @@ update () {
 # Define environment setup routine
 
 environment () {
-	environment_data=$(cat './sketchfab/environment-data-new.json')
+	if [[ -z "$environment_data" ]]
+	then
+		echo "${red}Warning: The environment data file is currently empty.${reset}"
 
-	curl -# -k -X PATCH \
-		-H "Content-Type: application/json" \
-		-d "$environment_data" \
-				"${api_server_url}" > "${id_file}"
+		exit 1
+	else
+		curl -# -k -X PATCH \
+			-H "Content-Type: application/json" \
+			-d "$environment_data" \
+					"${api_server_url}" > "${id_file}"
+	fi
 }
 
 # Define model information update routine
@@ -259,14 +264,20 @@ token_url="https://sketchfab.com/settings/password"
 token_file="$sketchfab_directory/token"
 token=$(cat "$token_file")
 
+environment_file="$sketchfab_directory/environment-data"
+environment_data=$(cat "$environment_file")
+
 uid_list="$sketchfab_directory/uid-list"
 
+# Check for main directory
 
 if [[ ! -d "$sketchfab_directory" ]]
 then
 	mkdir "$sketchfab_directory"
 else
 	echo "${green}Sketchfab work directory exists - Continuing...${reset}"
+
+	# Check for token file under main directory
 
 	if [[ ! -e "$token_file" ]]
 	then
@@ -282,7 +293,9 @@ else
 
 		sleep 1
 
-		xdg-open "$token_url" > /dev/null
+		# Open Sketchfab user settings page
+
+		xdg-open "$token_url" & > /dev/null
 		touch "$token_file"
 		parse_input
 		token_input="$?"
@@ -291,6 +304,33 @@ else
 	else
 		echo "${green}Token file exists - Continuing...${reset}"
 		echo "${green}Token...:${reset} $token"
+		echo ""
+	fi
+
+	# Check for environment data file under main directory
+
+	if [[ ! -e "$environment_file" ]] # If environment data file does not exist
+	then
+		echo "${yellow}Environment data file not found - Creating.${reset}"
+		echo ""
+
+		touch "$environment_file"
+
+		echo "${red}Warning: The environment data file is currently empty.${reset}"
+		echo "${yellow}You can add or append environment data as a template.${reset}"
+		echo "${yellow}by manually copying or pulling partial or full environment data${reset}"
+		echo "${yellow}from a model or scene you've already uploaded to you sketchfab account.${reset}"
+
+	elif [[ ! -s "$environment_file" ]] # If environment data file exists but is empty
+	then
+		echo "${yellow}Warning: Environment data file exists but is empty.${reset}"
+		echo "${yellow}You can add or append environment data as a template.${reset}"
+		echo "${yellow}by manually copying or pulling partial or full environment data${reset}"
+		echo "${yellow}from a model or scene you've already uploaded to you sketchfab account.${reset}"
+
+	elif [[ -s "$environment_file" ]] # If environment data file exists and is populated
+	then
+		echo "${green}Environment data file exists and is populated - Continuing...${reset}"
 		echo ""
 	fi
 
