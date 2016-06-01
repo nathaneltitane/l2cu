@@ -1,7 +1,7 @@
 # git:ldraw | L2CU
 # LDraw Linux Command line Utilities (L2CU)
 
-This project aims at providing user running Linux-based distribution with the tools to handle LDraw related batch operations on their models and projects.
+This project aims at providing user running Linux-based distribution with the tools to handle LDraw related batch operations on multiple models and/or project files at a time.
 
 L2CU is split into 5 utilities that each handle a specific task, or set of tasks relative to a type of operation relative to the LDraw parts system or LDraw based digital Lego models (ldr) or model assemblies (mpd).
 
@@ -14,3 +14,8 @@ This utility comes in handy with the use of editors or other LDraw related appli
 
 # model-export
 
+'model-export', as its name implies, serves as a batch LDraw model file exporter, that can generate (with the use of leocad and blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s).
+
+Those exported formats can be used to then upload the models online for showcasing or presentation, using WebGL based services such as Sketchfab.
+
+# model-modify
