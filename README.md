@@ -43,9 +43,34 @@ The user can modify any ldr or mpd file in one of three ways:
 
 'model-render' enables the user to generate preset high defintion renders of the selected LDraw model files or projects (using ldview) as the main rendering engine.
 
-PLease refer to LDView's help manual to get you started on setting up your LDview/ldview preferences to generate the renderings using the visual settings and angles of your choice.
+The user is required to specify the latitude and longitude parameters of the camera as well as a file saving suffix to register the coordinates as a viewing angle to the file name:
+
+Defaults (as array): coordinates=("latitude,longitude") view=("Current View File Suffix")
+
+coordinates=(
+  "30,-135"
+  "30,45"
+  "30,180"
+  "30,0"
+)
+
+view=(
+	"Quarter Back"
+	"Quarter Front"
+	"Back"
+	"Front"
+)
+
+Please refer to LDView's help manual to get you started on setting up your LDview/ldview preferences to generate the renderings using the visual settings and angles of your choice.
 
 ###### [model-upload] (https://github.com/nathaneltitane/ldraw/blob/master/model-upload)
 
+'model-upload' is a complementary utility to 'model-export'. It enables the user to batch upload the exported and optimized 3D formats to [Sketchfab] (https://sketchfab.com) for public or private hosting and viewing of the selected models.
 
+This utility is extremly useful in the case of multiple unique model uploads (new) or model updates, which would normally take minutes per model, and thus making several updates or uploads a daunting task.
 
+The user must already be registered to the Sketchfab services and obtain the [API token] (https://sketchfab.com/settings/password) needed to enable communication with the hosting servers, for uploading, updating and setting environment and camera parameters to the uploaded files.
+
+The utility also warns of the limitation of free subscription accounts: the model file size limit is set to 50Mb. If and when possible, the exported format will be compressed to limit the file size and prevent any errors while uploading.
+
+An example of the output from both 'model-export' and 'model-upload' can be seen [here] (https://sketchfab.com/nathaneltitane/models): the models are optimized and fused single-object blend files exported from either mpd or ldr formats and uploaded or updated on a regular basis.
