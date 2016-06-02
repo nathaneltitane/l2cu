@@ -74,3 +74,7 @@ The user must already be registered to the Sketchfab services and obtain the [AP
 The utility also warns of the limitation of free subscription accounts: the model file size limit is set to 50Mb. If and when possible, the exported format will be compressed to limit the file size and prevent any errors while uploading.
 
 An example of the output from both 'model-export' and 'model-upload' can be seen [here] (https://sketchfab.com/nathaneltitane/models): the models are optimized and fused single-object blend files exported from either mpd or ldr formats and uploaded or updated on a regular basis.
+
+Bug reports and enhancement requests are welcome :)
+
+Feel free to follow developments and new model builds at my [Blog] (http://www.nathnaeltitane.blogspot.com) or follow the [Sketchfab Blog] (https://blog.sketchfab.com/tag/ldraw/) for Sketchfab/LDraw tutorials and editorials!
