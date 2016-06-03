@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="15-05-2016"
+version="03-06-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -69,7 +69,8 @@ done
 
 for binary in \
 "leocad" \
-"blender"
+"blender" \
+"zip"
 do
 	binary=$(which $binary)
 
