@@ -310,7 +310,7 @@ echo ""
 
 # Specify directory location or exit on 'Cancel'
 
-directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
 
 cd "$directory" || exit
 

@@ -97,7 +97,7 @@ do
 		then
 			# Specify binary location or exit on 'Cancel'
 
-			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
 
 			binary="$bnary_path/$binary"
 		else
@@ -431,7 +431,7 @@ then
 else
 	# Specify directory location or exit on 'Cancel'
 
-	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || echo "" && echo "${yellow}Cancel button pressed. Aborting...${reset}" && echo "" && sleep 3 && exit
+	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
 
 	IFS=$'\n'
 	selection=($directory)
