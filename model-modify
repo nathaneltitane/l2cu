@@ -365,7 +365,6 @@ do
 	read -r line
 	do
 		temporary_file="$model.tmp"
-		stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
 		line_number=$(( $line_number + 1 ))
 
@@ -391,11 +390,16 @@ do
 
 			if [[ "$option" = "color" ]]
 			then
-				color="$new_color"
+				if [[ "$color" = "$old_color" ]]
+				then
+					color="$new_color"
 
-				echo "${red}Changing..:${reset} $old_color"
-				echo "${red}Setting...:${reset} $new_color"
-				echo ""
+					echo "${red}Changing..:${reset} $old_color"
+					echo "${red}Setting...:${reset} $new_color"
+					echo ""
+				else
+					: # pass
+				fi
 			fi
 
 
@@ -415,6 +419,8 @@ do
 					if [[ "$color" = "$old_color" ]]
 					then
 						color="$new_color"
+					else
+						: # pass
 					fi
 				fi
 			fi
@@ -426,6 +432,8 @@ do
 
 	done < "$model" # Feed model input for parsing into loop
 
+	stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
 	if [[ "$force_write" = "force" ]]
 	then
 		reply="yes"
@@ -434,17 +442,17 @@ do
 		echo "${cyan}Would you like to write your changes to the original model file ($model)? [ Yes | No ]${reset}"
 
 		read reply
-	fi
 
-	if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-	then
-		echo "${yellow}Writing file ($model)...${reset}"
+		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		then
+			echo "${yellow}Writing file ($model)...${reset}"
 
-		mv "$temporary_file" "$model"
-	else
-		echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
+			mv "$temporary_file" "$model"
+		else
+			echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
 
-		mv "$temporary_file" "$stamp_${model_export_name%.tmp}.$extension"
+			mv "$temporary_file" "${model_export_name%.tmp}_modified_$stamp.$extension"
+		fi
 	fi
 done
 
