@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="26-05-2016"
+version="13-08-2016"
 script=$(basename -- "$0")
 
 while (($#))
