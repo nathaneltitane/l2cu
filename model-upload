@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="28-05-2016"
+version="16-08-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -99,7 +99,7 @@ do
 
 			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
 
-			binary="$bnary_path/$binary"
+			binary="$binary_path/$binary"
 		else
 			echo "${red}Could not specify '$binary' binary installed on system.${reset}"
 			echo "${red}Please install '$binary' using your system's package manager${reset}"
@@ -183,7 +183,7 @@ temporary_file+=("$id_file")
 
 # Define cleanup routine
 
-cleanup() {
+cleanup () {
 	rm "${temporary_file[@]}"
 }
 
@@ -343,7 +343,7 @@ else
 	else
 		echo "${green}UIDs list file file exists - Continuing...${reset}"
 
-		if [[-s "$uid_list" ]]
+		if [[ -s "$uid_list" ]]
 		then
 			echo "${green}UIDs list file is populated.${reset}"
 			echo "${green}Entries...:${reset} $(wc -l $uid_list | awk '{print $1}')"
@@ -358,7 +358,7 @@ fi
 # Format description using HTML line break to prevent words cutting off on  website description panel
 
 full_name="Nathanel Titane"
-website_url="http://www.nathaneltitane.blogspot.com"
+website_url="http://legolinux.com"
 email_address="nathanel.titane@gmail.com"
 
 description_default="This model has been created by $full_name. </br> For more information, please visit </br> $website_url </br> or e-mail me at </br> $email_address"
@@ -522,13 +522,22 @@ else
 			# Process model transfer
 
 			echo "${message}"
-			echo "${cyan}Transfering $model_upload_name...${reset}"
+			echo "${cyan}Transferring $model_upload_name...${reset}"
 			echo ""
 			"${transfer}"
 
 			wait
 
-			echo "$uid" > "$path/uid"
+			# Verify UID content input
+
+			if [[ -z "$uid" ]]
+			then
+				uid="N/A" # Add value to clarify UID statement for model
+				: # pass
+			else
+				echo "$uid" > "$path/uid"
+			fi
+
 			wait
 
 			echo ""
@@ -572,6 +581,17 @@ else
 				fi
 
 				iteration=$(( iteration+1 ))
+
+				# Verify UID content input and force UID write from temporary file when it appears
+
+				if [[ -z "$uid" ]]
+				then
+					: # pass
+				else
+					uid=$(cat $id_file | sed 's/{"uid":"//g;s/"}//g')
+
+					echo "$uid" > "$path/uid"
+				fi
 
 				echo -ne "${yellow}Processing: Timeout threshold in $timeout seconds...${reset} [ $iteration ]"'\r'
 				sleep 1
