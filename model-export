@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="03-06-2016"
+version="16-08-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -36,6 +36,9 @@ do
 		-3ds)
 			option="3ds"
 			;;
+		-b|--blender)
+			option="blender"
+			;;
 		-wf|--wavefront)
 			option="wavefront"
 			;;
@@ -47,6 +50,7 @@ do
 			echo -e "-l, --ldr \t\t Selects ldr file format as target."
 			echo -e "-m, --mpd \t\t Selects mpd file format as target."
 			echo -e "-3ds \t\t\t Export 3ds file format only."
+			echo -e "-b, --blender \t\t\t Export blender file format only."
 			echo -e "-wf, --wavefront \t Export wavefront (obj and mtl as zip archive) file format only."
 			echo -e "-h, --help \t\t Show help options."
 			echo -e "-v, --version \t Print version."
@@ -87,7 +91,7 @@ do
 
 			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
 
-			binary="$bnary_path/$binary"
+			binary="$binary_path/$binary"
 		else
 			echo "${red}Could not specify '$binary' binary installed on system.${reset}"
 			echo "${red}Please install '$binary' using your system's package manager${reset}"
@@ -100,6 +104,10 @@ do
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
+
+		leocad=$(which leocad)
+		blender=$(which blender)
+		zip=$(which zip)
 	fi
 
 	sleep 1
@@ -118,7 +126,7 @@ else
 	extension_filter="mpd"
 	extension="mpd"
 
-	echo "${yellow}Defaulting to mpd file format option.${reset}"
+	echo "${yellow}Defaulting to $extension file format option.${reset}" # Warning when no option set for file type
 	echo""
 fi
 
@@ -127,19 +135,25 @@ then
 	export_option="-3ds"
 	export_extension="3ds"
 
+elif [[ "$option" == "blender" ]]
+then
+	export_option="-3ds"
+	export_extension="blend"
+
 elif [[ "$option" == "wavefront" ]]
 then
 	export_option="-wf"
 	export_extension="obj"
 else
+	option="blender"
 	export_option="-3ds"
-	export_extension="3ds"
+	export_extension="blend"
 
-	echo "${yellow}Defaulting to 3ds file format option.${reset}" # Warning when no option set for file type
+	echo "${yellow}Defaulting to $export_extension file export option.${reset}" # Warning when no option set for export type
 	echo ""
 fi
 
-# Generate temporary directory
+# Generate temporary content
 
 beautify=$(mktemp /tmp/beautify.XXXXXX)
 trap 'rm -rf "$beautify"' EXIT
@@ -151,7 +165,13 @@ cat > "$beautify" << 'PYTHON'
 
 import os
 import bpy
+from sys import argv
+
 context = bpy.context
+
+# arguments #
+# [blender, --background, --python, script, 3ds]
+# model_path = argv[4]
 
 # prepare scene #
 
@@ -160,13 +180,9 @@ for obj in context.scene.objects:
 
 bpy.ops.object.delete()
 
-# read file path from file #
-
-with open("/tmp/model_file", "r") as file:
-	export_model = file.read().rstrip()
-
 # import #
 
+export_model = argv[4]
 bpy.ops.import_scene.autodesk_3ds(filepath=export_model)
 
 # join objects #
@@ -208,6 +224,7 @@ bpy.ops.wm.save_as_mainfile(
 # print output #
 
 print("saved as:", blend_file)
+bpy.ops.wm.quit_blender()
 PYTHON
 
 # Confirm options being used before processing
@@ -247,9 +264,6 @@ do
 		exports_directory="/media/Disk/Dropbox/Lego/exports"
 		uid_list="/media/Disk/Dropbox/Linux/scripts/ldraw/sketchfab/uid-list"
 
-		model_file_log=$(mktemp /tmp/model_file)
-		trap 'rm -rf "$model_file_log"' EXIT
-
 		model_export="${model##*/}"
 		model_export_name="${model_export%.*}"
 		model_export_name_clean="${model_export_name:5}"
@@ -269,103 +283,127 @@ do
 			mkdir -p "$exports_directory/$model_type_directory/$model_export_name_clean"
 		fi
 
-		echo "${cyan}Exporting $model ("$export_extension")...${reset}"
+		# Export 3DS file
 
-		"$leocad" "$model" "$export_option" "$current_file" &> /dev/null
+		if [[ "$option" = "3ds" ]]
+		then
+			echo "${cyan}Exporting $model ("$export_extension")...${reset}"
 
-		# Append current file to temporary log for confirmation
+			"$leocad" "$model" "$export_option" "$current_file" >> /dev/null
 
-		echo "$current_file" > "$model_file_log"
+			wait
+		fi
 
-		# Run blender beautifier to smooth surfaces and recalculate normals
+		# Export optimized blend file
 
-		echo "${cyan}Converting $model (blender)...${reset}"
+		if [[ "$option" = "blender" ]]
+		then
+			echo "${cyan}Exporting $model ("$export_extension")...${reset}"
 
-		blender --background --python "$beautify" >> /dev/null
+			# Generate 3DS file
 
-		wait
+			"$leocad" "$model" "$export_option" "$current_file" >> /dev/null
 
-		echo ""
+			echo "${cyan}Converting $model ("$export_extension")...${reset}"
 
-		# Archive .obj and respective .mtl files for exported model when using the wavefront file export option for easy model upload or update
+			# Import 3DS file into blender to create optimized blend file
 
-		if [[ mode="wavefront" ]] && [[ -e *.obj ]] && [[ -e *.mtl ]]
+			"$blender" --background --python "$beautify" "$current_file_3ds" >> /dev/null
+
+			# Cleanup
+
+			rm -rf "$current_file_3ds"
+
+			wait
+		fi
+
+		# Export wavefront file with materials archive
+
+		if [[ "$option" = "wavefront" ]] && [[ -e *.obj ]] && [[ -e *.mtl ]]
 		then
 			cd "$exports_directory/$model_path" || exit
 
+			# Archive .obj and respective .mtl files for exported model
+			# when using the wavefront file export option for easy model upload or update
+
 			zip "${model_export_name}.zip" {*.obj,*.mtl}
 			rm -rf {*.obj,*.mtl}
+
+			wait
 		fi
 
-		# Compare model name to uid list model entry and generate uid token file under model's export directory for proper update authentication
+		echo ""
+
+		# Compare model name to uid list model entry and generate uid token file
+		# under model's export directory for proper update authentication
+
+		# Read UID from list
 
 		while IFS=$'\t'
-		read -r uid model_name
+		read -r model_uid model_name
 		do
 			if [[ "$model_name" == "$model_export_name_clean" ]] # If model export name matches list entry
 			then
-				if [[ -s "$current_directory"/uid ]]
-				then
-					read_uid=$(cat "$current_directory"/uid)
-				fi
+				model_list_uid_message="${green}Model export name matches UID list entry...${reset}"
+				list_uid="$model_uid"
+				color=$(tput setaf 2) # green
 
-				echo "${green}Model export name matches UID list entry - Generating UID token...${reset}"
-
-				if [[ ! -e "$current_directory/uid" ]] # If UID file does not exist in export model directory
-				then
-					message="${red}No UID file detected for $model_name - Generating UID token...${reset}"
-					confirmation="${green}Found match..: [ $model_name - $model_export_name_clean ]${reset}"
-
-				elif [[ ! -s "$current_directory/uid" ]] # If UID file exists in export model directory but is empty
-				then
-					uid="$read_uid"
-					message="${yellow}UID file already exists [ empty ] - Writing UID token...${reset}"
-					confirmation="${yellow}Write confirmation:${reset} Model ID from file: $uid" # Confirm write
-
-				elif [[ -s "$current_directory/uid" ]] # If UID file exists in export model directory
-				then
-					uid="$read_uid"
-					message="${yellow}UID file already exists for $model_name...${reset}"
-					confirmation="${yellow}Model ID from file:${reset} $uid"
-				fi
-
-				uid=$uid
-				model_name=$model_export_name_clean
-
-				# Verify exported file size and display message accordingly (Free account model upload limit: 50MB)
-
-				model_size=$(ls -s --block-size=MB "$current_file_blend" | awk '{print $1}')
-
-				model_size_threshold="50"
-				model_size_number="${model_size%MB}"
-
-				if [[ "$model_size_number" -le "$model_size_threshold" ]]
-				then
-					model_size_message="${green}Model file size is below ${model_size_threshold}MB [ $model_size ]- File size threshold not exceeded.${reset}"
-					color=$(tput setaf 2) # green
-
-				elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
-				then
-					model_size_message="${red}Warning: Model file size is above ${model_size_threshold}MB [ $model_size ] - Model cannot be uploaded to free subscription account due to maximum size limitation.${reset}"
-					color=$(tput setaf 1) # red
-				fi
-
-				echo "$uid" > "$current_directory/uid"
-
-				echo "${message}"
-				echo "${confirmation}"
-				echo ""
-				echo "Model ID.....: $uid"
-				echo "Model name...: $model_name"
-				echo "${color}Model size...:${reset} $model_size"
-				echo ""
-				echo "${model_size_message}"
-				echo ""
+				echo "$model_uid" > "$current_directory/uid"
 			else
-				: #pass
+				: # pass
+
+				model_list_uid_message="${red}Model export name does not match UID list entry...${reset}"
+				list_uid="N/A"
+				color=$(tput setaf 1) # red
 			fi
 
 		done < "$uid_list"
+
+		# Read UID from file
+
+		if [[ -e "$current_directory/uid" ]]
+		then
+			model_read_uid_message="${green}UID file exists under model export directory...${reset}"
+			read_uid=$(cat "$current_directory"/uid)
+
+			if [[ -z "$read_uid" ]]
+			then
+				model_read_uid_message="${red}UID file empty or not found...${reset}"
+				read_uid="N/A"
+			fi
+		fi
+
+		# Verify exported file size and display message accordingly (Free account model upload limit: 50MB)
+
+		model_size=$(ls -s --block-size=MB "$current_file_blend" | awk '{print $1}')
+
+		model_size_threshold="50"
+		model_size_number="${model_size%MB}"
+
+		if [[ "$model_size_number" -le "$model_size_threshold" ]]
+		then
+			model_size_message="${green}Model file size is below ${model_size_threshold}MB [ $model_size ] - File size threshold not exceeded.${reset}"
+			color=$(tput setaf 2) # green
+
+		elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
+		then
+			model_size_message="${red}Warning: Model file size is above ${model_size_threshold}MB [ $model_size ] - Model cannot be uploaded to free subscription account due to maximum size limitation.${reset}"
+			color=$(tput setaf 1) # red
+		fi
+
+		echo "${message}"
+		echo "${confirmation}"
+		echo ""
+		echo "${model_list_uid_message}"
+		echo "Model ID (List)...: $list_uid"
+		echo "${model_read_uid_message}"
+		echo "Model ID (File)...: $read_uid"
+		echo ""
+		echo "Model name........: $model_export_name_clean"
+		echo "Model size........: $model_size"
+		echo ""
+		echo "${model_size_message}"
+		echo ""
 
 		echo "${cyan}Done.${reset}"
 		echo ""
