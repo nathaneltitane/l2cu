@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="16-08-2016"
+version="18-08-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -588,7 +588,7 @@ else
 				then
 					: # pass
 				else
-					uid=$(cat $id_file | sed 's/{"uid":"//g;s/"}//g')
+					uid=$(cat $id_file | sed 's/{"uid":"//g;s/",".*//g')
 
 					echo "$uid" > "$path/uid"
 				fi
