@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="13-08-2016"
+version="20-08-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -283,9 +283,9 @@ parse_colors () {
 
 		if [[ "$color_input" == "$ldraw_color_name" || "$color_input" == "$ldraw_color_number" || "$color_input" == "$ldraw_color_hex_value" ]]
 		then
-			echo "Color name................: ${ldraw_color_name}" 		# Confirmation
-			echo "Color number..............: ${ldraw_color_number}"	# Confirmation
-			echo "Color hexadecimal value...: ${ldraw_color_hex_value}"	# Confirmation
+			echo "Color name................: ${ldraw_color_name}" 			# Confirmation
+			echo "Color number..............: ${ldraw_color_number}"		# Confirmation
+			echo "Color hexadecimal value...: ${ldraw_color_hex_value}"		# Confirmation
 
 			return "$ldraw_color_number"
 		fi
@@ -306,6 +306,12 @@ parse_parts () {
 
 echo "${cyan}Utility started using the $extension file format option.${reset}"
 echo "${cyan}Utility started using the $option modification option.${reset}"
+
+if [[ "$force_write" = "force" ]]
+then
+echo "${red}'Force write' option enabled - chages will be written to original model file!${reset}"
+fi
+
 echo ""
 
 # Specify directory location or exit on 'Cancel'
@@ -432,7 +438,9 @@ do
 
 	done < "$model" # Feed model input for parsing into loop
 
-	stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+	stamp=$(date +"%m-%d-%Y-%H-%M-%S") # Current date stamp
+
+	# Write changes to file?
 
 	if [[ "$force_write" = "force" ]]
 	then
@@ -442,17 +450,17 @@ do
 		echo "${cyan}Would you like to write your changes to the original model file ($model)? [ Yes | No ]${reset}"
 
 		read reply
+	fi
 
-		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-		then
-			echo "${yellow}Writing file ($model)...${reset}"
+	if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+	then
+		echo "${yellow}Writing file ($model)...${reset}"
 
-			mv "$temporary_file" "$model"
-		else
-			echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
+		mv "$temporary_file" "$model"
+	else
+		echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
 
-			mv "$temporary_file" "${model_export_name%.tmp}_modified_$stamp.$extension"
-		fi
+		mv "$temporary_file" "${model_export_name%.tmp}_modified_$stamp.$extension"
 	fi
 done
 
