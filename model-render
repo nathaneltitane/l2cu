@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="22-05-2016"
+version="02-09-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -39,6 +39,15 @@ do
 		-a|--animated)
 			option="animated"
 			;;
+		-F|--flat)
+			option="flat"
+			;;
+		-FL|--flat-lines)
+			option="flat-lines"
+			;;
+		-W|--wireframe)
+			option="wireframe"
+			;;
 		-h|--help)
 			echo -e "Usage:"
 			echo -e "./$script [EXTENSION] [OPTION]"
@@ -47,9 +56,14 @@ do
 			echo -e "-l, --ldr \t\t Selects ldr file format as target."
 			echo -e "-m, --mpd \t\t Selects mpd file format as target."
 			echo -e "-f, --fixed \t\t Renders series of images according to fixed view presets."
-			echo -e "-a, --animated \t Renders series of images to combine into a 360 degree rotational animation."
+			echo -e "-a, --animated \t\t Renders series of images to combine into a 360 degree rotational animation."
+
+			echo -e "-F, --flat \t\t Renders image using 'flat' preset (Lighting: Off, Edges: Off)."
+			echo -e "-FL, --flat-lines \t Renders image using 'flat-lines' preset (Lighting: Off, Edges: On)."
+			echo -e "-W, --wireframe \t Renders image using 'wireframe' preset (Lighting: Off, Wireframe: On, Fog: On [Default])."
+
 			echo -e "-h, --help \t\t Show help options."
-			echo -e "-v, --version \t Print version."
+			echo -e "-v, --version \t\t Print version."
 			exit
 			;;
 		-v|--version)
@@ -67,16 +81,16 @@ done
 
 # Test for utility dependencies and requirements
 
-for binary in \
+for binary_name in \
 "LDView" \
 "ldview" \
 "convert"
 do
-	binary=$(which $binary)
+	binary=$(which $binary_name)
 
 	if [[ -z "$binary" ]] # If binary is not found or unspecified
 	then
-		echo "${yellow}The '$binary' binary does not seem to be installed or present on your system.${reset}"
+		echo "${yellow}The '$binary_name' binary does not seem to be installed or present on your system.${reset}"
 		echo "${yellow}Would you like to specify its location manually? [ Yes | No ]${reset}"
 
 		read reply
@@ -87,10 +101,10 @@ do
 
 			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
 
-			binary="$bnary_path/$binary"
+			binary="$binary_path/$binary"
 		else
-			echo "${red}Could not specify '$binary' binary installed on system.${reset}"
-			echo "${red}Please install '$binary' using your system's package manager${reset}"
+			echo "${red}Could not specify '$binary_name' binary installed on system.${reset}"
+			echo "${red}Please install '$binary_name' using your system's package manager${reset}"
 			echo "${red}and restart this utility when you are done.${reset}"
 			echo ""
 			exit 1
@@ -118,28 +132,44 @@ else
 	extension_filter="mpd"
 	extension="mpd"
 
-	echo "${yellow}Defaulting to mpd file format option.${reset}"
+	echo "${yellow}Defaulting to $extension file format option.${reset}"
 	echo ""
 fi
 
 if [[ "$option" == "preset" ]]
 then
-	preset="fixed"
+	position_preset="fixed"
 
 elif [[ "$option" == "animated" ]]
 then
-	preset="animated"
+	position_preset="animated"
 else
-	preset="fixed"
+	position_preset="fixed"
 
-	echo "${yellow}Defaulting to fixed render preset options.${reset}"
+	echo "${yellow}Defaulting to $position_preset render preset options.${reset}"
 	echo ""
+fi
+
+if [[ "$option" == "flat" ]]
+then
+	render_preset="flat"
+
+elif [[ "$option" == "flat-lines" ]]
+then
+	render_preset="flat-lines"
+
+elif [[ "$option" == "wireframe" ]]
+then
+	render_preset="wireframe"
+else
+	render_preset="standard"
 fi
 
 # Confirm options being used before processing
 
 echo "${cyan}Utility started using the $extension file format option.${reset}"
-echo "${cyan}Utility started using the $preset render preset options.${reset}"
+echo "${cyan}Utility started using the $position_preset position option.${reset}"
+echo "${cyan}Utility started using the $render_preset rendering option.${reset}"
 echo ""
 
 # Specify directory location or exit on 'Cancel'
@@ -164,11 +194,317 @@ do
 		model_type_directory=${path[6]}
 		model_directory=${path[7]}
 
-		if [[ "$preset" == "fixed" ]]
+		# Define model renders top directory
+
+		models_directory="/media/Disk/Dropbox/Public/www/blog/var/www/blog/models"
+
+		# Define LDView main render routine
+
+		run_ldview () {
+
+			# General
+
+			ldrawdir="/home/nathanel/.ldraw"
+
+			backgroundcolor3=""
+			defaultcolor3=""
+			transdefaultcolor="1"
+			processldconfig="1"
+			randomcolors="0"
+
+			# General > Miscellaneous
+
+			linesmoothing="1"
+			showfps="0"
+			showaxes="0"
+			showerrors="0"
+			fov="45"
+			memoryusage="2"
+
+			# General > Default Save Directories
+
+			snapshotsdirmode="2"
+			snapshotsdir="$render_directory"
+
+			partslistsdirmode="2"
+			partslistsdir="/home/nathanel/.ldraw"
+
+			exportsdirmode="2"
+			exportsdir="/home/nathanel/.exports"
+
+			# Geometry > Model
+
+			seams="0"
+			seamwidth="50"
+			boundingboxesonly="0"
+
+			# Geometry > Wireframe
+
+			wireframe="0"
+			wireframefog="1"
+			removehiddenlines="0"
+			wireframethickness="1"
+
+			# Geometry > BFC
+
+			bfc="1"
+			redbackfaces="0"
+			greenfrontfaces="0"
+			blueneutralfaces="0"
+
+			# Geometry > Edge Lines
+
+			showhighlightlines="1"
+			edgesonly="0"
+			conditionalhighlights="1"
+			showalltype5="0"
+			showtype5controlpoints="0"
+			polygonoffset="1"
+			blackhighlights="0"
+			edgethickness="1"
+
+			# Effects > Lighting
+
+			lighting="1"
+			usequalitylighting="0"
+			subduedlighting="0"
+			usespecular="1"
+			onelight="0"
+
+			# Effects > Light Direction
+
+#			⎡ a b c ⎤
+#			⎢ d e f ⎥
+#			⎣ g h i ⎦
+
+			lightvector="0,0,1"			# [ e ] - Default
+
+#			lightvector="-1,1,1"		# [ a ]
+#			lightvector="0,1,1"			# [ b ]
+#			lightvector="1,1,1"			# [ c ]
+#			lightvector="-1,0,1"		# [ d ]
+#			lightvector="1,0,1"			# [ f ]
+#			lightvector="-1,-1,1"		# [ g ]
+#			lightvector="0,-1,1"		# [ h ]
+#			lightvector="1,-1,1"		# [ i ]
+
+			# Effects > LIGHT.DAT
+
+			drawlightdats="1"
+			optionalstandardlight="1"
+			nolightgeom="0"
+
+			# Effects > Stereo
+
+			stereomode="0"
+			stereospacing="50"
+
+			# Effects > Wireframe cutaway
+
+			cutawaymode="0"
+			cutawayalpha="100"
+			cutawaythickness="1"
+
+			# Effects > Transparency
+
+			sorttransparent="1"
+			usestipple="0"
+
+			# Effects > Miscellaneous
+
+			useflatshading="0"
+			performsmoothing="1"
+
+			# Primitives > Primitive Substitution
+
+			allowprimitivesubstitution="1"
+			curvequality="8"
+
+			# Primitives > Textures
+
+			texmaps="0"
+			texturestuds="0"
+			anisolevel="1"				# Anisotropic: 2x - 16x - AnisoLevel: 2 >> 16
+			texturefiltertype="9987"	# Nearest:9984 | Bilinear:9985 | Trilinear:9987
+
+			# Primitives > Miscellaneous
+
+			usequalitystuds="1"
+			hiresprimitives="1"
+
+			# Updates > Internet Proxy
+
+			proxytype="0"
+
+			# Updates > Missing Parts
+
+			checkparttracker="0"
+			checkpartwait="7"
+			checkpartupdatewait="7"
+
+			# Window
+
+			windowheight="400"
+			windowwidth="400"
+			viewmode="0"
+
+			# Snapshot Options > Snapshot Series
+
+			saveseries="1"
+			savedigits="1"
+
+			# Snapshot Options > Save with specific size
+
+			saveactualsize="1"
+			savewidth="3000"
+			saveheight="3000"
+			savezoomtofit="1"							# Forces centering of model when coupled with 'DefaultZoom' value
+			saveimagetype="1"
+
+			# Snapshot Options > Miscellaneous
+
+			savealpha="1"
+			autocrop="0"
+
+			# Snapshot Options > Steps
+
+			savesteps="0"
+			savestepssuffix="-step"
+			savestepssamescale="1"
+
+			# Command line options
+
+			modelcenter="0.0,0.0,0.0"
+			savesnapshots=1
+			snapshotsuffix=".png"
+			savedir="$render_directory"
+			defaultzoom=0.9								# Bug: cannot go over 0.5 zoom value due to canvas stitching bug
+			defaultlatlong=${coordinates[position]}
+
+			# Preset overrides
+
+			if [[ "$render_preset" == "flat" ]]
+			then
+				# Flat preset override
+
+				lighting="0"
+				showhighlightlines="0"
+
+			elif [[ "$render_preset" == "flat-lines" ]]
+			then
+				# Flat-Lines preset override
+
+				lighting="0"
+				showhighlightlines="1"
+
+			elif [[ "$render_preset" == "wireframe" ]]
+			then
+				# Wireframe-preset override
+
+				lighting="0"
+				wireframe="1"
+			else
+				# Standard presets override
+
+				lighting="1"
+				showhighlightlines="1"
+			fi
+
+			# Main  render routine
+
+			ldview \
+				-LDrawDir="$ldrawdir" \
+				-BackgroundColor3="$backgroundcolor3" \
+				-DefaultColor3="$defaultcolor3" \
+				-TransDefaultColor="$transdefaultcolor" \
+				-ProcessLDConfig="$processldconfig" \
+				-RandomColors="$randomcolors" \
+				-LineSmoothing="$linesmoothing" \
+				-ShowFPS="$showfps" \
+				-ShowAxes="$showaxes" \
+				-ShowErrors="$showerrors" \
+				-FOV="$fov" \
+				-MemoryUsage="$memoryusage" \
+				-SnapshotsDirMode="$snapshotsdirmode" \
+				-SnapshotsDir="$snapshotsdir" \
+				-PartsListsDirMode="$partslistsdirmode" \
+				-PartsListsDir="$partslistsdir" \
+				-ExportsDirMode="$exportsdirmode" \
+				-ExportsDir="$exportsdir" \
+				-Seams="$seams" \
+				-SeamWidth="$seamwidth" \
+				-BoundingBoxesOnly="$boundingboxesonly" \
+				-Wireframe="$wireframe" \
+				-WireframeFog="$wireframefog" \
+				-RemoveHiddenLines="$removehiddenlines" \
+				-WireframeThickness="$wireframethickness" \
+				-BFC="$bfc" \
+				-RedBackFaces="$redbackfaces" \
+				-GreenFrontFaces="$greenfrontfaces" \
+				-BlueNeutralFaces="$blueneutralfaces" \
+				-ShowHighlightLines="$showhighlightlines" \
+				-EdgesOnly="$edgesonly" \
+				-ConditionalHighlights="$conditionalhighlights" \
+				-ShowAllType5="$showalltype5" \
+				-ShowType5ControlPoints="$showtype5controlpoints" \
+				-PolygonOffset="$polygonoffset" \
+				-BlackHighlights="$blackhighlights" \
+				-EdgeThickness="$edgethickness" \
+				-Lighting="$lighting" \
+				-UseQualityLighting="$usequalitylighting" \
+				-SubduedLighting="$subduedlighting" \
+				-UseSpecular="$usespecular" \
+				-OneLight="$onelight" \
+				-LightVector="$lightvector" \
+				-DrawLightDats="$drawlightdats" \
+				-OptionalStandardLight="$optionalstandardlight" \
+				-NoLightGeom="$nolightgeom" \
+				-StereoMode="$stereomode" \
+				-StereoSpacing="$stereospacing" \
+				-CutawayMode="$cutawaymode" \
+				-CutawayAlpha="$cutawayalpha" \
+				-CutawayThickness="$cutawaythickness" \
+				-SortTransparent="$sorttransparent" \
+				-UseStipple="$usestipple" \
+				-UseFlatShading="$useflatshading" \
+				-PerformSmoothing="$performsmoothing" \
+				-AllowPrimitiveSubstitution="$allowprimitivesubstitution" \
+				-CurveQuality="$curvequality" \
+				-Texmaps="$texmaps" \
+				-TextureStuds="$texturestuds" \
+				-AnisoLevel="$anisolevel" \
+				-TextureFilterType="$texturefiltertype" \
+				-UseQualityStuds="$usequalitystuds" \
+				-HiResPrimitives="$hiresprimitives" \
+				-ProxyType="$proxytype" \
+				-CheckPartTracker="$checkparttracker" \
+				-CheckPartWait="$checkpartwait" \
+				-CheckPartUpdateWait="$checkpartupdatewait" \
+				-SaveSeries="$saveseries" \
+				-SaveDigits="$savedigits" \
+				-SaveActualSize="$saveactualsize" \
+				-SaveWidth="$savewidth" \
+				-SaveHeight="$saveheight" \
+				-SaveZoomToFit="$savezoomtofit" \
+				-SaveImageType="$saveimagetype" \
+				-SaveAlpha="$savealpha" \
+				-AutoCrop="$autocrop" \
+				-SaveSteps="$savesteps" \
+				-SaveStepsSuffix="$savestepssuffix" \
+				-SaveStepsSameScale="$savestepssamescale" \
+				-ModelCenter="$modelcenter" \
+				-SaveSnapshots="$savesnapshots" \
+				-SnapshotSuffix="$snapshotsuffix" \
+				-SaveDir="$savedir" \
+				-DefaultZoom="$defaultzoom" \
+				-DefaultLatLong="$defaultlatlong" "$1"
+		}
+
+		if [[ "$position_preset" == "fixed" ]]
 		then
 			# Define directory and render parameters for standard preset
 
-			renders_directory="/media/Disk/Dropbox/Public/models" # Define model renders top directory for standard preset
+			top_directory="$models_directory" # Define model renders top directory for fixed preset
 
 			coordinates=(
 				"30,-135"
@@ -178,139 +514,99 @@ do
 			)
 
 			view=(
-				"Quarter Back"
-				"Quarter Front"
-#				"Back"
-#				"Front"
+				"-quarter-back"
+				"-quarter-front"
+#				"-back"
+#				"-front"
 			)
 
+			cameraglobe=""
 			radius="" # Radius value as null: no need to specify the radius value on standard latitude + longitude camera preset (automatic zoom)
 
-			height="1440"
-			width="1440"
-			background_color=""
-			save_alpha="1"
-			zoom_to_fit="1" # Forces centering of model when coupled with zoom value
-			zoom="0.9" # Bug: cannot go over 0.5 zoom value due to canvas stitching bug
 		fi
 
-		if [[ "$preset" == "animated" ]] # animated preset conditional
+		if [[ "$position_preset" == "animated" ]] # animated preset conditional
 		then
 			# Define directory and render parameters for animated preset
 
-			renders_directory="/media/Disk/Dropbox/Public/models/360" # Define model renders top directory for animated preset
+			top_directory="$models_directory/360" # Define model renders top directory for animated preset
 
 			coordinates=(0,{0..359})	# Define coordinates array using degree range as longitude:
-							# cannot use variable string substitution into array for iteration
+										# cannot use variable string substitution into array for iteration
 
-			view=({0..359})			# Define view array using degree range as longitude:
-							# cannot use variable string substitution into array for iteration
+			view=({0..359})				# Define view array using degree range as longitude:
+										# cannot use variable string substitution into array for iteration
 
-			height="360"
-			width="360"
-			background_color="0xffffff"
-			save_alpha="0"
-			zoom_to_fit="0"
-			zoom="0.5"
+			# Animated presets override
+
+			backgroundcolor3="0xffffff"
+			defaultzoom="0.5"			# Bug: cannot go over 0.5 zoom value due to canvas stitching bug
+			savealpha="0"
+			saveheight="360"
+			savewidth="360"
+			savezoomtofit="0"			# Forces centering of model when coupled with 'DefaultZoom' value
+
+			# Compile snapshots 0 to 359 into animated gif using ImageMagick 'convert'
+
+			frames_directory="$top_directory/frames"
+
+			echo "${cyan}Compiling animation...${reset}"
+
+			convert \
+				-delay 5 \
+				-layers OptimizePlus \
+				-quality 99 \
+				-loop 0 "$final_file (%d)$snapshotsuffix[0-359]" "$final_file-animated.gif"
+
+			if [[ ! -d "$frames_directory" ]] # Generate 'frames' directory for cleanup if it does not exist
+			then
+				mkdir -p "$frames_directory"
+			fi
+
+			# Cleanup
+
+			echo "${cyan}Cleaning up...${reset}"
+
+			mv "${top_directory%/}"/**/*"$snapshotsuffix" "$frames_directory"
 		fi
 
-		range=${#coordinates[@]} # Define range as coordinates array positional values
+		# Render
+
+		range=${#coordinates[@]} # Define range as coordinates array containing positional values
 
 		for (( position=0; position < $range; position++ ))
 		do
-			# Define file and extension variables
+			# Define file naming variables
 
-			model_render="${model##*/}"
-			model_render_name="${model_render%.*}"
-			model_render_name_clean="${model_render_name:5}"
+			model_file="${model##*/}"					# Get model file name from path
+			model_file_name="${model_file%.*}"			# Strip extension from model file name
+			model_render_name="${model_file_name:3}"	# Strip first 3 characters from model file name (normally '00-')
 
-			current_file="$renders_directory/$model_type_directory/$model_render_name_clean/$model_render_name"
-			final_file="$renders_directory/$model_type_directory/$model_render_name_clean/$model_render_name_clean"
-			position_file="$renders_directory/$model_type_directory/$model_render_name_clean/$model_render_name_clean (${view[position]})"
+			# Define render directory location by model
 
-			fov="45"
-			render_extension="png"
+			render_directory="$top_directory/$model_type_directory/$model_render_name"
 
 			# Check for the renders directory existence
 
-			if [ ! -d "$renders_directory" ]
+			if [ ! -d "$render_directory" ]
 			then
-				mkdir -p "$renders_directory"
+				mkdir -p "$render_directory"
 			fi
 
-			cd "$renders_directory" || exit
-
-			if [ ! -d "$renders_directory/$model_type_directory/$model_render_name_clean" ]
-			then
-				mkdir -p "$renders_directory/$model_type_directory/$model_render_name_clean"
-			fi
+			cd "$render_directory" || exit
 
 			# Render model using specified parameters according to rendering preset
 
-			echo "${cyan}Rendering $model_render_name_clean (${view[position]})...${reset}"
+			echo "${cyan}Rendering $model_render_name${view[position]}...${reset}"
 
-			ldview \
-			-FOV="$fov" \
-			-ModelCenter=0.0,0.0,0.0 \
-			-BackgroundColor3="$background_color" \
-			-SaveAlpha="$save_alpha" \
-			-ProcessLDConfig=1 \
-			-SaveSnapshots=1 \
-			-SaveZoomToFit="$zoom_to_fit" \
-			-DefaultZoom="$zoom" \
-			-SnapshotSuffix=."$render_extension" \
-			-SaveDir="$renders_directory/$model_type_directory/$model_render_name_clean" \
-			-SnapshotsDir="$renders_directory/$model_type_directory/$model_render_name_clean" \
-			-SnapshotsDirMode=2 \
-			-SaveHeight="$height" \
-			-SaveWidth="$width" \
-			-DefaultLatLong=${coordinates[position]} "$model"
+			run_ldview "$model"
 
 			wait
 
-			mv "$current_file.$render_extension" "$position_file.$render_extension"
-
-			# Generate Dropbox public URL for renders and append to file
-
-			url=$(dropbox puburl "$position_file.$render_extension")
-			url_file="$renders_directory/$model_type_directory/url"
-
-			echo "${yellow}Generating public URL...${reset}"
-			echo ""
-
-			echo "<img src=\"$url\"/>" >> "$url_file"
-
-			wait
+			mv "${model_file_name}${snapshotsuffix}" "${model_render_name}${view[position]}${snapshotsuffix}"
 		done
 
-	# Compile snapshots 0 to 359 into animated gif using ImageMagick 'convert'
-
-	if [[ "$preset" == "animated" ]]
-	then
-		frames_directory="$renders_directory/$model_type_directory/$model_render_name_clean/frames"
-
-		echo "${cyan}Compiling animation...${reset}"
-
-		convert \
-			-delay 5 \
-			-layers OptimizePlus \
-			-quality 99 \
-			-loop 0 "$final_file (%d).$render_extension[0-359]" "$final_file (Animated).gif"
-
-		if [[ ! -d "$frames_directory" ]] # Generate 'frames' directory for cleanup if it does not exist
-		then
-			mkdir -p "$frames_directory"
-		fi
-
-		# Cleanup
-
-		echo "${cyan}Cleaning up...${reset}"
-
-		mv "${renders_directory%/}"/**/*."$render_extension" "$frames_directory"
-	fi
-
-	echo "${cyan}Done.${reset}"
-	echo ""
-
+		echo "${cyan}Done.${reset}"
+		echo ""
 	done
 done
