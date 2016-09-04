@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="20-08-2016"
+version="03-09-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -369,24 +369,24 @@ tags_default="3d armogyres armoredcore armoredknights armsframe battleplatforms 
 
 if [[ "$setting_option" = "about" ]]
 then
-	while IFS=$'\t'
-		read -r uid model_name
+	while IFS=$'|'
+		read -r model_uid model_upload_name model_file_name model_web_id
 		do
 			description=$description_default
 			tags=$tags_default
 
-			uid="$uid"
+			uid="$model_uid"
 			api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
 			status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
 			model_url="https://sketchfab.com/models/${uid}"
-			message="${cyan}Setting description and tags for $model_name...${reset}"
+			message="${cyan}Setting description and tags for $model_upload_name...${reset}"
 			transfer=about
 
 			echo "${message}"
 			echo ""
 			"${transfer}"
 			echo ""
-			echo "${green}Model...:${reset} $model_name"
+			echo "${green}Model...:${reset} $model_upload_name"
 			echo "${green}UID.....:${reset} $uid"
 			echo "${green}URL.....:${reset} $model_url"
 
@@ -401,22 +401,22 @@ then
 
 elif [[ "$setting_option" = "environment" ]]
 then
-	while IFS=$'\t'
-	read -r uid model_name
+	while IFS=$'|'
+	read -r model_uid model_upload_name model_file_name model_web_id
 	do
-		uid="$uid"
+		uid="$model_uid"
 		api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
 		status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
 		model_url="https://sketchfab.com/models/${uid}"
-		message="${cyan}Setting ennvironment for $model_name...${reset}"
+		message="${cyan}Setting ennvironment for $model_upload_name...${reset}"
 		transfer=environment
 
 		echo "${message}"
-		echo "${cyan}Transfering environment parameters for $model_name...${reset}"
+		echo "${cyan}Transfering environment parameters for $model_upload_name...${reset}"
 		echo ""
 		"${transfer}"
 		echo ""
-		echo "${green}Model...:${reset} $model_name"
+		echo "${green}Model...:${reset} $model_upload_name"
 		echo "${green}UID.....:${reset} $uid"
 		echo "${green}URL.....:${reset} $model_url"
 
@@ -564,7 +564,7 @@ else
 			# Define counter variables
 
 			iteration="0"
-			timeout="320"
+			timeout="300" # 5 minutes
 
 			while [[ "${status}" != *SUCCEEDED* ]]
 			do

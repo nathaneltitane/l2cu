@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="20-08-2016"
+version="03-09-2016"
 script=$(basename -- "$0")
 
 while (($#))
@@ -104,6 +104,10 @@ do
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
+		
+		leocad=$(which leocad)
+		blender=$(which blender)
+		zip=$(which zip)
 	fi
 
 	sleep 1
@@ -255,28 +259,36 @@ do
 		model_type_directory=${path[6]}
 		model_directory=${path[7]}
 
-		# Define directory and file variables
+		# Define model exports top directory
 
 		exports_directory="/media/Disk/Dropbox/Lego/exports"
+		
+		# Define model exports UID list location
+		
 		uid_list="/media/Disk/Dropbox/Linux/scripts/ldraw/sketchfab/uid-list"
 
-		model_export="${model##*/}"
-		model_export_name="${model_export%.*}"
-		model_export_name_clean="${model_export_name:5}"
+		# Define file naming variables
 
-		current_directory="$exports_directory/$model_type_directory/$model_export_name_clean/"
-		current_file="$exports_directory/$model_type_directory/$model_export_name_clean/$model_export_name_clean.$export_extension"
+		model_file="${model##*/}"					# Get model file name from path
+		model_file_name="${model_file%.*}"			# Strip extension from model file name
+		model_export_name="${model_file_name:3}"	# Strip first 3 characters from model file name (normally '00-')
+
+		# Define render directory location by model
+
+		export_directory="$exports_directory/$model_type_directory/$model_export_name"
+		
+		export_file="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.$export_extension"
 
 		# Explicit file types
 
-		current_file_3ds="$exports_directory/$model_type_directory/$model_export_name_clean/$model_export_name_clean.3ds"
-		current_file_blend="$exports_directory/$model_type_directory/$model_export_name_clean/$model_export_name_clean.blend"
-
+		export_file_3ds="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.3ds"
+		export_file_blend="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.blend"
+		
 		# Check for the exports directory existence
 
-		if [ ! -d "$exports_directory/$model_type_directory/$model_export_name_clean" ]
+		if [ ! -d "$exports_directory/$model_type_directory/$model_export_name" ]
 		then
-			mkdir -p "$exports_directory/$model_type_directory/$model_export_name_clean"
+			mkdir -p "$exports_directory/$model_type_directory/$model_export_name"
 		fi
 
 		# Export 3DS file
@@ -284,8 +296,13 @@ do
 		if [[ "$option" = "3ds" ]]
 		then
 			echo "${cyan}Exporting $model ("$export_extension")...${reset}"
+			
+			if [[ ! -d "$export_directory" ]]
+			then
+				mkdir -p "$export_directory"
+			fi
 
-			"$leocad" "$model" "$export_option" "$current_file" >> /dev/null
+			"$leocad" "$model" "$export_option" "$export_file" >> /dev/null
 
 			wait
 		fi
@@ -298,33 +315,49 @@ do
 
 			# Generate 3DS file
 
-			"$leocad" "$model" "$export_option" "$current_file" >> /dev/null
+			if [[ ! -d "$export_directory" ]]
+			then
+				mkdir -p "$export_directory"
+			fi
+
+			"$leocad" "$model" "$export_option" "$export_file" >> /dev/null
+
+			wait
 
 			echo "${cyan}Converting $model ("$export_extension")...${reset}"
 
 			# Import 3DS file into blender to create optimized blend file
 
-			"$blender" --background --python "$beautify" "$current_file_3ds" >> /dev/null
+			"$blender" --background --python "$beautify" "$export_file_3ds" >> /dev/null
 
 			# Cleanup
 
-			rm -rf "$current_file_3ds"
+			rm -rf "$export_file_3ds"
 
 			wait
 		fi
 
 		# Export wavefront file with materials archive
 
-		if [[ "$option" = "wavefront" ]] && [[ -e *.obj ]] && [[ -e *.mtl ]]
+		if [[ "$option" = "wavefront" ]]
 		then
-			cd "$exports_directory/$model_path" || exit
+					if [[ ! -d "$export_directory" ]]
+			then
+				mkdir -p "$export_directory"
+			fi
+
+			"$leocad" "$model" "$export_option" "$export_file" >> /dev/null
+			
+			cd "$export_directory" || exit
 
 			# Archive .obj and respective .mtl files for exported model
 			# when using the wavefront file export option for easy model upload or update
+			
+			export_file="${model_export_name}.zip"
 
-			zip "${model_export_name}.zip" {*.obj,*.mtl}
+			zip "$export_file" {*.obj,*.mtl}
 			rm -rf {*.obj,*.mtl}
-
+			
 			wait
 		fi
 
@@ -335,32 +368,45 @@ do
 
 		# Read UID from list
 
-		while IFS=$'\t'
-		read -r model_uid model_name
+		while IFS=$'\n'
+		read -r line
 		do
-			if [[ "$model_name" == "$model_export_name_clean" ]] # If model export name matches list entry
+			IFS='|'
+			read -r -a row <<<  "$(echo "$line" | sed 's/||*/|/g')"
+
+			model_uid=${row[0]}
+			model_upload_name=${row[1]}
+			model_file_name_list=${row[2]}
+			model_web_id=${row[3]}
+			
+			list_uid=""
+
+			if [[ "$model_export_name" == "$model_file_name_list" ]] # If model export name matches list entry
 			then
 				model_list_uid_message="${green}Model export name matches UID list entry...${reset}"
 				list_uid="$model_uid"
 				color=$(tput setaf 2) # green
 
-				echo "$model_uid" > "$current_directory/uid"
-			else
-				: # pass
-
-				model_list_uid_message="${red}Model export name does not match UID list entry...${reset}"
-				list_uid="N/A"
-				color=$(tput setaf 1) # red
+				echo "$model_uid" > "$export_directory/uid"
+			
+				break
 			fi
 
 		done < "$uid_list"
+		
+		if [ -z "$list_uid" ]
+		then
+			model_list_uid_message="${red}Model export name does not match UID list entry...${reset}"
+			list_uid="N/A"
+			color=$(tput setaf 1) # red
+		fi
 
 		# Read UID from file
 
-		if [[ -e "$current_directory/uid" ]]
+		if [[ -e "$export_directory/uid" ]]
 		then
 			model_read_uid_message="${green}UID file exists under model export directory...${reset}"
-			read_uid=$(cat "$current_directory"/uid)
+			read_uid=$(cat "$export_directory"/uid)
 
 			if [[ -z "$read_uid" ]]
 			then
@@ -371,7 +417,7 @@ do
 
 		# Verify exported file size and display message accordingly (Free account model upload limit: 50MB)
 
-		model_size=$(ls -s --block-size=MB "$current_file_blend" | awk '{print $1}')
+		model_size=$(ls -s --block-size=MB "$export_file" | awk '{print $1}')
 
 		model_size_threshold="50"
 		model_size_number="${model_size%MB}"
@@ -391,12 +437,12 @@ do
 		echo "${confirmation}"
 		echo ""
 		echo "${model_list_uid_message}"
-		echo "Model ID (List)...: $list_uid"
+		echo "Model ID [ List ]...: $list_uid"
 		echo "${model_read_uid_message}"
-		echo "Model ID (File)...: $read_uid"
+		echo "Model ID [ File ]...: $read_uid"
 		echo ""
-		echo "Model name........: $model_export_name_clean"
-		echo "Model size........: $model_size"
+		echo "Model name..........: $model_export_name"
+		echo "Model size..........: $model_size"
 		echo ""
 		echo "${model_size_message}"
 		echo ""
