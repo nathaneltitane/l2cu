@@ -356,8 +356,8 @@ do
 			# Snapshot Options > Save with specific size
 
 			saveactualsize="1"
-			savewidth="3000"
-			saveheight="3000"
+			savewidth="1000"
+			saveheight="1000"
 			savezoomtofit="1"							# Forces centering of model when coupled with 'DefaultZoom' value
 			saveimagetype="1"
 
