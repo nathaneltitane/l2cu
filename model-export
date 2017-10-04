@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="03-09-2016"
+version="25-08-2017"
 script=$(basename -- "$0")
 
 while (($#))
@@ -39,6 +39,9 @@ do
 		-b|--blender)
 			option="blender"
 			;;
+		-c|--collada)
+			option="collada"
+			;;
 		-wf|--wavefront)
 			option="wavefront"
 			;;
@@ -51,6 +54,7 @@ do
 			echo -e "-m, --mpd \t\t Selects mpd file format as target."
 			echo -e "-3ds \t\t\t Export 3ds file format only."
 			echo -e "-b, --blender \t\t\t Export blender file format only."
+			echo -e "-c, --collada \t Export collada file format only."
 			echo -e "-wf, --wavefront \t Export wavefront (obj and mtl as zip archive) file format only."
 			echo -e "-h, --help \t\t Show help options."
 			echo -e "-v, --version \t Print version."
@@ -104,7 +108,7 @@ do
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
-		
+
 		leocad=$(which leocad)
 		blender=$(which blender)
 		zip=$(which zip)
@@ -140,14 +144,19 @@ then
 	export_option="-3ds"
 	export_extension="blend"
 
+elif [[ "$option" == "collada" ]]
+then
+	export_option="-dae"
+	export_extension="dae"
+
 elif [[ "$option" == "wavefront" ]]
 then
-	export_option="-wf"
+	export_option="-obj"
 	export_extension="obj"
 else
-	option="blender"
-	export_option="-3ds"
-	export_extension="blend"
+	option="collada"
+	export_option="-dae"
+	export_extension="dae"
 
 	echo "${yellow}Defaulting to $export_extension file export option.${reset}" # Warning when no option set for export type
 	echo ""
@@ -208,6 +217,12 @@ bpy.ops.object.modifier_add(
 
 bpy.ops.object.editmode_toggle()
 bpy.ops.mesh.remove_doubles()
+
+# remove loose vertices #
+
+bpy.ops.mesh.select_loose()
+bpy.ops.mesh.delete(type='VERT')
+
 bpy.ops.mesh.normals_make_consistent(
 	inside = False
 )
@@ -262,9 +277,9 @@ do
 		# Define model exports top directory
 
 		exports_directory="/media/Disk/Dropbox/Lego/exports"
-		
+
 		# Define model exports UID list location
-		
+
 		uid_list="/media/Disk/Dropbox/Linux/scripts/ldraw/sketchfab/uid-list"
 
 		# Define file naming variables
@@ -276,14 +291,15 @@ do
 		# Define render directory location by model
 
 		export_directory="$exports_directory/$model_type_directory/$model_export_name"
-		
+
 		export_file="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.$export_extension"
 
 		# Explicit file types
 
 		export_file_3ds="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.3ds"
 		export_file_blend="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.blend"
-		
+		export_file_collada="$exports_directory/$model_type_directory/$model_export_name/$model_export_name.dae"
+
 		# Check for the exports directory existence
 
 		if [ ! -d "$exports_directory/$model_type_directory/$model_export_name" ]
@@ -296,7 +312,7 @@ do
 		if [[ "$option" = "3ds" ]]
 		then
 			echo "${cyan}Exporting $model ("$export_extension")...${reset}"
-			
+
 			if [[ ! -d "$export_directory" ]]
 			then
 				mkdir -p "$export_directory"
@@ -337,6 +353,22 @@ do
 			wait
 		fi
 
+		# Export collada file
+
+		if [[ "$option" = "collada" ]]
+		then
+			echo "${cyan}Exporting $model ("$export_extension")...${reset}"
+
+			if [[ ! -d "$export_directory" ]]
+			then
+				mkdir -p "$export_directory"
+			fi
+
+			"$leocad" "$model" "$export_option" "$export_file_collada" >> /dev/null
+
+			wait
+		fi
+
 		# Export wavefront file with materials archive
 
 		if [[ "$option" = "wavefront" ]]
@@ -347,17 +379,17 @@ do
 			fi
 
 			"$leocad" "$model" "$export_option" "$export_file" >> /dev/null
-			
+
 			cd "$export_directory" || exit
 
 			# Archive .obj and respective .mtl files for exported model
 			# when using the wavefront file export option for easy model upload or update
-			
+
 			export_file="${model_export_name}.zip"
 
 			zip "$export_file" {*.obj,*.mtl}
 			rm -rf {*.obj,*.mtl}
-			
+
 			wait
 		fi
 
@@ -378,7 +410,7 @@ do
 			model_upload_name=${row[1]}
 			model_file_name_list=${row[2]}
 			model_web_id=${row[3]}
-			
+
 			list_uid=""
 
 			if [[ "$model_export_name" == "$model_file_name_list" ]] # If model export name matches list entry
@@ -388,12 +420,12 @@ do
 				color=$(tput setaf 2) # green
 
 				echo "$model_uid" > "$export_directory/uid"
-			
+
 				break
 			fi
 
 		done < "$uid_list"
-		
+
 		if [ -z "$list_uid" ]
 		then
 			model_list_uid_message="${red}Model export name does not match UID list entry...${reset}"

@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="02-09-2016"
+version="30-09-2017"
 script=$(basename -- "$0")
 
 while (($#))
@@ -39,11 +39,17 @@ do
 		-a|--animated)
 			option="animated"
 			;;
+		-b|--background)
+			option="background"
+			;;
 		-F|--flat)
 			option="flat"
 			;;
 		-FL|--flat-lines)
 			option="flat-lines"
+			;;
+		-S|--sketchfab)
+			option="sketchfab"
 			;;
 		-W|--wireframe)
 			option="wireframe"
@@ -150,13 +156,21 @@ else
 	echo ""
 fi
 
-if [[ "$option" == "flat" ]]
+if [[ "$option" == "background" ]]
+then
+	render_preset="background"
+
+elif [[ "$option" == "flat" ]]
 then
 	render_preset="flat"
 
 elif [[ "$option" == "flat-lines" ]]
 then
 	render_preset="flat-lines"
+
+elif [[ "$option" == "sketchfab" ]]
+then
+	render_preset="sketchfab"
 
 elif [[ "$option" == "wireframe" ]]
 then
@@ -179,8 +193,11 @@ directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --
 IFS=$'\n'
 selection=($directory)
 
+count="1"
+
 for directory in "${selection[@]}"
 do
+
 	for model in "${directory%/}"/**/*."$extension_filter"
 	do
 		IFS='/'
@@ -196,7 +213,11 @@ do
 
 		# Define model renders top directory
 
-		models_directory="/media/Disk/Dropbox/Public/www/blog/var/www/blog/models"
+		models_directory="/media/Disk/Dropbox/Public/www/legolinux/var/www/legolinux/models"
+
+		# Define background renders top directory
+
+		background_directory="/media/Disk/Dropbox/Public/www/legolinux/var/www/legolinux/background"
 
 		# Define LDView main render routine
 
@@ -383,12 +404,36 @@ do
 
 			# Preset overrides
 
-			if [[ "$render_preset" == "flat" ]]
+			if [[ "$render_preset" == "background" ]]
+			then
+
+				top_directory="$background_directory" # Define model renders top directory for background preset
+
+				# Background preset overrides
+
+				backgroundcolor3="0xdddddd"
+				savealpha="0"
+				savewidth="5000"
+				saveheight="5000"
+				lighting="0"
+				showhighlightlines="0"
+				defaultzoom="1.5"
+				option_prefix="background"
+
+			elif [[ "$render_preset" == "flat" ]]
 			then
 				# Flat preset override
 
 				lighting="0"
 				showhighlightlines="0"
+
+			elif [[ "$render_preset" == "sketchfab" ]]
+			then
+				# Flat preset override
+
+				lighting="0"
+				showhighlightlines="0"
+				option_prefix="sketchfab"
 
 			elif [[ "$render_preset" == "flat-lines" ]]
 			then
@@ -403,6 +448,7 @@ do
 
 				lighting="0"
 				wireframe="1"
+				wireframefog="1"
 			else
 				# Standard presets override
 
@@ -584,7 +630,12 @@ do
 
 			# Define render directory location by model
 
-			render_directory="$top_directory/$model_type_directory/$model_render_name"
+			if [[ "$render_preset" == "background" ]]
+			then
+				render_directory="$top_directory"
+			else
+				render_directory="$top_directory/$model_type_directory/$model_render_name"
+			fi
 
 			# Check for the renders directory existence
 
@@ -603,8 +654,22 @@ do
 
 			wait
 
-			mv "${model_file_name}${snapshotsuffix}" "${model_render_name}${view[position]}${snapshotsuffix}"
+			digit="-0${count}"
+
+			if [[ "$render_preset" == "background" ]]
+			then
+				mv "${model_file_name}${snapshotsuffix}" "${option_prefix}""${digit}""${snapshotsuffix}"
+
+			elif [[ "$render_preset" == "sketchfab" ]]
+			then
+				mv "${model_file_name}${snapshotsuffix}" "${option_prefix}${snapshotsuffix}"
+			else
+				mv "${model_file_name}${snapshotsuffix}" "${option_prefix}${model_render_name}${view[position]}${snapshotsuffix}"
+			fi
+
 		done
+
+		count=$((count+1))
 
 		echo "${cyan}Done.${reset}"
 		echo ""

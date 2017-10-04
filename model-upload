@@ -21,7 +21,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="03-09-2016"
+version="30-08-2017"
 script=$(basename -- "$0")
 
 while (($#))
@@ -32,6 +32,9 @@ do
 			;;
 		-b)
 			option="blend"
+			;;
+		-c)
+			option="collada"
 			;;
 		-wf|--wavefront)
 			option="wavefront"
@@ -53,14 +56,15 @@ do
 			echo -e "./$script [OPTION] [SETUP] [SETTING]"
 			echo -e "Utility options:"
 			echo -e "-3ds \t\t\t Upload 3ds file format only."
-			echo -e "-b, --blend \t Upload blend file format only."
+			echo -e "-b, --blend \t\t Upload blend file format only."
+			echo -e "-c, --collada \t Upload collada file format only."
 			echo -e "-wf, --wavefront \t Upload wavefront (obj and mtl as zip archive) file format only."
 			echo -e "-d, --default \t\t Use default settings for description and tags."
 			echo -e "-m, --manual \t\t Use maual input settings for description and tags."
-			echo -e "-a, --about \t Apply description and tag string settings for specified model(s)."
+			echo -e "-a, --about \t\t Apply description and tag string settings for specified model(s)."
 			echo -e "-e, --environment \t Bypass upload and apply environment settings for specified model(s)."
 			echo -e "-h, --help \t\t Show help options."
-			echo -e "-v, --version \t Print version."
+			echo -e "-v, --version \t\t Print version."
 			exit
 			;;
 		-v|--version)
@@ -82,7 +86,8 @@ echo "${yellow}Verifying utility requirements...${reset}"
 echo ""
 
 for binary_name in \
-"curl"
+"curl" \
+"jq"
 do
 	binary=$(which $binary_name)
 
@@ -97,7 +102,7 @@ do
 		then
 			# Specify binary location or exit on 'Cancel'
 
-			binary_path=$(zenity --file-selection  --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
+			binary_path=$(zenity --file-selection --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
 
 			binary="$binary_path/$binary"
 		else
@@ -127,14 +132,18 @@ then
 	extension_filter="blend"
 	extension="blend"
 
+elif [[ "$option" == "collada" ]]
+then
+	extension_filter="dae"
+	extension="dae"
+
 elif [[ "$option" == "wavefront" ]]
 then
 	extension_filter="zip"
 	extension="wavefront"
-
 else
-	extension_filter="3ds"
-	extension="3ds"
+	extension_filter="dae"
+	extension="dae"
 
 	echo "${yellow}Defaulting to $extension file format option.${reset}"
 	echo ""
@@ -207,6 +216,8 @@ parse_input () {
 
 upload () {
 	curl -# -k -X POST \
+		-H 'Content-Type: multipart/form-data' \
+		-H "Authorization: Token ${token}" \
 		-F "source=bash" \
 		-F "modelFile=@${file}" \
 		-F "name=${filename}" \
@@ -221,14 +232,16 @@ upload () {
 # Define update routine
 
 update () {
-	curl -# -k -X PATCH \
+	curl -# -k -X PUT \
+		-H 'Content-Type: multipart/form-data' \
+		-H "Authorization: Token ${token}" \
 		-F "modelFile=@${file}" \
 		-F "name=${filename}" \
 		-F "description=${description}" \
 		-F "password=${password}" \
 		-F "private=${private}" \
 		-F "tags=${tags}" \
-				"${api_server_url}" > "${id_file}"
+			"${api_server_url}" > "${id_file}"
 }
 
 # Define environment setup routine
@@ -355,13 +368,13 @@ fi
 
 # Define setup defaults
 
-# Format description using HTML line break to prevent words cutting off on  website description panel
+# Format description using HTML line break to prevent words cutting off on website description panel
 
 full_name="Nathanel Titane"
 website_url="http://legolinux.com"
 email_address="nathanel.titane@gmail.com"
 
-description_default="This model has been created by $full_name. </br> For more information, please visit </br> $website_url </br> or e-mail me at </br> $email_address"
+description_default="This model has been created by $full_name. </br> For more information, please visit $website_url </br> or e-mail me at $email_address"
 
 # Maximum allowed number of tags: 42
 
@@ -376,8 +389,8 @@ then
 			tags=$tags_default
 
 			uid="$model_uid"
-			api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
-			status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+			api_server_url="https://api.sketchfab.com/v3/models/${uid}"
+			status_url="https://api.sketchfab.com/v3/models/${uid}"
 			model_url="https://sketchfab.com/models/${uid}"
 			message="${cyan}Setting description and tags for $model_upload_name...${reset}"
 			transfer=about
@@ -431,7 +444,7 @@ then
 else
 	# Specify directory location or exit on 'Cancel'
 
-	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
+	directory=$(zenity --file-selection --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
 
 	IFS=$'\n'
 	selection=($directory)
@@ -458,35 +471,35 @@ else
 			password=""
 			private=0
 
-			server_url="https://sketchfab.com/v2/models"
+			server_url="https://sketchfab.com/v3/models"
 
 			uid_file="$path/uid"
 
 			# Verify UID file existence and process model transfer accordingly
 
-			if [[ ! -e "$uid_file" ]]
+			if [[ ! -e "$uid_file" ]] # UID file does not exist
 			then
-				uid=$(cat $id_file | sed 's/{"uid":"//g;s/"}//g')
-				api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
-				status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+				uid=$(curl -s "${status_url}" | jq '.uid' | tr -d '"')
+				api_server_url="https://api.sketchfab.com/v3/models"
+				status_url="https://api.sketchfab.com/i/models/${uid}"
 				model_url="https://sketchfab.com/models/${uid}"
 				message="${red}UID file does not exist under $path - Generating UID file - Uploading...${reset}"
 				transfer=upload
 
-			elif [[ ! -s "$uid_file" ]]
+			elif [[ ! -s "$uid_file" ]] # UID file is empty
 			then
-				uid=$(cat $id_file | sed 's/{"uid":"//g;s/"}//g')
-				api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
-				status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+				uid=$(curl -s "${status_url}" | jq '.uid' | tr -d '"')
+				api_server_url="https://api.sketchfab.com/v3/models"
+				status_url="https://api.sketchfab.com/i/models/${uid}"
 				model_url="https://sketchfab.com/models/${uid}"
 				message="${yellow}UID file already exists [ empty ] - Writing UID token - Uploading...${reset}"
 				transfer=upload
 
-			elif [[ -s "$uid_file" ]]
+			elif [[ -s "$uid_file" ]] #UID file is not empty
 			then
 				uid=$(cat "$uid_file")
-				api_server_url="https://api.sketchfab.com/v2/models/${uid}?token=${token}"
-				status_url="https://api.sketchfab.com/v2/models/${uid}/status?token=${token}"
+				api_server_url="https://api.sketchfab.com/v3/models/${uid}"
+				status_url="https://api.sketchfab.com/i/models/${uid}"
 				model_url="https://sketchfab.com/models/${uid}"
 				message="${green}UID file exists under $path - Continuing - Updating...${reset}"
 				transfer=update
@@ -568,7 +581,7 @@ else
 
 			while [[ "${status}" != *SUCCEEDED* ]]
 			do
-				status=$(curl -k -s "${status_url}")
+				status=$(curl -s "${status_url}" | jq '.status.processing' | tr -d '"') # Retrieve status and strip quotes
 
 				if [[ "$iteration" == "$timeout" ]] && [[ "${status}" != *SUCCEEDED* ]]
 				then
@@ -588,7 +601,8 @@ else
 				then
 					: # pass
 				else
-					uid=$(cat $id_file | sed 's/{"uid":"//g;s/",".*//g')
+					
+					uid=$(curl -s "${status_url}" | jq '.uid' | tr -d '"') # Retrieve model UID and strip quotes
 
 					echo "$uid" > "$path/uid"
 				fi
