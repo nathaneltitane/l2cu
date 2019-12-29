@@ -9,7 +9,7 @@ If required, the utilities verify the presence of the necessary applications and
 
 - [LDView - Travis Cobb's real-time 3D viewer for displaying LDraw models] (http://ldview.sourceforge.net/)
 - [ldview (a.k.a. ldview-osmesa - the command line version of the LDView renderer)] (http://ldview.sourceforge.net/)
-- [LeoCAD - Leonardo Zide's multiplatform LDraw compatible model editor] (http://leocad.org/trac)
+- [LeoCAD - Leonardo Zide's multiplatform LDraw compatible model editor] (http://leocad.org/)
 
 L2CU is split into 5 utilities that each handle a specific task, or set of tasks relative to a type of operation relative to the LDraw parts system or LDraw based digital Lego models (ldr) or model assemblies (mpd).
 
