@@ -7,9 +7,16 @@ It is mostly centered around the use of the BASH shell, opearates with maximum p
 
 If required, the utilities verify the presence of the necessary applications and other dependencies before proceeding but the user may wish to build or install the following requirements prior to using these scripts for a more streamlined experience:
 
-- [LDView - Travis Cobb's real-time 3D viewer for displaying LDraw models] (http://ldview.sourceforge.net/)
-- [ldview (a.k.a. ldview-osmesa - the command line version of the LDView renderer)] (http://ldview.sourceforge.net/)
-- [LeoCAD - Leonardo Zide's multiplatform LDraw compatible model editor] (http://leocad.org/)
+- LDView - Travis Cobb's real-time 3D viewer for displaying LDraw models [*]
+- ldview (a.k.a. ldview-osmesa - the command line version of the LDView renderer [*]
+
+  https://github.com/tcobbs/ldview
+  
+- LeoCAD - Leonardo Zide's multiplatform LDraw compatible model editor
+
+  https://github.com/leozide/leocad
+
+[*] Deprecated use in latest L2CU updates to the benefit of LeoCAD as ann all in one solution for most part.
 
 L2CU is split into 5 utilities that each handle a specific task, or set of tasks relative to a type of operation relative to the LDraw parts system or LDraw based digital Lego models (ldr) or model assemblies (mpd).
 
@@ -52,26 +59,26 @@ The user can choose from preselected defaults or specify the latitude and longit
 
 Defaults (as arrays):
 
-		latitude=(
-			30
-			30
-			30
-			30
-		)
+latitude=(
+	30
+	30
+	30
+	30
+)
 
-		longitude=(
-			225
-			45
-			180
-			0
-		)
+longitude=(
+	225
+	45
+	180
+	0
+)
 
-		view=(
-			"quarter-back"
-			"quarter-front"
-			"back"
-			"front"
-		)
+view=(
+	"quarter-back"
+	"quarter-front"
+	"back"
+	"front"
+)
 
 Please refer to LeoCAD's help manual to get you started on setting up your editing and rendering preferences to generate the output desired using the visual settings and angles of your choice.
 
