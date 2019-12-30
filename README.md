@@ -1,6 +1,6 @@
 # L2CU
 
-This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw related batch operations on multiple models and/or project files.
+This project aims at providing any user running a *Linux*-based distribution with the tools to handle *LDraw* related batch operations on multiple models and/or project files.
 
 It is mostly centered around the use of the BASH shell, opearates with maximum portability and uses a minimal set of dependencies.
 
@@ -104,4 +104,5 @@ Feel free to follow developments and new model builds at my [Blog](http://www.le
 
 ## REFERENCE
 
+- [LDraw.org](https://ldraw.org)
 - [AWESOME LDraw](https://github.com/symbian9/awesome-ldraw)
