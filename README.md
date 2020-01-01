@@ -29,7 +29,7 @@ The user can create a list that either parses and sorts the content of that dire
 
 This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the Ldraw parts directory contents.
 
-The list that isgenerated is frequently used for legacy editors (such as MLCAD, which can be run using wine) to provide it with an index of parts to locate and use. Most modern editors generate a cached session dynamic index on launch and do nor require this list anymore.
+The list that is generated is frequently used for legacy editors (such as MLCAD, which can be run using wine) to provide it with an index of parts to locate and use. Most modern editors generate a cached session dynamic index on launch and do nor require this list anymore.
 
 ###### [ldraw-model-export] (https://github.com/nathaneltitane/ldraw/blob/master/ldraw-model-export)
 
