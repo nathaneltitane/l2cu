@@ -39,6 +39,7 @@ do
 			echo -e "Utility options:"
 			echo -e "-d, --description \t Sort list by part description."
 			echo -e "-n, --number \t\t Sort list by part number."
+			echo -e ""
 			echo -e "-h, --help \t\t Show help options."
 			echo -e "-v, --version \t\t Print version."
 			exit
