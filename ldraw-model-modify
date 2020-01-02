@@ -70,6 +70,7 @@ do
 			echo -e "-b, --bind \t\t Matches a part to a specific color and modifies the color for that part."
 			echo -e "-f, --format \t\t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
 			echo -e "-o, --overwrite \t\t Assumes 'Yes' and forces the overwrite of the original model file after modification."
+			echo -e ""
 			echo -e "-h, --help \t\t Show help options."
 			echo -e "-v, --version \t Print version."
 			exit
