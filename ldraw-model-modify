@@ -19,7 +19,7 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="28-12-2019"
+version="01-01-2020"
 script=$(basename -- "$0")
 
 while (($#))
@@ -99,152 +99,152 @@ trap 'rm -rf "$colors"' EXIT
 # Push LDraw colors list to temporary file
 
 cat > "$colors" << 'COLORS'
-Black									0		#05131D
-Blue									1		#0055BF
-Green									2		#257A3E
-Dark_Turquoise							3		#00838F
-Red										4		#C91A09
-Dark_Pink								5		#C870A0
-Brown									6		#583927
-Light_Gray								7		#9BA19D
-Dark_Gray								8		#6D6E5C
-Light_Blue								9		#B4D2E3
-Bright_Green							10		#4B9F4A
-Light_Turquoise							11		#55A5AF
-Salmon									12		#F2705E
-Pink									13		#FC97AC
-Yellow									14		#F2CD37
-White									15		#FFFFFF
-Light_Green								17		#C2DAB8
-Light_Yellow							18		#FBE696
-Tan										19		#E4CD9E
-Light_Violet							20		#C9CAE2
-Purple									22		#81007B
-Dark_Blue_Violet						23		#2032B0
-Orange									25		#FE8A18
-Magenta									26		#923978
-Lime									27		#BBE90B
-Dark_Tan								28		#958A73
-Bright_Pink								29		#E4ADC8
-Medium_Lavender							30		#AC78BA
-Lavender								31		#E1D5ED
-Very_Light_Orange						68		#F3CF9B
-Light_Purple							69		#CD6298
-Reddish_Brown							70		#582A12
-Light_Bluish_Gray						71		#A0A5A9
-Dark_Bluish_Gray						72		#6C6E68
-Medium_Blue								73		#5C9DD1
-Medium_Green							74		#73DCA1
-Light_Pink								77		#FECCCF
-Light_Flesh								78		#F6D7B3
-Medium_Dark_Flesh						84		#CC702A
-Dark_Purple								85		#3F3691
-Dark_Flesh								86		#7C503A
-Blue_Violet								89		#4C61DB
-Flesh									92		#D09168
-Light_Salmon							100		#FEBABD
-Violet									110		#4354A3
-Medium_Violet							112		#6874CA
-Medium_Lime								115		#C7D23C
-Aqua									118		#B3D7D1
-Light_Lime								120		#D9E4A7
-Light_Orange							125		#F9BA61
-Very_Light_Bluish_Gray					151		#E6E3E0
-Bright_Light_Orange						191		#F8BB3D
-Bright_Light_Blue						212		#86C1E1
-Rust									216		#B31004
-Bright_Light_Yellow						226		#FFF03A
-Sky_Blue								232		#56BED6
-Dark_Blue								272		#0D325B
-Dark_Green								288		#184632
-Dark_Brown								308		#352100
-Maersk_Blue								313		#54A9C8
-Dark_Red								320		#720E0F
-Dark_Azure								321		#1498D7
-Medium_Azure							322		#3EC2DD
-Light_Aqua								323		#BDDCD8
-Yellowish_Green							326		#DFEEA5
-Olive_Green								330		#9B9A5A
-Sand_Red								335		#D67572
-Medium_Dark_Pink						351		#F785B1
-Earth_Orange							366		#FA9C1C
-Sand_Purple								373		#845E84
-Sand_Green								378		#A0BCAC
-Sand_Blue								379		#597184
-Fabuland_Brown							450		#B67B50
-Medium_Orange							462		#FFA70B
-Dark_Orange								484		#A95500
-Very_Light_Gray							503		#E6E3DA
-Trans_Clear								47		#FCFCFC
-Trans_Black								40		#635F52
-Trans_Red								36		#C91A09
-Trans_Neon_Orange						38		#FF800D
-Trans_Orange							57		#F08F1C
-Trans_Neon_Yellow						54		#DAB000
-Trans_Yellow							46		#F5CD2F
-Trans_Neon_Green						42		#C0FF00
-Trans_Bright_Green						35		#56E646
-Trans_Green								34		#237841
-Trans_Dark_Blue							33		#0020A0
-Trans_Medium_Blue						41		#559AB7
-Trans_Light_Blue						43		#AEE9EF
-Trans_Very_Light_Blue					39		#C1DFF0
-Trans_Light_Purple						44		#96709F
-Trans_Purple							52		#A5A5CB
-Trans_Dark_Pink							37		#DF6695
-Trans_Pink								45		#FC97AC
-Chrome_Gold								334		#BBA53D
-Chrome_Silver							383		#E0E0E0
-Chrome_Antique_Brass					60		#645A4C
-Chrome_Black							64		#1B2A34
-Chrome_Blue								61		#6C96BF
-Chrome_Green							62		#3CB371
-Chrome_Pink								63		#AA4D8E
-Pearl_White								183		#F2F3F2
-Pearl_Very_Light_Gray					150		#BBBDBC
-Pearl_Light_Gray						135		#9CA3A8
-Flat_Silver								179		#898788
-Pearl_Dark_Gray							148		#575857
-Metal_Blue								137		#5677BA
-Pearl_Light_Gold						142		#DCBE61
-Pearl_Gold								297		#CC9C2B
-Flat_Dark_Gold							178		#B4883E
-Copper									134		#964A27
-Metallic_Silver							80		#A5A9B4
-Metallic_Green							81		#899B5F
-Metallic_Gold							82		#DBAC34
-Metallic_Black							83		#1A2831
-Metallic_Dark_Gray						87		#6D6E5C
-Milky_White								79		#FFFFFF
-Glow_In_Dark_Opaque						21		#E0FFB0
-Glow_In_Dark_Trans						294		#BDC6AD
-Glitter_Trans_Dark_Pink					114		#DF6695
-Glitter_Trans_Clear						117		#FFFFFF
-Glitter_Trans_Purple					129		#640061
-Speckle_Black_Silver					132		#000000
-Speckle_Black_Gold						133		#000000
-Speckle_Black_Copper					75		#000000
-Speckle_Dark_Bluish_Gray_Silver			76		#635F61
-Rubber_Yellow							65		#F5CD2F
-Rubber_Trans_Yellow						66		#CAB000
-Rubber_Trans_Clear						67		#FFFFFF
-Rubber_Black							256		#212121
-Rubber_Blue								273		#0033B2
-Rubber_Red								324		#C40026
-Rubber_Orange							350		#D06610
-Rubber_Light_Gray						375		#C1C2C1
-Rubber_Dark_Blue						406		#001D68
-Rubber_Purple							449		#81007B
-Rubber_Lime								490		#D7F000
-Rubber_Light_Bluish_Gra					496		#A3A2A4
-Rubber_Flat_Silver						504		#898788
-Rubber_White							511		#FAFAFA
-Main_Colour								16		#7F7F7F
-Edge_Colour								24		#7F7F7F
-Trans_Black_IR_Lens						32		#000000
-Magnet											493		#656761
-Electric_Contact_Alloy					494		#D0D0D0
-Electric_Contact_Copper					495		#AE7A59
+Black                                   0          #05131D
+Blue                                    1          #0055BF
+Green                                   2          #257A3E
+Dark_Turquoise                          3          #00838F
+Red                                     4          #C91A09
+Dark_Pink                               5          #C870A0
+Brown                                   6          #583927
+Light_Gray                              7          #9BA19D
+Dark_Gray                               8          #6D6E5C
+Light_Blue                              9          #B4D2E3
+Bright_Green                            10         #4B9F4A
+Light_Turquoise                         11         #55A5AF
+Salmon                                  12         #F2705E
+Pink                                    13         #FC97AC
+Yellow                                  14         #F2CD37
+White                                   15         #FFFFFF
+Light_Green                             17         #C2DAB8
+Light_Yellow                            18         #FBE696
+Tan                                     19         #E4CD9E
+Light_Violet                            20         #C9CAE2
+Purple                                  22         #81007B
+Dark_Blue_Violet                        23         #2032B0
+Orange                                  25         #FE8A18
+Magenta                                 26         #923978
+Lime                                    27         #BBE90B
+Dark_Tan                                28         #958A73
+Bright_Pink                             29         #E4ADC8
+Medium_Lavender                         30         #AC78BA
+Lavender                                31         #E1D5ED
+Very_Light_Orange                       68         #F3CF9B
+Light_Purple                            69         #CD6298
+Reddish_Brown                           70         #582A12
+Light_Bluish_Gray                       71         #A0A5A9
+Dark_Bluish_Gray                        72         #6C6E68
+Medium_Blue                             73         #5C9DD1
+Medium_Green                            74         #73DCA1
+Light_Pink                              77         #FECCCF
+Light_Flesh                             78         #F6D7B3
+Medium_Dark_Flesh                       84         #CC702A
+Dark_Purple                             85         #3F3691
+Dark_Flesh                              86         #7C503A
+Blue_Violet                             89         #4C61DB
+Flesh                                   92         #D09168
+Light_Salmon                            100        #FEBABD
+Violet                                  110        #4354A3
+Medium_Violet                           112        #6874CA
+Medium_Lime                             115        #C7D23C
+Aqua                                    118        #B3D7D1
+Light_Lime                              120        #D9E4A7
+Light_Orange                            125        #F9BA61
+Very_Light_Bluish_Gray                  151        #E6E3E0
+Bright_Light_Orange                     191        #F8BB3D
+Bright_Light_Blue                       212        #86C1E1
+Rust                                    216        #B31004
+Bright_Light_Yellow                     226        #FFF03A
+Sky_Blue                                232        #56BED6
+Dark_Blue                               272        #0D325B
+Dark_Green                              288        #184632
+Dark_Brown                              308        #352100
+Maersk_Blue                             313        #54A9C8
+Dark_Red                                320        #720E0F
+Dark_Azure                              321        #1498D7
+Medium_Azure                            322        #3EC2DD
+Light_Aqua                              323        #BDDCD8
+Yellowish_Green                         326        #DFEEA5
+Olive_Green                             330        #9B9A5A
+Sand_Red                                335        #D67572
+Medium_Dark_Pink                        351        #F785B1
+Earth_Orange                            366        #FA9C1C
+Sand_Purple                             373        #845E84
+Sand_Green                              378        #A0BCAC
+Sand_Blue                               379        #597184
+Fabuland_Brown                          450        #B67B50
+Medium_Orange                           462        #FFA70B
+Dark_Orange                             484        #A95500
+Very_Light_Gray                         503        #E6E3DA
+Trans_Clear                             47         #FCFCFC
+Trans_Black                             40         #635F52
+Trans_Red                               36         #C91A09
+Trans_Neon_Orange                       38         #FF800D
+Trans_Orange                            57         #F08F1C
+Trans_Neon_Yellow                       54         #DAB000
+Trans_Yellow                            46         #F5CD2F
+Trans_Neon_Green                        42         #C0FF00
+Trans_Bright_Green                      35         #56E646
+Trans_Green                             34         #237841
+Trans_Dark_Blue                         33         #0020A0
+Trans_Medium_Blue                       41         #559AB7
+Trans_Light_Blue                        43         #AEE9EF
+Trans_Very_Light_Blue                   39         #C1DFF0
+Trans_Light_Purple                      44         #96709F
+Trans_Purple                            52         #A5A5CB
+Trans_Dark_Pink                         37         #DF6695
+Trans_Pink                              45         #FC97AC
+Chrome_Gold                             334        #BBA53D
+Chrome_Silver                           383        #E0E0E0
+Chrome_Antique_Brass                    60         #645A4C
+Chrome_Black                            64         #1B2A34
+Chrome_Blue                             61         #6C96BF
+Chrome_Green                            62         #3CB371
+Chrome_Pink                             63         #AA4D8E
+Pearl_White                             183        #F2F3F2
+Pearl_Very_Light_Gray                   150        #BBBDBC
+Pearl_Light_Gray                        135        #9CA3A8
+Flat_Silver                             179        #898788
+Pearl_Dark_Gray                         148        #575857
+Metal_Blue                              137        #5677BA
+Pearl_Light_Gold                        142        #DCBE61
+Pearl_Gold                              297        #CC9C2B
+Flat_Dark_Gold                          178        #B4883E
+Copper                                  134        #964A27
+Metallic_Silver                         80         #A5A9B4
+Metallic_Green                          81         #899B5F
+Metallic_Gold                           82         #DBAC34
+Metallic_Black                          83         #1A2831
+Metallic_Dark_Gray                      87         #6D6E5C
+Milky_White                             79         #FFFFFF
+Glow_In_Dark_Opaque                     21         #E0FFB0
+Glow_In_Dark_Trans                      294        #BDC6AD
+Glitter_Trans_Dark_Pink                 114        #DF6695
+Glitter_Trans_Clear                     117        #FFFFFF
+Glitter_Trans_Purple                    129        #640061
+Speckle_Black_Silver                    132        #000000
+Speckle_Black_Gold                      133        #000000
+Speckle_Black_Copper                    75         #000000
+Speckle_Dark_Bluish_Gray_Silver         76         #635F61
+Rubber_Yellow                           65         #F5CD2F
+Rubber_Trans_Yellow                     66         #CAB000
+Rubber_Trans_Clear                      67         #FFFFFF
+Rubber_Black                            256        #212121
+Rubber_Blue                             273        #0033B2
+Rubber_Red                              324        #C40026
+Rubber_Orange                           350        #D06610
+Rubber_Light_Gray                       375        #C1C2C1
+Rubber_Dark_Blue                        406        #001D68
+Rubber_Purple                           449        #81007B
+Rubber_Lime                             490        #D7F000
+Rubber_Light_Bluish_Gra                 496        #A3A2A4
+Rubber_Flat_Silver                      504        #898788
+Rubber_White                            511        #FAFAFA
+Main_Colour                             16         #7F7F7F
+Edge_Colour                             24         #7F7F7F
+Trans_Black_IR_Lens                     32         #000000
+Magnet                                  493        #656761
+Electric_Contact_Alloy                  494        #D0D0D0
+Electric_Contact_Copper                 495        #AE7A59
 COLORS
 
 parse_input () {
@@ -266,7 +266,7 @@ parse_colors () {
 
 	color_input="${input,,}"
 
-	while IFS=$'\t'
+	while IFS=$' '
 	read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
 	do
 		# Color input entries cleanup
@@ -274,19 +274,19 @@ parse_colors () {
 		# Color name
 
 		space_name="${ldraw_color_name//_/ }"		# Remove underscores from name
-		name="${space_name,,}"								# Set name to lowercase for input match
-		ldraw_color_name="${name}"						# Reattribute input variable to lowercase name value
+		name="${space_name,,}"				# Set name to lowercase for input match
+		ldraw_color_name="${name}"			# Reattribute input variable to lowercase name value
 
 		# Color hex value
 
 		hex_value="${ldraw_color_hex_value//#/}"	# Remove pound from name
-		hex_value="${hex_value,,}"							# Set name to lowercase for input match
-		ldraw_color_hex_value=${hex_value}				# Reattribute input variable to lowercase name value
+		hex_value="${hex_value,,}"			# Set name to lowercase for input match
+		ldraw_color_hex_value=${hex_value}		# Reattribute input variable to lowercase name value
 
 		if [[ "$color_input" == "$ldraw_color_name" || "$color_input" == "$ldraw_color_number" || "$color_input" == "$ldraw_color_hex_value" ]]
 		then
-			echo "Color name................: ${ldraw_color_name}" 					# Confirmation
-			echo "Color number..............: ${ldraw_color_number}"				# Confirmation
+			echo "Color name................: ${ldraw_color_name}" 			# Confirmation
+			echo "Color number..............: ${ldraw_color_number}"		# Confirmation
 			echo "Color hexadecimal value...: ${ldraw_color_hex_value}"		# Confirmation
 
 			return "$ldraw_color_number"
@@ -305,14 +305,6 @@ parse_parts () {
 }
 
 # Confirm options being used before processing
-
-if [[ "$overwrite_option" = "overwrite" ]]
-then
-	echo "${red}'Overwrite' option enabled - changes will be written to original model file after parsing!${reset}"
-else
-	echo "${cyan}Utility started using the $extension file format option.${reset}"
-	echo "${cyan}Utility started using the $option modification option.${reset}"
-fi
 
 echo ""
 
@@ -366,131 +358,24 @@ fi
 
 for extension in ${extensions_list[@]}
 do
-	echo $(find ${directory}  -iname "*.$extension") | while read -r model
+	echo $(find ${directory} -iname *.$extension) | while read -r model
 	do
 		model_export="${model##*/}"
 		model_export_name="${model_export%.*}"
-		model_export_name_clean="${model_export_name:3}"
+		model_export_name_clean="${model_export_name:5}"
 
-		line_number=0 # Initial line count
+		temporary_file="$model.tmp"
 
-		while IFS=
-		read -r line
-		do
-			temporary_file="${model}.tmp"
-			
-			author_string="Nathanel Titane - nathanel.titane@gmail.com"
-			
-			if [[ "$option" = "format" ]]
-			then
-			
-				# Strip lines that match the following expressions - comment out to keep
-			
-				if	[[ "$line" = 0 ]]							|| \
-					[[ "$line" = *"New Model"* ]]		|| \
-					[[ "$line" = *Author* ]]				|| \
-					[[ "$line" = *Name* ]]				|| \
-					[[ "$line" = *Unofficial* ]]			|| \
-					[[ "$line" = *Untitled* ]]				|| \
-					[[ "$line" = *BACKGROUND* ]]	|| \
-					[[ "$line" = *GROUP* ]]				|| \
-					[[ "$line" = *ROTATION* ]]			|| \
-					[[ "$line" = *PIVOT* ]]
-				then
-					: # pass
-				else
+		if [[ "$option" = "color" ]] || [[ "$option" = "part" ]] || [[ "$option" = "bind" ]]
+		then
+			# Initialize line count
 
-					# If line contains '!LPUB' header/meta tag for LPub formatting references
+			line_number=0
 
-					if [[ "$line" == *!LPUB* ]]
-					then
-						# Skip header and footer lines containing matching patterns - prevents model file syntax modification
-
-						echo "$line" >> "$temporary_file"
-						continue
-					else
-				
-						# If line contains 'AUTHOR' tag
-
-						if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
-						then
-							# Reformat line to specific string
-							
-							line="0 !LEOCAD MODEL AUTHOR $author_string"
-
-							echo "$line" >> "$temporary_file"
-							continue
-						else
-
-							# If line contains '!LEOCAD' header/meta tag
-
-							if [[ "$line" == *!LEOCAD* ]]
-							then
-								# Skip header and footer lines containing matching patterns - prevents model file syntax modification
-			
-								echo "$line" >> "$temporary_file"
-								continue
-							else
-			
-								# If line contains 'NOFILE' header/meta tag for mpd footer references
-			
-								if [[ "$line" == *NOFILE* ]]
-								then
-									# Skip header and footer lines containing matching patterns - prevents model file syntax modification
-			
-									echo "$line" >> "$temporary_file"
-									continue
-								else
-			
-									# If line contains 'FILE' header/meta tag for mpd header references
-			
-									if [[ "$line" == *FILE* ]]
-									then
-										IFS=' '
-										read -r flag statement file_name <<< "$line"
-			
-										clean_file_name="${file_name//\(/}"			# Strip (
-										clean_file_name="${clean_file_name//\)/}"	# Strip )
-										clean_file_name="${clean_file_name// /-}"	# Spaces to dashes
-										clean_file_name="${clean_file_name,,}"		# String to lower case
-			
-										# Write changes to tempporary file
-			
-										echo "$flag $statement $clean_file_name" >> "$temporary_file"
-									else
-			
-										# Parse all other lines and format according to regular expressions
-			
-										IFS=' '
-										read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
-			
-										clean_part="${part_dat//\(/}"						# Strip (
-										clean_part="${clean_part//\)/}"					# Strip )
-										clean_part="${clean_part// /-}"					# Spaces to dashes
-										clean_part="${clean_part,,}"						# String to lower case
-			
-										vect_x="$a $b $c"
-										vect_y="$d $e $f"
-										vect_z="$g $h $i"
-			
-										# ⎡ a d g 0 ⎤	⎡ a b c x ⎤
-										# ⎢ b e h 0 ⎥	⎢ d e f y ⎥
-										# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
-										# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
-			
-										# Write changes to temporary file
-			
-										echo "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$clean_part" >> "$temporary_file" # Push to temporary file
-									fi
-								fi
-							fi
-						fi
-					fi
-				fi			
-			
-			else
-			
-				line_number=$(( $line_number + 1 )) # Offset line number for parsing count
+			while IFS=
+			read -r line
+			do
+				line_number=$(( $line_number + 1 ))
 
 				if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
 				then
@@ -544,7 +429,7 @@ do
 						fi
 					fi
 
-					# Part + Color Color substitution
+					# Bind (Part + Color) Color substitution
 
 					if [[ "$option" = "bind" ]]
 					then
@@ -561,23 +446,138 @@ do
 
 					# Write changes to tempporary file
 
-					echo "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part.$suffix" >> "$temporary_file" # Push to temporary file
+					echo "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part.$suffix" >> "$temporary_file"
 				fi
-			fi
 
-		done < "$model" # Feed model file as input for parsing into loop
-		
-		sed -i -e 's/[[:space:]]\+$//' "$temporary_file"	# Strip trailing white space and line endings from formatted output
+			done < "$model" # Feed model into loop for parsing
 
-		stamp=$(date +"%m-%d-%Y-%H-%M-%S") # Current date stamp
-		
+		elif [[ "$option" = "format" ]]
+		then
+			# Initialize line count
+
+			line_number=0
+
+			while IFS=
+			read -r line
+			do
+				author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
+			
+				# Strip lines that match the following expressions - comment out to keep
+			
+				if	[[ "$line" = 0 ]]			|| \
+					[[ "$line" = *"New Model"* ]]		|| \
+					[[ "$line" = *Author* ]			|| \
+					[[ "$line" = *Name* ]]			|| \
+					[[ "$line" = *Unofficial* ]]		|| \
+					[[ "$line" = *Untitled* ]]		|| \
+					[[ "$line" = *BACKGROUND* ]]		|| \
+					[[ "$line" = *GROUP* ]]			|| \
+					[[ "$line" = *ROTATION* ]]		|| \
+					[[ "$line" = *PIVOT* ]]
+				then
+					: # pass
+				else
+
+					# If line contains '!LPUB' header/meta tag for LPub formatting references
+
+					if [[ "$line" == *!LPUB* ]]
+					then
+						# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+
+						echo "$line" >> "$temporary_file"
+						continue
+					else
+
+						# If line contains 'AUTHOR' tag
+
+						if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
+						then
+							# Reformat line to specific string
+							
+							line="0 !LEOCAD MODEL AUTHOR $author_string"
+
+							echo "$line" >> "$temporary_file"
+							continue
+						else
+
+							# If line contains '!LEOCAD' header/meta tag
+
+							if [[ "$line" == *!LEOCAD* ]]
+							then
+								# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+
+								echo "$line" >> "$temporary_file"
+								continue
+							else
+
+								# If line contains 'NOFILE' header/meta tag for mpd footer references
+
+								if [[ "$line" == *NOFILE* ]]
+								then
+									# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+
+									echo "$line" >> "$temporary_file"
+									continue
+								else
+
+									# If line contains 'FILE' header/meta tag for mpd header references
+
+									if [[ "$line" == *FILE* ]]
+									then
+										IFS=' '
+										read -r flag statement file_name <<< "$line"
+
+										clean_file_name="${file_name//\(/}"		# Strip (
+										clean_file_name="${clean_file_name//\)/}"	# Strip )
+										clean_file_name="${clean_file_name// /-}"	# Spaces to dashes
+										clean_file_name="${clean_file_name,,}"		# String to lower case
+
+										# Write changes to tempporary file
+
+										echo "$flag $statement $clean_file_name" >> "$temporary_file"
+									else
+										# Parse all other lines and format according to regular expressions
+			
+										IFS=' '
+										read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
+			
+										clean_part="${part_dat//\(/}"			# Strip (
+										clean_part="${clean_part//\)/}"			# Strip )
+										clean_part="${clean_part// /-}"			# Spaces to dashes
+										clean_part="${clean_part,,}"			# String to lower case
+			
+										vect_x="$a $b $c"
+										vect_y="$d $e $f"
+										vect_z="$g $h $i"
+			
+										# ⎡ a d g 0 ⎤	⎡ a b c x ⎤
+										# ⎢ b e h 0 ⎥	⎢ d e f y ⎥
+										# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
+										# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
+			
+										# Write changes to temporary file
+			
+										echo "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$clean_part" >> "$temporary_file" # Push to temporary file
+									fi
+								fi
+							fi
+						fi
+					fi
+				fi
+
+			done < "$model" # Feed model input for parsing into loop
+		fi
+
+		# Current date stamp
+
+		stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
 		# Write changes to file?
 
 		if [[ "$overwrite_option" = "overwrite" ]]
 		then
 			reply="yes"
-			
-			echo "${red}'Overwrite' option enabled - writing changes to original model file!${reset}"
+			echo "${red}'overwrite write' option enabled - writing chages to original model file!${reset}"
 		else
 			echo "${cyan}Would you like to write your changes to the original model file ($model)? [ Yes | No ]${reset}"
 
@@ -588,11 +588,11 @@ do
 		then
 			echo "${yellow}Writing file ($model)...${reset}"
 
-			mv "$temporary_file" "$model" # Move temporary file to original input file
+			mv "$temporary_file" "$model"
 		else
-			echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"			
+			echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
 
-			mv "$temporary_file" "${model_export_name%.tmp}_modified_$stamp.$extension"  # Append stamp to temporary file and save as ldraw readable file
+			mv "$temporary_file" "${model_export_name%.tmp}_modified_$stamp.$extension"
 		fi
 	done
 done
