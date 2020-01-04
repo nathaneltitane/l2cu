@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# Author: Nathanel Titane - nathanel.titane@gmail.com - Copyright 2016
+# Author: Nathanel Titane - nathanel.titane@gmail.com
 
-shopt -s extglob globstar nullglob
-
-# model upload #
+# ldraw model upload #
 
 black= red= green= yellow= blue= magenta= cyan= white= reset=
 
@@ -21,35 +19,43 @@ then
 	reset=$(tput sgr0)
 fi
 
-version="30-08-2017"
+version="01-01-2020"
 script=$(basename -- "$0")
 
 while (($#))
 do
 	case "$1" in
+		-d|--directory)
+			shift
+			directory="$1"
+			;;
 		-3ds)
-			option="3ds"
+			extension_option="3ds"
+			extensions_list=(3ds)
 			;;
 		-b)
-			option="blend"
+			extension_option="blend"
+			extensions_list=(blend)
 			;;
 		-c)
-			option="collada"
+			extension_option="collada"
+			extensions_list=(dae)
 			;;
 		-wf|--wavefront)
-			option="wavefront"
+			extension_option="wavefront"
+			extensions_list=(zip)
 			;;
-		-d|--default)
-			setup="default"
+		-dt|--default)
+			setup_option="default"
 			;;
 		-m|--manual)
-			setup="manual"
+			setup_option="manual"
 			;;
 		-a|--about)
-			setting="about"
+			setting_option="about"
 			;;
 		-e|--environment)
-			setting="environment"
+			setting_option="environment"
 			;;
 		-h|--help)
 			echo -e "Usage:"
@@ -80,18 +86,27 @@ do
 	shift
 done
 
+zenity() {
+	/usr/bin/zenity "$@" 2>/dev/null
+}
+
 # Test for utility dependencies and requirements
 
 echo "${yellow}Verifying utility requirements...${reset}"
 echo ""
 
-for binary_name in \
-"curl" \
-"jq"
+binaries=(
+	curl
+	jq
+)
+
+for binary_name in ${binaries[@]}
 do
 	binary=$(which $binary_name)
 
-	if [[ -z "$binary" ]] # If binary is not found or unspecified
+	# If binary is not found or unspecified
+
+	if [[ -z "$binary" ]]
 	then
 		echo "${yellow}The '$binary_name' binary does not seem to be installed or present on your system.${reset}"
 		echo "${yellow}Would you like to specify its location manually? [ Yes | No ]${reset}"
@@ -102,7 +117,7 @@ do
 		then
 			# Specify binary location or exit on 'Cancel'
 
-			binary_path=$(zenity --file-selection --multiple --separator=$'\n' --title="Please specify binary location") 2> /dev/null || exit
+			binary_path=$(zenity --file-selection --multiple --separator=$'\n' --title="Please specify binary location") || exit
 
 			binary="$binary_path/$binary"
 		else
@@ -113,7 +128,9 @@ do
 			exit 1
 		fi
 
-	elif [[ ! -z "$binary" ]] # If binary exists
+	# If binary exists
+
+	elif [[ ! -z "$binary" ]]
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
@@ -122,75 +139,17 @@ do
 	sleep 1
 done
 
-if [[ "$option" == "3ds" ]]
-then
-	extension_filter="3ds"
-	extension="3ds"
-
-elif [[ "$option" == "blend" ]]
-then
-	extension_filter="blend"
-	extension="blend"
-
-elif [[ "$option" == "collada" ]]
-then
-	extension_filter="dae"
-	extension="dae"
-
-elif [[ "$option" == "wavefront" ]]
-then
-	extension_filter="zip"
-	extension="wavefront"
-else
-	extension_filter="dae"
-	extension="dae"
-
-	echo "${yellow}Defaulting to $extension file format option.${reset}"
-	echo ""
-fi
-
-if [[ "$setup" == "default" ]]
-then
-	setup_option="default"
-
-elif [[ "$setup" == "manual" ]]
-then
-	setup_option="manual"
-else
-	setup_option="default"
-
-	echo "${yellow}Utility started using the $setting_option setup option.${reset}"
-	echo ""
-fi
-
-if [[ "$setting" = "about" ]]
-then
-	setting_option="about"
-
-	echo "${yellow}Utility started using the $setting_option setup option.${reset}"
-	echo ""
-
-elif [[ "$setting" = "environment" ]]
-then
-	setting_option="environment"
-
-	echo "${yellow}Utility started using the $setting_option setup option.${reset}"
-	echo ""
-fi
-
 # Confirm options being used before processing
 
 echo "${cyan}Utility started using the $extension file format option.${reset}"
 echo "${cyan}Utility started using the $setup_option setup options.${reset}"
 echo ""
 
-# Generate temporary return file for server IDs
+# Generate temporary return file for server side model ID
 
 temporary_file=()
 id_file=$(mktemp -t sketchfab-id-file.XXXXXX)
 temporary_file+=("$id_file")
-
-# Define cleanup routine
 
 cleanup () {
 	rm "${temporary_file[@]}"
@@ -212,8 +171,6 @@ parse_input () {
 	done
 }
 
-# Define upload routine
-
 upload () {
 	curl -# -k -X POST \
 		-H 'Content-Type: multipart/form-data' \
@@ -229,8 +186,6 @@ upload () {
 				"${server_url}" > "${id_file}"
 }
 
-# Define update routine
-
 update () {
 	curl -# -k -X PUT \
 		-H 'Content-Type: multipart/form-data' \
@@ -243,8 +198,6 @@ update () {
 		-F "tags=${tags}" \
 			"${api_server_url}" > "${id_file}"
 }
-
-# Define environment setup routine
 
 environment () {
 	if [[ -z "$environment_data" ]]
@@ -259,8 +212,6 @@ environment () {
 					"${api_server_url}" > "${id_file}"
 	fi
 }
-
-# Define model information update routine
 
 about () {
 	curl -# -k -X PATCH \
@@ -322,7 +273,9 @@ else
 
 	# Check for environment data file under main directory
 
-	if [[ ! -e "$environment_file" ]] # If environment data file does not exist
+	# If environment data file does not exist
+
+	if [[ ! -e "$environment_file" ]]
 	then
 		echo "${yellow}Environment data file not found - Creating.${reset}"
 		echo ""
@@ -334,14 +287,18 @@ else
 		echo "${yellow}by manually copying or pulling partial or full environment data${reset}"
 		echo "${yellow}from a model or scene you've already uploaded to you sketchfab account.${reset}"
 
-	elif [[ ! -s "$environment_file" ]] # If environment data file exists but is empty
+	# If environment data file exists but is empty
+
+	elif [[ ! -s "$environment_file" ]]
 	then
 		echo "${yellow}Warning: Environment data file exists but is empty.${reset}"
 		echo "${yellow}You can add or append environment data as a template.${reset}"
 		echo "${yellow}by manually copying or pulling partial or full environment data${reset}"
 		echo "${yellow}from a model or scene you've already uploaded to you sketchfab account.${reset}"
 
-	elif [[ -s "$environment_file" ]] # If environment data file exists and is populated
+	# If environment data file exists and is populated
+
+	elif [[ -s "$environment_file" ]]
 	then
 		echo "${green}Environment data file exists and is populated - Continuing...${reset}"
 		echo ""
@@ -368,8 +325,6 @@ fi
 
 # Define setup defaults
 
-# Format description using HTML line break to prevent words cutting off on website description panel
-
 full_name="Nathanel Titane"
 website_url="http://legolinux.com"
 email_address="nathanel.titane@gmail.com"
@@ -377,8 +332,47 @@ email_address="nathanel.titane@gmail.com"
 description_default="This model has been created by $full_name. </br> For more information, please visit $website_url </br> or e-mail me at $email_address"
 
 # Maximum allowed number of tags: 42
+# Format description using HTML line break:
+# Prevents word cutoff on website description panel
 
-tags_default="3d armogyres armoredcore armoredknights armsframe battleplatforms blender cad cataphract design fortresses frames ghostintheshell gundam heavygear labors ldd ldraw ldview lego leocad lpub macross mecha mechanicalminions micropowerarmors microveritechs mlcad mobileassaultframes mobilefortresses mobilesuits mobilethrusterframes moc nathaneltitane nathanel titane orbitalframes powerarmors skeletalassaultpods transformers variablefighters veritechs"
+tags_default="3d"
+#	"armogyres" \
+#	"armoredcore" \
+#	"armoredknights" \
+#	"armsframe" \
+#	"battleplatforms" \
+#	"blender" \
+#	"cad" \
+#	"cataphract" \
+#	"design" \
+#	"fortresses" \
+#	"ghostintheshell" \
+#	"gundam" \
+#	"heavygear" \
+#	"labors" \
+#	"ldd" \
+#	"ldraw" \
+#	"ldview" \
+#	"lego" \
+#	"leocad" \
+#	"lpub" \
+#	"macross" \
+#	"mecha" \
+#	"mechanicalminions" \
+#	"micropowerarmors" \
+#	"microveritechs" \
+#	"mobileassaultframes" \
+#	"mobilefortresses" \
+#	"mobilesuits" \
+#	"mobilethrusterframes" \
+#	"moc" \
+#	"nathaneltitane" \
+#	"orbitalframes" \
+#	"powerarmors" \
+#	"skeletalassaultpods" \
+#	"transformers" \
+#	"variablefighters" \
+#	"veritechs"
 
 if [[ "$setting_option" = "about" ]]
 then
@@ -444,17 +438,20 @@ then
 else
 	# Specify directory location or exit on 'Cancel'
 
-	directory=$(zenity --file-selection --multiple --directory --separator=$'\n' --title="Select a Directory") 2> /dev/null || exit
+	if [[ -z "$directory" ]]
+	then
+		directory=$(zenity --file-selection --multiple --directory --separator=$'\n' --title="Select a Directory") || exit
+	fi
 
 	IFS=$'\n'
 	selection=($directory)
 
-	for directory in "${selection[@]}"
+	for extension in ${extensions_list[@]}
 	do
-		cd "$directory" || exit
-
-		for model in "${directory%/}"/**/*."$extension_filter"
+		for $(echo $(find ${directory} -iname *.$extension))
 		do
+			cd "$directory" || exit
+
 			# Define directory and file variables
 
 			path=${model%/*}
@@ -570,18 +567,31 @@ else
 				: $(( seconds-- ))
 			done
 
-			sleep "$seconds" # Let servers start processing. Solution to curl not resolving host on getting the status for the model because the query follows too quickly after the model transfer
+			# Let servers start processing.
+			# Solution to curl not resolving host on getting the status for the model:
+			# Query follows too quickly after the model transfer
 
-			echo -ne "" # Swap parsing counter for status poll timeout counter
+			sleep "$seconds"
+
+			# Swap parsing counter for status poll timeout counter
+
+			echo -ne ""
 
 			# Define counter variables
 
+			# Initialize counter
+
 			iteration="0"
-			timeout="300" # 5 minutes
+
+			# Set timeout: 5 minutes
+
+			timeout="300"
 
 			while [[ "${status}" != *SUCCEEDED* ]]
 			do
-				status=$(curl -s "${status_url}" | jq '.status.processing' | tr -d '"') # Retrieve status and strip quotes
+				# Retrieve status and strip quotes
+
+				status=$(curl -s "${status_url}" | jq '.status.processing' | tr -d '"')
 
 				if [[ "$iteration" == "$timeout" ]] && [[ "${status}" != *SUCCEEDED* ]]
 				then
@@ -601,8 +611,9 @@ else
 				then
 					: # pass
 				else
-					
-					uid=$(curl -s "${status_url}" | jq '.uid' | tr -d '"') # Retrieve model UID and strip quotes
+					# Retrieve model UID and strip quotes
+
+					uid=$(curl -s "${status_url}" | jq '.uid' | tr -d '"')
 
 					echo "$uid" > "$path/uid"
 				fi
