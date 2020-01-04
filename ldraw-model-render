@@ -304,7 +304,7 @@ do
 
 			wait
 
-			# Create outline splash image and backgrounds
+			# Create outline splash image
 
 			if [[ "$position_option" == "outline" ]]
 			then
