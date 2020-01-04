@@ -64,6 +64,9 @@ zenity() {
 
 # Test for utility dependencies and requirements
 
+echo "${yellow}Verifying utility requirements...${reset}"
+echo ""
+
 binaries=(
 	curl
 	wget
@@ -75,7 +78,9 @@ for binary_name in ${binaries[@]}
 do
 	binary=$(which $binary_name)
 
-	if [[ -z "$binary" ]] # If binary is not found or unspecified
+	# If binary is not found or unspecified
+
+	if [[ -z "$binary" ]]
 	then
 		echo "${yellow}The '$binary_name' binary does not seem to be installed or present on your system.${reset}"
 		echo "${yellow}Would you like to specify its location manually? [ Yes | No ]${reset}"
@@ -94,10 +99,13 @@ do
 			echo "${red}Please install '$binary_name' using your system's package manager${reset}"
 			echo "${red}and restart this utility when you are done.${reset}"
 			echo ""
+			
 			exit 1
 		fi
 
-	elif [[ ! -z "$binary" ]] # If binary exists
+	# If binary exists
+
+	elif [[ ! -z "$binary" ]]
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
