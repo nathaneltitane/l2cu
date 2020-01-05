@@ -103,10 +103,6 @@ do
 	shift
 done
 
-zenity() {
-	/usr/bin/zenity "$@" 2>/dev/null
-}
-
 # Test for utility dependencies and requirements
 
 echo "${yellow}Verifying utility requirements...${reset}"
@@ -114,7 +110,6 @@ echo ""
 
 binaries=(
 	leocad
-	convert
 )
 
 for binary_name in ${binaries[@]}
@@ -152,15 +147,23 @@ do
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
+
+		leocad() {
+			$(which leocad)
+		}
 	fi
 
 	sleep 1
 done
 
+zenity() {
+	/usr/bin/zenity "$@" 2>/dev/null
+}
+
 # Confirm options being used before processing
 
 echo "${cyan}Utility started using the $extension file extension option.${reset}"
-echo "${cyan}Utility started using the $position_preset view preset.${reset}"
+echo "${cyan}Utility started using the $position_option view preset.${reset}"
 echo ""
 
 sleep 1
@@ -199,7 +202,7 @@ do
 				--line-width ${line_width} "$model"
 		}
 
-		# Define directory and render parameters for other presets
+		# Define directory and render parameters for all presets
 
 		renders_directory="${model%/*}/renders/"			# Use model directory as root
 		background_directory="${model%/*}/renders/background"		# Use render directory as root
