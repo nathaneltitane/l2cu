@@ -9,7 +9,7 @@ If required, the utilities verify the presence of the necessary applications and
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's multiplatform LDraw compatible model editor
 
 - [LDView](https://github.com/tcobbs/ldview) - Travis Cobb's real-time 3D viewer for displaying LDraw models [*]
-- [ldview](https://github.com/tcobbs/ldview) (a.k.a. ldview-osmesa - the command line version of the LDView renderer [*]
+- [ldview](https://github.com/tcobbs/ldview) (ldview-osmesa) - the command line version of the LDView renderer [*]
   
 [*] Deprecated use in latest L2CU updates to the benefit of LeoCAD as an all in one solution for most part.
 
