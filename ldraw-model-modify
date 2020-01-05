@@ -92,7 +92,7 @@ zenity() {
 	/usr/bin/zenity "$@" 2>/dev/null
 }
 
-# Generate temporary directory
+# Generate temporary file
 
 colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
 trap 'rm -rf "$colors"' EXIT
@@ -307,7 +307,18 @@ parse_parts () {
 
 # Confirm options being used before processing
 
+echo "${cyan}Utility started using the $extension file extension option.${reset}"
+echo "${cyan}Utility started using the $position_preset view preset.${reset}"
 echo ""
+
+sleep 1
+
+if [[ "$option" == "overwrite" ]]
+then
+	echo "${red}WARNING:${reset}"
+	echo "${red}Utility started using the overwrite option.${reset}"
+	echo "${red}Parsed model modification will be written to file directly!${reset}"
+fi
 
 # Specify directory location or exit on 'Cancel'
 
@@ -380,7 +391,9 @@ do
 
 				if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
 				then
-					echo "$line" >> "$temporary_file" # Skip header and footer lines containing matching patterns - prevents model file syntax modification
+					# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+
+					echo "$line" >> "$temporary_file"
 					continue
 				else
 					IFS=' '
@@ -396,7 +409,10 @@ do
 					# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
 
 					IFS='.'
-					read part suffix <<< "$part_dat" # Split part argument into part number and part extension
+
+					# Split part argument into part number and part extension
+
+					read part suffix <<< "$part_dat"
 
 					# Color substitution
 
