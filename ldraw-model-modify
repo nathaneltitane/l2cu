@@ -72,7 +72,7 @@ do
 			echo -e "-p, --part \t\t Modifies the part number attribute only."
 			echo -e "-b, --bind \t\t Matches a part to a specific color and modifies the color for that part."
 			echo -e "-f, --format \t\t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
-            echo -e "-s, --step \t\t Separates and formats ldr submodels as individual steps."
+      echo -e "-s, --step \t\t Separates and formats ldr submodels as individual steps."
 			echo -e "-o, --overwrite \t\t Assumes 'Yes' and forces the overwrite of the original model file after modification."
 			echo -e ""
 			echo -e "-h, --help \t\t Show help options."
@@ -281,14 +281,14 @@ parse_colors () {
 		# Color name
 
 		space_name="${ldraw_color_name//_/ }"		# Remove underscores from name
-		name="${space_name,,}"				# Set name to lowercase for input match
-		ldraw_color_name="${name}"			# Reattribute input variable to lowercase name value
+		name="${space_name,,}"						# Set name to lowercase for input match
+		ldraw_color_name="${name}"					# Reattribute input variable to lowercase name value
 
 		# Color hex value
 
 		hex_value="${ldraw_color_hex_value//#/}"	# Remove pound from name
-		hex_value="${hex_value,,}"			# Set name to lowercase for input match
-		ldraw_color_hex_value=${hex_value}		# Reattribute input variable to lowercase name value
+		hex_value="${hex_value,,}"					# Set name to lowercase for input match
+		ldraw_color_hex_value=${hex_value}			# Reattribute input variable to lowercase name value
 
 		if [[ "$color_input" == "$ldraw_color_name" || "$color_input" == "$ldraw_color_number" || "$color_input" == "$ldraw_color_hex_value" ]]
 		then
@@ -474,20 +474,20 @@ do
 				
 				# Step ldr submodel separation
 								
-                if [[ "$option" = "step" ]]
-                then
-                    if [[ "$line" == *ldr* ]]
-                    then
-                        if [[ "$suffix" == *ldr* ]]
-                        then
-                            color="0"
-                            suffix="ldr\n0 STEP"
-                        else
-                            : # pass
-                        fi
-                    fi
-                fi
-
+				if [[ "$option" = "step" ]]
+				then
+						if [[ "$line" == *ldr* ]]
+						then
+								if [[ "$suffix" == *ldr* ]]
+								then
+										color="0"
+										suffix="ldr\n0 STEP"
+								else
+										: # pass
+								fi
+						fi
+				fi
+				
 				# Format - File structure and META substitution
 
 				if [[ "$option" = "format" ]]
@@ -587,15 +587,13 @@ do
 											# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
 											# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
 
-											# Write changes to temporary file
-
 										fi
 									fi
 								fi
 							fi
 						fi
 					fi
-                fi
+				fi
 
 				# Write changes to tempporary file
 
@@ -603,8 +601,17 @@ do
 			fi
 
 		done < "$model" # Feed model into loop for parsing
-
-		# Current date stamp
+		
+		# Post parsing cleanup
+		
+		if [[ "$option" = "step" ]]
+		then
+			# Remove consecutive empty step tags
+			
+			sed -i -e '/0 STEP/N;/^\(.*\)\n\1$/!P; D' "$temporary_file"
+		fi
+		
+		# Set current date stamp
 
 		stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
@@ -622,7 +629,8 @@ do
             mv "$temporary_file" "${temporary_file%.tmp}"
 			
 		else
-			echo "${cyan}Would you like to write your changes to the original model file ($model)? [ Yes | No ]${reset}"
+			echo "${cyan}Would you like to write your changes to the original model file? [ Yes | No ]${reset}"
+			echo "${cyan}Model file: $model${reset}"
 			echo ""
 
 			read reply
