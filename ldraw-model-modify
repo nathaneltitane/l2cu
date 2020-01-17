@@ -4,19 +4,17 @@
 
 # ldraw model modify #
 
-black= red= green= yellow= blue= magenta= cyan= white= reset=
-
 if [[ -t 1 ]]
 then
-	black=$(tput setaf 0)
-	red=$(tput setaf 1)
-	green=$(tput setaf 2)
-	yellow=$(tput setaf 3)
-	blue=$(tput setaf 4)
-	magenta=$(tput setaf 5)
-	cyan=$(tput setaf 6)
-	white=$(tput setaf 7)
-	reset=$(tput sgr0)
+    black=$(tput setaf 0)
+    red=$(tput setaf 1)
+    green=$(tput setaf 2)
+    yellow=$(tput setaf 3)
+    blue=$(tput setaf 4)
+    magenta=$(tput setaf 5)
+    cyan=$(tput setaf 6)
+    white=$(tput setaf 7)
+    reset=$(tput sgr0)
 fi
 
 version="01-01-2020"
@@ -24,76 +22,80 @@ script=$(basename -- "$0")
 
 while (($#))
 do
-	case "$1" in
-		-d|--directory)
-			shift
-			directory="$1"
-			;;
-		-a|--all)
-			extension_option="all"
-			extensions_list=(ldr mpd)
-			;;
-		-l|--ldr)
-			extension_option="ldr"
-			extensions_list=(ldr)
-			;;
-		-m|--mpd)
-			extension_option="mpd"
-			extensions_list=(mpd)
-			;;
-		-c|--color)
-			option="color"
-			;;
-		-p|--part)
-			option="part"
-			;;
-		-b|--bind)
-			option="bind"
-			;;
-		-f|--format)
-			option="format"
-			;;
+    case "$1" in
+        -d|--directory)
+            shift
+            directory="$1"
+            ;;
+        -a|--all)
+            extension_option="all"
+            extensions_list=(ldr mpd)
+            ;;
+        -l|--ldr)
+            extension_option="ldr"
+            extensions_list=(ldr)
+            ;;
+        -m|--mpd)
+            extension_option="mpd"
+            extensions_list=(mpd)
+            ;;
+        -c|--color)
+            option="color"
+            ;;
+        -p|--part)
+            option="part"
+            ;;
+        -b|--bind)
+            option="bind"
+            ;;
+        -f|--format)
+            option="format"
+            ;;
         -s|--step)
-			option="step"
-			;;
-		-o|--overwrite)
-			overwrite_option="overwrite"
-			;;
-		-h|--help)
-			echo -e "Usage:"
-			echo -e "./$script [EXTENSION] [OPTION] [DIRECTORY]"
-			echo -e ""
-			echo -e "Utility options:"
-			echo -e "-a, --all \t\t Selects ldr and mpd file formats as target."
-			echo -e "-l, --ldr \t\t Selects ldr file format as target."
-			echo -e "-m, --mpd \t\t Selects mpd file format as target. - This option has not yet been implemented."
-			echo -e "-d, --directory \t\t Specifies execution directory for specified file format(s)."
-			echo -e "-c, --color \t\t Modifies the part color attribute only."
-			echo -e "-p, --part \t\t Modifies the part number attribute only."
-			echo -e "-b, --bind \t\t Matches a part to a specific color and modifies the color for that part."
-			echo -e "-f, --format \t\t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
-      echo -e "-s, --step \t\t Separates and formats ldr submodels as individual steps."
-			echo -e "-o, --overwrite \t\t Assumes 'Yes' and forces the overwrite of the original model file after modification."
-			echo -e ""
-			echo -e "-h, --help \t\t Show help options."
-			echo -e "-v, --version \t Print version."
-			exit
-			;;
-		-v|--version)
-			echo -e "$script $version"
-			exit
-			;;
-		*)
-			echo -e "$script: Unknown option $1"
-			echo -e "Try '$script --help' for options information."
-			exit
-			;;
-		esac
-	shift
+            option="step"
+            ;;
+        -t|--lint)
+            option="lint"
+            ;;
+        -o|--overwrite)
+            overwrite_option="overwrite"
+            ;;
+        -h|--help)
+            echo -e "Usage:"
+            echo -e "./$script [EXTENSION] [OPTION] [DIRECTORY]"
+            echo -e ""
+            echo -e "Utility options:"
+            echo -e "-a, --all \t\t Selects ldr and mpd file formats as target."
+            echo -e "-l, --ldr \t\t Selects ldr file format as target."
+            echo -e "-m, --mpd \t\t Selects mpd file format as target. - This option has not yet been implemented."
+            echo -e "-d, --directory \t\t Specifies execution directory for specified file format(s)."
+            echo -e "-c, --color \t\t Modifies the part color attribute only."
+            echo -e "-p, --part \t\t Modifies the part number attribute only."
+            echo -e "-b, --bind \t\t Matches a part to a specific color and modifies the color for that part."
+            echo -e "-f, --format \t\t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
+            echo -e "-s, --step \t\t Separates and formats ldr submodels as individual steps."
+            echo -e "-t, --lint \t\t Standardizes and formats model files for parsing."
+            echo -e "-o, --overwrite \t\t Assumes 'Yes' and forces the overwrite of the original model file after modification."
+            echo -e ""
+            echo -e "-h, --help \t\t Show help options."
+            echo -e "-v, --version \t Print version."
+            exit
+            ;;
+        -v|--version)
+            echo -e "$script $version"
+            exit
+            ;;
+        *)
+            echo -e "$script: Unknown option $1"
+            echo -e "Try '$script --help' for options information."
+            exit
+            ;;
+        esac
+    shift
 done
 
 zenity() {
-	/usr/bin/zenity "$@" 2>/dev/null
+    /usr/bin/zenity "$@" 2>/dev/null
 }
 
 # Generate temporary file
@@ -253,63 +255,63 @@ Electric_Contact_Copper                 495        #AE7A59
 COLORS
 
 parse_input () {
-	while true
-	do
-		read input
+    while true
+    do
+        read input
 
-		if [[ -z $input ]]
-		then
-			echo "${yellow}Warning:${reset}"
-			echo "${yellow}Empty value. Please try again...${reset}"
-			echo ""
-		else
-			break
-		fi
-	done
+        if [[ -z $input ]]
+        then
+            echo "${yellow}Warning:${reset}"
+            echo "${yellow}Empty value. Please try again...${reset}"
+            echo ""
+        else
+            break
+        fi
+    done
 }
 
 parse_colors () {
-	parse_input
+    parse_input
 
-	color_input="${input,,}"
+    color_input="${input,,}"
 
-	while IFS=$' '
-	read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
-	do
-		# Color input entries cleanup
+    while IFS=$' '
+    read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
+    do
+        # Color input entries cleanup
 
-		# Color name
+        # Color name
 
-		space_name="${ldraw_color_name//_/ }"		# Remove underscores from name
-		name="${space_name,,}"						# Set name to lowercase for input match
-		ldraw_color_name="${name}"					# Reattribute input variable to lowercase name value
+        space_name="${ldraw_color_name//_/ }"        # Remove underscores from name
+        name="${space_name,,}"                        # Set name to lowercase for input match
+        ldraw_color_name="${name}"                    # Reattribute input variable to lowercase name value
 
-		# Color hex value
+        # Color hex value
 
-		hex_value="${ldraw_color_hex_value//#/}"	# Remove pound from name
-		hex_value="${hex_value,,}"					# Set name to lowercase for input match
-		ldraw_color_hex_value=${hex_value}			# Reattribute input variable to lowercase name value
+        hex_value="${ldraw_color_hex_value//#/}"    # Remove pound from name
+        hex_value="${hex_value,,}"                    # Set name to lowercase for input match
+        ldraw_color_hex_value=${hex_value}            # Reattribute input variable to lowercase name value
 
-		if [[ "$color_input" == "$ldraw_color_name" || "$color_input" == "$ldraw_color_number" || "$color_input" == "$ldraw_color_hex_value" ]]
-		then
-			echo "Color name................: ${ldraw_color_name}" 			# Confirmation
-			echo "Color number..............: ${ldraw_color_number}"		# Confirmation
-			echo "Color hexadecimal value...: ${ldraw_color_hex_value}"		# Confirmation
+        if [[ "$color_input" == "$ldraw_color_name" || "$color_input" == "$ldraw_color_number" || "$color_input" == "$ldraw_color_hex_value" ]]
+        then
+            echo "Color name................: ${ldraw_color_name}"             # Confirmation
+            echo "Color number..............: ${ldraw_color_number}"        # Confirmation
+            echo "Color hexadecimal value...: ${ldraw_color_hex_value}"        # Confirmation
 
-			return "$ldraw_color_number"
-		fi
+            return "$ldraw_color_number"
+        fi
 
-	done < "$colors"
+    done < "$colors"
 
-	echo "${red}NO MATCH${reset}"
-	exit 1
+    echo "${red}NO MATCH${reset}"
+    exit 1
 }
 
 parse_parts () {
-	parse_input
-	part_input="$input"
-	
-	return "$part_input"
+    parse_input
+    part_input="$input"
+    
+    return "$part_input"
 }
 
 # Confirm options being used before processing
@@ -322,9 +324,9 @@ sleep 1
 
 if [[ "$option" == "overwrite" ]]
 then
-	echo "${red}WARNING:${reset}"
-	echo "${red}Utility started using the overwrite option.${reset}"
-	echo "${red}Parsed model modification will be written to file directly!${reset}"
+    echo "${red}WARNING:${reset}"
+    echo "${red}Utility started using the overwrite option.${reset}"
+    echo "${red}Parsed model modification will be written to file directly!${reset}"
 fi
 
 sleep 1
@@ -333,46 +335,46 @@ sleep 1
 
 if [[ -z "$directory" ]]
 then
-	directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") || exit
+    directory=$(zenity --file-selection  --multiple --directory --separator=$'\n' --title="Select a Directory") || exit
 fi
 
 cd "$directory" || exit
 
 if [[ "$option" = "color" ]]
 then
-	echo "${cyan}Please enter the color description [ name / number / hexadecimal ] you would like to modify.${reset}"
-	parse_colors
-	old_color="$ldraw_color_number" # $? returning wrong arbitrary value for $old_color
+    echo "${cyan}Please enter the color description [ name / number / hexadecimal ] you would like to modify.${reset}"
+    parse_colors
+    old_color="$ldraw_color_number" # $? returning wrong arbitrary value for $old_color
 
-	echo "${cyan}Please enter the color description [ name / number / hexadecimal ] you would like to set.${reset}"
-	parse_colors
-	new_color="$ldraw_color_number" # $? returning wrong arbitrary value for $new_color
+    echo "${cyan}Please enter the color description [ name / number / hexadecimal ] you would like to set.${reset}"
+    parse_colors
+    new_color="$ldraw_color_number" # $? returning wrong arbitrary value for $new_color
 fi
 
 if [[ "$option" = "part" ]]
 then
-	echo "${cyan}Please enter the part number you would like to modify.${reset}"
-	parse_parts
-	old_part="$part_input" # $? returning wrong arbitrary value for $old_part
+    echo "${cyan}Please enter the part number you would like to modify.${reset}"
+    parse_parts
+    old_part="$part_input" # $? returning wrong arbitrary value for $old_part
 
-	echo "${cyan}Please enter the part number you would like to set.${reset}"
-	parse_parts
-	new_part="$part_input" # $? returning wrong arbitrary value for $new_part
+    echo "${cyan}Please enter the part number you would like to set.${reset}"
+    parse_parts
+    new_part="$part_input" # $? returning wrong arbitrary value for $new_part
 fi
 
 if [[ "$option" = "bind" ]]
 then
-	echo "${cyan}Please enter the part number you would like to modify.${reset}"
-	parse_parts
-	part_selection="$part_input" # $? returning wrong arbitrary value for $part_selection
+    echo "${cyan}Please enter the part number you would like to modify.${reset}"
+    parse_parts
+    part_selection="$part_input" # $? returning wrong arbitrary value for $part_selection
 
-	echo "${cyan}Please enter the matching color description [ name | number | hexadecimal ] you would like to modify for the selected part.${reset}"
-	parse_colors
-	old_color="$ldraw_color_number" # $? returning wrong arbitrary value for $old_color
+    echo "${cyan}Please enter the matching color description [ name | number | hexadecimal ] you would like to modify for the selected part.${reset}"
+    parse_colors
+    old_color="$ldraw_color_number" # $? returning wrong arbitrary value for $old_color
 
-	echo "${cyan}Please enter the new color description [ name | number | hexadecimal ] you would like to set for the selected part.${reset}"
-	parse_colors
-	new_color="$ldraw_color_number" # $? returning wrong arbitrary value for $new_color
+    echo "${cyan}Please enter the new color description [ name | number | hexadecimal ] you would like to set for the selected part.${reset}"
+    parse_colors
+    new_color="$ldraw_color_number" # $? returning wrong arbitrary value for $new_color
 fi
 
 # Substitution
@@ -381,262 +383,303 @@ IFS=' '
 
 for extension in ${extensions_list[@]}
 do
-	echo $(find ${directory} -iname *.$extension) | while read -r model
-	do
-		model_export="${model##*/}"
-		model_export_name="${model_export%.*}"
-		model_export_name_clean="${model_export_name:5}"
+    echo $(find ${directory} -iname *.$extension) | while read -r model
+    do
+        model_export="${model##*/}"
+        model_export_name="${model_export%.*}"
+        model_export_name_clean="${model_export_name:5}"
 
-		temporary_file="$model.tmp"
+        temporary_file="$model.tmp"
+        
+        # Model file linting
+        
+        # substitute carriage returns for newline
+        # delete lines beginning with dot
+        # delete lines beginning with whitespace
+        # eliminate consecutive step tags
+        
+        if [[ "$option" = "lint" ]]
+        then
+            sed -i \
+                -e 's/\r\ /\n/g' \
+                -e 's/\r/\n/g'\
+                -e '/^\./d' \
+                -e '/^ /d' \
+                -e '/0 STEP/N;/^\(.*\)\n\1$/!P; D' $model
+        fi
 
-		# Initialize line count
+        # Initialize line count
 
-		line_number=0
+        line_number=0
 
-		while IFS=
-		read -r line
-		do
-			line_number=$(( $line_number + 1 ))
+        while IFS=
+        read -r line
+        do
+            line_number=$(( $line_number + 1 ))
 
-			if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
-			then
-				# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+               
+            if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
+            then
+                author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
+                
+                # Reformat line to specific string
 
-				echo "$line" >> "$temporary_file"
-				continue
-			else
-				IFS=' '
-				read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
+                line="0 !LEOCAD MODEL AUTHOR $author_string"
 
-				vect_x="$a $b $c"
-				vect_y="$d $e $f"
-				vect_z="$g $h $i"
+                echo "$line" >> "$temporary_file"
+            
+            elif [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
+            then
+                # Skip header and footer lines containing matching patterns - prevents model file syntax modification
 
-				# ⎡ a d g 0 ⎤	⎡ a b c x ⎤
-				# ⎢ b e h 0 ⎥	⎢ d e f y ⎥
-				# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
-				# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
+                echo "$line" >> "$temporary_file"
+                continue
+            else
+                IFS=' '
+                read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
 
-				IFS='.'
+                vect_x="$a $b $c"
+                vect_y="$d $e $f"
+                vect_z="$g $h $i"
 
-				# Split part argument into part number and part extension
+                # ⎡ a d g 0 ⎤    ⎡ a b c x ⎤
+                # ⎢ b e h 0 ⎥    ⎢ d e f y ⎥
+                # ⎢ c f i 0 ⎥    ⎢ g h i z ⎥
+                # ⎣ x y z 1 ⎦    ⎣ 0 0 0 1 ⎦
+                
+                # Set IFS
 
-				read part suffix <<< "$part_dat"
+                IFS='.'
 
-				# Color substitution
+                # Split part argument into part number and part extension
 
-				if [[ "$option" = "color" ]]
-				then
-					if [[ "$color" = "$old_color" ]]
-					then
-						color="$new_color"
+                read part suffix <<< "$part_dat"
 
-						echo "${red}Changing..:${reset} $old_color"
-						echo "${red}Setting...:${reset} $new_color"
-						echo ""
-					else
-						: # pass
-					fi
-				fi
+                # Color substitution
 
-				# Part substitution
+                if [[ "$option" = "color" ]]
+                then
+                    if [[ "$color" = "$old_color" ]]
+                    then
+                        color="$new_color"
 
-				if [[ "$option" = "part" ]]
-				then
-					if [[ "$part" = "$old_part" ]]
-					then
-						part="$new_part"
+                        echo "${red}Changing..:${reset} $old_color"
+                        echo "${red}Setting...:${reset} $new_color"
+                        echo ""
+                    else
+                        : # pass
+                    fi
+                fi
 
-						echo "${cyan}Modifying $model..."
-						echo ""
-						echo "${red}Changing..:${reset} $old_part"
-						echo "${red}Setting...:${reset} $new_part"
-						echo ""
-					else
-						: # pass
-					fi
-				fi
+                # Part substitution
 
-				# Bind (Part + Color) Color substitution
+                if [[ "$option" = "part" ]]
+                then
+                    if [[ "$part" = "$old_part" ]]
+                    then
+                        part="$new_part"
 
-				if [[ "$option" = "bind" ]]
-				then
-					if [[ "$part" == "$part_selection" ]]
-					then
-						if [[ "$color" = "$old_color" ]]
-						then
-							color="$new_color"
-						else
-							: # pass
-						fi
-					fi
-				fi
-				
-				# Step ldr submodel separation
-								
-				if [[ "$option" = "step" ]]
-				then
-						if [[ "$line" == *ldr* ]]
-						then
-								if [[ "$suffix" == *ldr* ]]
-								then
-										color="0"
-										suffix="ldr\n0 STEP"
-								else
-										: # pass
-								fi
-						fi
-				fi
-				
-				# Format - File structure and META substitution
+                        echo "${cyan}Modifying $model..."
+                        echo ""
+                        echo "${red}Changing..:${reset} $old_part"
+                        echo "${red}Setting...:${reset} $new_part"
+                        echo ""
+                    else
+                        : # pass
+                    fi
+                fi
 
-				if [[ "$option" = "format" ]]
-				then
-					author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
+                # Bind (Part + Color) Color substitution
 
-					# Strip lines that match the following expressions - comment out to keep
+                if [[ "$option" = "bind" ]]
+                then
+                    if [[ "$part" == "$part_selection" ]]
+                    then
+                        if [[ "$color" = "$old_color" ]]
+                        then
+                            color="$new_color"
+                        else
+                            : # pass
+                        fi
+                    fi
+                fi
+                
+                # Step ldr submodel separation
+                                
+                if [[ "$option" = "step" ]]
+                then
+                        if [[ "$line" == *ldr* ]]
+                        then
+                                if [[ "$suffix" == *ldr* ]]
+                                then
+                                        color="0"
+                                        suffix="ldr\n0 STEP"
+                                else
+                                        : # pass
+                                fi
+                        fi
+                fi
+                
+                # Format - File structure and META substitution
 
-					if	[[ "$line" = 0 ]]		             	|| \
-							[[ "$line" = *"New Model"* ]]		|| \
-							[[ "$line" = *Author* ]]			|| \
-							[[ "$line" = *Name* ]]			    || \
-							[[ "$line" = *Unofficial* ]]		|| \
-							[[ "$line" = *Untitled* ]]	        || \
-							[[ "$line" = *BACKGROUND* ]]		|| \
-							[[ "$line" = *GROUP* ]]		        || \
-							[[ "$line" = *ROTATION* ]]		    || \
-							[[ "$line" = *PIVOT* ]]
-					then
-						: # pass
-					else
+                if [[ "$option" = "format" ]]
+                then
+                    # Strip lines that match the following expressions - comment out to keep
 
-						# If line contains '!LPUB' header/meta tag for LPub formatting references
+                    if [[ "$line" = *"New Model"* ]]
+                    then
+                        : # pass
+                    
+                    elif [[ "$line" = *Name* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *Unofficial* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *Untitled* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *BACKGROUND* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *GROUP* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *ROTATION* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *PIVOT* ]]
+                    then
+                        : # pass
+                        
+                    elif [[ "$line" = *PIVOT* ]]
+                    then
+                        : # pass
+                    else
 
-						if [[ "$line" == *!LPUB* ]]
-						then
-							# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+                        # If line contains '!LPUB' header/meta tag for LPub formatting references
 
-							echo "$line" >> "$temporary_file"
-							continue
-						else
+                        if [[ "$line" == *!LPUB* ]]
+                        then
+                            # Skip header and footer lines containing matching patterns - prevents model file syntax modification
 
-							# If line contains 'AUTHOR' tag
+                            echo "$line" >> "$temporary_file"
+                            
+                            continue
+                        fi
+                            # If line contains '!LEOCAD' header/meta tag
 
-							if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
-							then
-								# Reformat line to specific string
+                        if [[ "$line" == *!LEOCAD* ]]
+                        then
+                            # Skip header and footer lines containing matching patterns - prevents model file syntax modification
 
-								line="0 !LEOCAD MODEL AUTHOR $author_string"
+                            echo "$line" >> "$temporary_file"
+                            
+                            continue
+                        fi
 
-								echo "$line" >> "$temporary_file"
-								continue
-							else
+                        # If line contains 'NOFILE' header/meta tag for mpd footer references
 
-								# If line contains '!LEOCAD' header/meta tag
+                        if [[ "$line" == *NOFILE* ]]
+                        then
+                            # Skip header and footer lines containing matching patterns - prevents model file syntax modification
 
-								if [[ "$line" == *!LEOCAD* ]]
-								then
-									# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+                            echo "$line" >> "$temporary_file"
+                            
+                            continue
+                        fi
 
-									echo "$line" >> "$temporary_file"
-									continue
-								else
+                        # If line contains 'FILE' header/meta tag for mpd header references
 
-									# If line contains 'NOFILE' header/meta tag for mpd footer references
+                        if [[ "$line" == *FILE* ]]
+                        then
+                            IFS=' '
+                            read -r flag statement file_name <<< "$line"
 
-									if [[ "$line" == *NOFILE* ]]
-									then
-										# Skip header and footer lines containing matching patterns - prevents model file syntax modification
+                            clean_file_name="${file_name//\(/}"          # Strip (
+                            clean_file_name="${clean_file_name//\)/}"    # Strip )
+                            clean_file_name="${clean_file_name// /-}"    # Spaces to dashes
+                            clean_file_name="${clean_file_name,,}"       # String to lower case
 
-										echo "$line" >> "$temporary_file"
-										continue
-									else
+                            # Write changes to tempporary file
 
-										# If line contains 'FILE' header/meta tag for mpd header references
+                            echo "$flag $statement $clean_file_name" >> "$temporary_file"
+                        else
+                            # Parse all other lines and format according to regular expressions
 
-										if [[ "$line" == *FILE* ]]
-										then
-											IFS=' '
-											read -r flag statement file_name <<< "$line"
+                            IFS=' '
+                            read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
 
-											clean_file_name="${file_name//\(/}"		# Strip (
-											clean_file_name="${clean_file_name//\)/}"	# Strip )
-											clean_file_name="${clean_file_name// /-}"	# Spaces to dashes
-											clean_file_name="${clean_file_name,,}"		# String to lower case
+                            clean_part="${part_dat//\(/}"            # Strip (
+                            clean_part="${clean_part//\)/}"            # Strip )
+                            clean_part="${clean_part// /-}"            # Spaces to dashes
+                            clean_part="${clean_part,,}"            # String to lower case
 
-											# Write changes to tempporary file
+                            vect_x="$a $b $c"
+                            vect_y="$d $e $f"
+                            vect_z="$g $h $i"
 
-											echo "$flag $statement $clean_file_name" >> "$temporary_file"
-										else
-											# Parse all other lines and format according to regular expressions
+                            # ⎡ a d g 0 ⎤    ⎡ a b c x ⎤
+                            # ⎢ b e h 0 ⎥    ⎢ d e f y ⎥
+                            # ⎢ c f i 0 ⎥    ⎢ g h i z ⎥
+                            # ⎣ x y z 1 ⎦    ⎣ 0 0 0 1 ⎦
 
-											IFS=' '
-											read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
+                        fi
+                    fi
+                fi
 
-											clean_part="${part_dat//\(/}"			# Strip (
-											clean_part="${clean_part//\)/}"			# Strip )
-											clean_part="${clean_part// /-}"			# Spaces to dashes
-											clean_part="${clean_part,,}"			# String to lower case
+                # Reset IFS
+                
+                IFS=" "
+                
+                # Write changes to tempporary file
 
-											vect_x="$a $b $c"
-											vect_y="$d $e $f"
-											vect_z="$g $h $i"
+                echo -e "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part_dat" >> "$temporary_file"
+            fi
 
-											# ⎡ a d g 0 ⎤	⎡ a b c x ⎤
-											# ⎢ b e h 0 ⎥	⎢ d e f y ⎥
-											# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
-											# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
+        done < "$model" # Feed model into loop for parsing
+        
+        # Post parsing cleanup
+        
+        if [[ "$option" = "step" ]]
+        then
+            # Remove consecutive empty step tags
+            
+            sed -i -e '/0 STEP/N;/^\(.*\)\n\1$/!P; D' "$temporary_file"
+        fi
+        
+        # Set current date stamp
 
-										fi
-									fi
-								fi
-							fi
-						fi
-					fi
-				fi
+        stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
-				# Write changes to tempporary file
+        # Write changes to file?
 
-				echo -e "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part.$suffix" >> "$temporary_file"
-			fi
-
-		done < "$model" # Feed model into loop for parsing
-		
-		# Post parsing cleanup
-		
-		if [[ "$option" = "step" ]]
-		then
-			# Remove consecutive empty step tags
-			
-			sed -i -e '/0 STEP/N;/^\(.*\)\n\1$/!P; D' "$temporary_file"
-		fi
-		
-		# Set current date stamp
-
-		stamp=$(date +"%m-%d-%Y-%H-%M-%S")
-
-		# Write changes to file?
-
-		if [[ "$overwrite_option" = "overwrite" ]]
-		then
-			reply="yes"
-			
-			echo "${red}'overwrite' option enabled - writing changes to original model file!${reset}"
-			echo ""
+        if [[ "$overwrite_option" = "overwrite" ]]
+        then
+            reply="yes"
+            
+            echo "${red}'overwrite' option enabled - writing changes to original model file!${reset}"
+            echo ""
             echo "${yellow}Writing file ($model)...${reset}"
             echo ""
             
             mv "$temporary_file" "${temporary_file%.tmp}"
-			
-		else
-			echo "${cyan}Would you like to write your changes to the original model file? [ Yes | No ]${reset}"
-			echo "${cyan}Model file: $model${reset}"
-			echo ""
+            
+        else
+            echo "${cyan}Would you like to write your changes to the original model file? [ Yes | No ]${reset}"
+            echo "${cyan}Model file: $model${reset}"
+            echo ""
 
-			read reply
-			
-			if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-			then			
+            read reply
+            
+            if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+            then            
                 echo "${red}Overwriting original model file!${reset}"
                 echo ""
                 echo "${yellow}Writing file ($model)...${reset}"
@@ -644,14 +687,14 @@ do
                 
                  mv "$temporary_file" "${temporary_file%.tmp}"
 
-			else
-				echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
+            else
+                echo "${yellow}Unknown input - Writing changes to model file copy...${reset}"
                 echo ""
                 
                 mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.$extension"
-			fi
-		fi
-	done
+            fi
+        fi
+    done
 done
 
 echo "${cyan}Done.${reset}"
