@@ -4,8 +4,6 @@
 
 # ldraw model export #
 
-black= red= green= yellow= blue= magenta= cyan= white= reset=
-
 if [[ -t 1 ]]
 then
 	black=$(tput setaf 0)
@@ -127,18 +125,6 @@ do
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
-
-		leocad(){
-			$(which leocad)
-		}
-
-		blender() {
-			$(which blender)
-		}
-
-		zip() {
-			$(which zip)
-		}
 	fi
 
 	sleep 1
@@ -230,7 +216,7 @@ PYTHON
 
 # Confirm options being used before processing
 
-echo "${cyan}Utility started using the $extension file format option.${reset}"
+echo "${cyan}Utility started using the $extension_option file format option.${reset}"
 echo "${cyan}Utility started using the $export_option file format option.${reset}"
 echo ""
 
@@ -274,6 +260,7 @@ do
 		run_leocad () {
 
 			echo "${cyan}Exporting $model to ${export_name} format ("$export_extension")...${reset}"
+			echo ""
 
 			leocad "$model" "-$export_option" "$export_file" >> /dev/null
 
@@ -313,6 +300,7 @@ do
 			run_leocad
 
 			echo "${cyan}Converting $model ("$export_extension")...${reset}"
+			echo ""
 
 			# Import 3DS file into blender to create optimized blend file
 
@@ -323,8 +311,6 @@ do
 			rm -rf "$export_file_3ds"
 
 		fi
-
-		echo ""
 
 		# Compare model name to uid list model entry and generate uid token file
 		# under model's export directory for proper update authentication
@@ -401,11 +387,9 @@ do
 			color=$(tput setaf 1) # red
 		fi
 
-		echo "${message}"
-		echo "${confirmation}"
-		echo ""
 		echo "${model_list_uid_message}"
 		echo "Model ID [ List ]...: $list_uid"
+		echo ""
 		echo "${model_read_uid_message}"
 		echo "Model ID [ File ]...: $read_uid"
 		echo ""
