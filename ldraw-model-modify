@@ -303,7 +303,7 @@ parse_colors () {
 
     done < "$colors"
 
-    echo "${red}NO MATCH${reset}"
+    echo "${red}No available color matches the input - Exiting.${reset}"
     exit 1
 }
 
