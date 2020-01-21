@@ -4,8 +4,6 @@
 
 # ldraw model render #
 
-black= red= green= yellow= blue= magenta= cyan= white= reset=
-
 if [[ -t 1 ]]
 then
 	black=$(tput setaf 0)
@@ -69,7 +67,6 @@ do
 			position_option="front"
 			position_preset="front"
 			;;
-
 		-h|--help)
 			echo -e "Usage:"
 			echo -e "./$script [EXTENSION] [RENDER OPTION] [VIEW PRESET]"
@@ -147,10 +144,6 @@ do
 	then
 		echo "${green}'$binary' binary found on system - Continuing...${reset}"
 		echo ""
-
-		leocad() {
-			$(which leocad)
-		}
 	fi
 
 	sleep 1
@@ -162,7 +155,7 @@ zenity() {
 
 # Confirm options being used before processing
 
-echo "${cyan}Utility started using the $extension file extension option.${reset}"
+echo "${cyan}Utility started using the $extension_option file extension option.${reset}"
 echo "${cyan}Utility started using the $position_option view preset.${reset}"
 echo ""
 
