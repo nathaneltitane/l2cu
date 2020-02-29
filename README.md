@@ -109,7 +109,7 @@ The parts list acts as an index and is often required for legacy editors (i.e.: 
 
 Most modern editors now generate a cached, per-session dynamic index on launch and do not require this list anymore.
 
-To find examples that make use of L²CU, or to simply browse my models, you can visit my [Blog](https://www.legolinux.com) which is hosted at [GitHub](https://github.com/nathaneltitane/legolinux.github.io) as well.
+To find examples that make use of L²CU, or to simply browse my models, you can visit my [Blog](https://legolinux.com) which is hosted at [GitHub](https://github.com/nathaneltitane/legolinux.github.io) as well.
 
 ***
 
