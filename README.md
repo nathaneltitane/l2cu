@@ -94,7 +94,7 @@ The user can modify any ldr or mpd file in one of four ways:
 - modify the color of a specific part to any other color for that same part (bind option)
 - strip and clean the model file for unwanted or extraneous meta tags and condense it to suitable parameters (format option)
 
-### make-list
+### 'make-list'
 
 'ldraw-make-List' was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw package.
 It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within Ldraw/parts).
