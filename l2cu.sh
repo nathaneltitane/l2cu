@@ -67,32 +67,32 @@ do
 			option="render"
 			;;
 		-full)
-			position_option="full"
-			position_preset="full"
+			render_option="full"
+			render_preset="full"
 			;;
 		-fixed)
-			position_option="fixed"
-			position_preset="fixed"
+			render_option="fixed"
+			render_preset="fixed"
 			;;
 		-outline)
-			position_option="outline"
-			position_preset="outline"
+			render_option="outline"
+			render_preset="outline"
 			;;
 		-quarter-back)
-			position_option="quarter-back"
-			position_preset="quarter-back"
+			render_option="quarter-back"
+			render_preset="quarter-back"
 			;;
 		-quarter-front)
-			position_option="quarter-front"
-			position_preset="quarter-front"
+			render_option="quarter-front"
+			render_preset="quarter-front"
 			;;
 		-back)
-			position_option="back"
-			position_preset="back"
+			render_option="back"
+			render_preset="back"
 			;;
 		-front)
-			position_option="front"
-			position_preset="front"
+			render_option="front"
+			render_preset="front"
 			;;
 
 # exports -------------------------------------------------------------------- #
@@ -618,7 +618,7 @@ echo ""
 
 if [[ "$option" = "render" ]]
 then
-	echo "${marker_info}Utility started using the ${cyan}$position_option${reset} camera preset."
+	echo "${marker_info}Utility started using the ${cyan}$render_option${reset} camera preset."
 	echo ""
 
 elif [[ "$option" = "export" ]]
@@ -726,47 +726,47 @@ do
 
 			# define camera position presets
 
-			if [[ "$position_preset" == "full" ]]
+			if [[ "$render_preset" == "full" ]]
 			then
 				position=(0 1 2 3)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$position_preset" == "fixed" ]]
+			if [[ "$render_preset" == "fixed" ]]
 			then
 				position=(0 1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$position_preset" == "quarter-back" ]]
+			if [[ "$render_preset" == "quarter-back" ]]
 			then
 				position=(0)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$position_preset" == "quarter-front" ]]
+			if [[ "$render_preset" == "quarter-front" ]]
 			then
 				position=(1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$position_preset" == "back" ]]
+			if [[ "$render_preset" == "back" ]]
 			then
 				position=(2)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$position_preset" == "front" ]]
+			if [[ "$render_preset" == "front" ]]
 			then
 				position=(3)
 			fi
 
-			if [[ "$position_preset" == "outline" ]]
+			if [[ "$render_preset" == "outline" ]]
 			then
 				position=(1)
 				shading=flat
@@ -803,7 +803,7 @@ do
 
 				# create outline splash image
 
-				if [[ "$position_option" == "outline" ]]
+				if [[ "$render_option" == "outline" ]]
 				then
 					# Rename renders to designated splash images
 
@@ -1098,6 +1098,8 @@ then
 
 			temporary_file="$model.tmp"
 
+# modify: lint --------------------------------------------------------------- #
+
 			# model file linting
 
 			# substitute carriage returns for newline
@@ -1130,7 +1132,6 @@ then
 			read -r line
 			do
 				line_number=$(( $line_number + 1 ))
-
 
 				if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
 				then
@@ -1170,6 +1171,8 @@ then
 
 					read part suffix <<< "$part_dat"
 
+# modify: color -------------------------------------------------------------- #
+
 					# color substitution
 
 					if [[ "$modify_option" = "color" ]]
@@ -1187,6 +1190,8 @@ then
 							: # pass
 						fi
 					fi
+
+# modify: part --------------------------------------------------------------- #
 
 					# part substitution
 
@@ -1206,6 +1211,8 @@ then
 							: # pass
 						fi
 					fi
+
+# modify: bind --------------------------------------------------------------- #
 
 					# bind [ part + color ] color substitution
 
@@ -1230,6 +1237,8 @@ then
 						fi
 					fi
 
+# modify: step --------------------------------------------------------------- #
+
 					# step submodel [ldr ] separation
 
 					if [[ "$modify_option" = "step" ]]
@@ -1245,6 +1254,8 @@ then
 									fi
 							fi
 					fi
+
+# modify: format ------------------------------------------------------------- #
 
 					# format - file structure and META substitution
 
@@ -1289,7 +1300,6 @@ then
 						then
 							: # pass
 						else
-
 							# if line contains '!LPUB' tag
 
 							if [[ "$line" == *!LPUB* ]]
@@ -1400,6 +1410,8 @@ then
 			# Set current date stamp
 
 			stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
+# modify: overwrite ---------------------------------------------------------- #
 
 			# write changes to file?
 
