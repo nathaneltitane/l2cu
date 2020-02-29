@@ -41,7 +41,7 @@ That being said,the user may wish to build or install the following requirements
 
 L²CU is split into wseveral functions to make the most out of your Ldraw model files.
 
-### mkae-list
+### make-list
 
 'ldraw-make-List' was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw package.
 It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within Ldraw/parts).
