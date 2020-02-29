@@ -22,7 +22,7 @@ L²CU parses the model file, reads each line contained in it and processes the v
 ### What does it need?
 
 On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's request.
-That being said,the user may wish to build or install the following requirements prior to using this utility for convenience's sake:
+That being said, the user may wish to build or install the following requirements prior to using this utility for convenience's sake:
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's multiplatform LDraw compatible model editor
 
