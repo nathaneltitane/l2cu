@@ -42,38 +42,6 @@ You can:
 
 You can also download and unpack the LDraw parts library if you need to install or update it as well as create the legacy 'parts.lst' file still used by certain editors (i.e.: MLCad)
 
-### make-list
-
-'ldraw-make-List' was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw package.
-It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within Ldraw/parts).
-
-The user can create a list that either parses and sorts the content of that directory by part number or by description.
-
-This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the Ldraw parts directory contents.
-
-The list that is generated is frequently used for legacy editors (such as MLCAD, which can be run using wine) to provide it with an index of parts to locate and use. Most modern editors generate a cached session dynamic index on launch and do nor require this list anymore.
-
-### export
-
-'ldraw-model-export', as its name implies, serves as a batch LDraw model file exporter, that can generate (with the use of leocad and blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s).
-
-Those exported formats can be used to then upload the models online for showcasing or presentation, using WebGL based services such as Sketchfab.
-
-### modify
-
-'ldraw-model-modify' serves as a bulk editing tool to enable batch editing and modification of LDraw based digital Lego model files and projects.
-
-It can be extremely helpful in the case of massive model updates or adjustments that would normally be done manually through any LDraw model editor.
-
-It uses stream editing to find and replace the appropriate string elements from the known syntax of the LDraw file specification.
-
-The user can modify any ldr or mpd file in one of four ways:
-
-- modify any specific color for another (color option)
-- modify any specific part for another (part option)
-- modify the color of a specific part to any other color for that same part (bind option)
-- strip and clean the model file for unwanted or extraneous meta tags and condense it to suitable parameters (format option)
-
 ### render
 
 'ldraw-model-render' enables the user to generate preset, high defintion renders, of the selected LDraw model files or projects (using leocad as the main rendering engine).
@@ -103,7 +71,41 @@ view=(
 	"front"
 )
 
-Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences to generate the output desired using the visual settings and angles of your choice.
+Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences.
+
+### export
+
+'ldraw-model-export', as its name implies, serves as a batch LDraw model file exporter, that can generate (with the use of leocad and blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s).
+
+Those exported formats can be used to then upload the models online for showcasing or presentation, using WebGL based services such as Sketchfab.
+
+### modify
+
+'ldraw-model-modify' serves as a bulk editing tool to enable batch editing and modification of LDraw based digital Lego model files and projects.
+
+It can be extremely helpful in the case of massive model updates or adjustments that would normally be done manually through any LDraw model editor.
+
+It uses stream editing to find and replace the appropriate string elements from the known syntax of the LDraw file specification.
+
+The user can modify any ldr or mpd file in one of four ways:
+
+- modify any specific color for another (color option)
+- modify any specific part for another (part option)
+- modify the color of a specific part to any other color for that same part (bind option)
+- strip and clean the model file for unwanted or extraneous meta tags and condense it to suitable parameters (format option)
+
+### make-list
+
+'ldraw-make-List' was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw package.
+It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within Ldraw/parts).
+
+The user can create a list that either parses and sorts the content of that directory by part number or by description.
+
+This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the Ldraw parts directory contents.
+
+The parts list acts as an index and is often required for legacy editors (i.e.: MLCAD, which can be run using wine under Linux-based distributions).
+
+Most modern editors generate a cached session dynamic index on launch and do nor require this list anymore.
 
 Feel free to follow developments and new model builds at my [Blog](https://www.legolinux.com) or follow the [Sketchfab Blog
 
