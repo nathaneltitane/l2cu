@@ -36,7 +36,7 @@ L²CU is split into several functions to make the most out of your Ldraw model f
 
 You can:
 - render
-- export (into various 3D standard formats)
+- export (to various 3D standard formats)
 - modify (color, part or part with a specific color)
 - format (meta tags, steps, linting)
 
