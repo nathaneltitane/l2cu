@@ -2,10 +2,9 @@
 
 This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related operations, on multiple models and/or project files at the same time.
 
-L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for efficientmanagement of Ldraw model files in various ways, be it part, color, submodel or format editing, where most of the modern editors fail to provide such obvious features.
+L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of Ldraw model files in many ways. Most of the modern editors fail to provide such obvious features and that is where this utility tries to fill the gap in a simple and user-friendly way.
 
 The BASH shell is what makes the L²CU backbone: the now monolithic utilityaims to pearate while being optimized for portability and uses a very minimal set of dependencies to get the job done.
-
 
 ### What does it do?
 
@@ -34,7 +33,6 @@ That being said,the user may wish to build or install the following requirements
 
 - curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer (i.e.: apt, dnf, etc.)
 
-  
 ###### [*] Deprecated in latest L²CU updates to the benefit of LeoCAD as an all in one solution for most functions.
 
 ### What can I do with L²CU?
