@@ -26,14 +26,9 @@ That being said,the user may wish to build or install the following requirements
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's multiplatform LDraw compatible model editor
 
-- [LDView](https://github.com/tcobbs/ldview) - Travis Cobb's real-time 3D viewer for displaying LDraw models [*]
-- [ldview](https://github.com/tcobbs/ldview) (ldview-osmesa) - the command line version of the LDView renderer [*]
-
 - [Blender](https://www.blender.org/) - The free and open source 3D creation suite
 
 - curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer (i.e.: apt, dnf, etc.)
-
-###### [*] Deprecated in latest L²CU updates to the benefit of LeoCAD as an all in one solution for most functions.
 
 ### What can I do with L²CU?
 
