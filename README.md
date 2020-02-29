@@ -68,6 +68,7 @@ It can be extremely helpful in the case of massive model updates or adjustments 
 It uses stream editing to find and replace the appropriate string elements from the known syntax of the LDraw file specification.
 
 The user can modify any ldr or mpd file in one of four ways:
+
 - modify any specific color for another (color option)
 - modify any specific part for another (part option)
 - modify the color of a specific part to any other color for that same part (bind option)
@@ -81,6 +82,7 @@ The user can choose from preselected defaults or specify the latitude and longit
 
 Defaults (as arrays):
 
+```
 latitude=(
 	30
 	30
@@ -101,12 +103,14 @@ view=(
 	"back"
 	"front"
 )
+```
 
 Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences to generate the output desired using the visual settings and angles of your choice.
 
-Feel free to follow developments and new model builds at my [Blog](http://www.legolinux.com) or follow the [Sketchfab Blog](https://blog.sketchfab.com/tag/ldraw/) for *Sketchfab*/*LDraw* tutorials and editorials!
+Feel free to follow developments and new model builds at my [Blog](https://legolinux.com) or follow the [Sketchfab Blog](https://blog.sketchfab.com/tag/ldraw/) for *Sketchfab/LDraw* tutorials and editorials!
 
 ### [Submit bug report or feature request](https://github.com/nathaneltitane/ldraw/issues)
+
 ### [Submit pull request](https://github.com/nathaneltitane/ldraw/pulls)
 
 ### [LDraw](https://www.ldraw.org)
