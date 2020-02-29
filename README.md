@@ -1,6 +1,6 @@
 ### L²CU: LDraw Linux Command line Utilities
 
-This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related batch operations on multiple models and/or project files at the same time.
+This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related operations, on multiple models and/or project files at the same time.
 
 L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for efficientmanagement of Ldraw model files in various ways, be it part, color, submodel or format editing, where most of the modern editors fail to provide such obvious features.
 
