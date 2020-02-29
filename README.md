@@ -44,9 +44,9 @@ You can also download and unpack the LDraw parts library if you need to install 
 
 ### render
 
-'ldraw-model-render' enables the user to generate preset, high defintion renders, of the selected LDraw model files or projects (using leocad as the main rendering engine).
+The render function generates preset, high defintion renders, of the selected LDraw model files or projects (using leocad to process the renders).
 
-The user can choose from preselected defaults or specify the latitude and longitude parameters of the camera as well as a file saving suffix to register the coordinates as a viewing angle to the file name:
+The user can choose from set defaults or specify the latitude and longitude parameters of the camera, as well as a file saving suffix to register the coordinates as a viewing angle string to the file name:
 
 Defaults (as arrays):
 
@@ -75,17 +75,17 @@ Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html)
 
 ### export
 
-'ldraw-model-export', as its name implies, serves as a batch LDraw model file exporter, that can generate (with the use of leocad and blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s).
+This function serves as a 3D standard file exporter, that can generate (with the use of leocad and/or blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s) or project files.
 
-Those exported formats can be used to then upload the models online for showcasing or presentation, using WebGL based services such as Sketchfab.
+Those exported formats can be used to then upload the models online for showcase purposes or to put in online personal or commercial galleries (think WebGL, [ThreeJS](https://threejs.org/), [Sketchfab](https://sketchfab.com)).
 
 ### modify
 
-'ldraw-model-modify' serves as a bulk editing tool to enable batch editing and modification of LDraw based digital Lego model files and projects.
+This portion of the utility is the more interesting one: it serves as a batch editing tool to modify model files at the part level for both ldr and mpd file extensions.
 
-It can be extremely helpful in the case of massive model updates or adjustments that would normally be done manually through any LDraw model editor.
+It can be extremely helpful in the case of massive model updates and color or part adjustments that would normally be done manually through an editor.
 
-It uses stream editing to find and replace the appropriate string elements from the known syntax of the LDraw file specification.
+It uses stream editing to find and replace the desired elements, using the LDraw file specification syntax as reference.
 
 The user can modify any ldr or mpd file in one of four ways:
 
@@ -96,10 +96,10 @@ The user can modify any ldr or mpd file in one of four ways:
 
 ### 'make-list'
 
-'ldraw-make-List' was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw package.
-It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within Ldraw/parts).
+The 'make-list' option was the initial project that inadvertantly started the L²CU project over 6 years ago. This function was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw parts library.
+It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within ./Ldraw/parts).
 
-The user can create a list that either parses and sorts the content of that directory by part number or by description.
+The user can create a list that sorts the parts in that directory either by part number or by description.
 
 This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the Ldraw parts directory contents.
 
