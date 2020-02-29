@@ -105,9 +105,11 @@ This utility comes in handy with the use of editors or other LDraw related appli
 
 The parts list acts as an index and is often required for legacy editors (i.e.: MLCAD, which can be run using wine under Linux-based distributions).
 
-Most modern editors generate a cached session dynamic index on launch and do nor require this list anymore.
+Most modern editors now generate a cached, per-session dynamic index on launch and do not require this list anymore.
 
-Feel free to follow developments and new model builds at my [Blog](https://www.legolinux.com) or follow the [Sketchfab Blog
+To find examples that make use of L²CU, or to simply browse my models, you can visit my [Blog](https://www.legolinux.com) which is hosted at [GitHub](https://github.com/nathaneltitane/legolinux.github.io) as well.
+
+***
 
 ### [Submit bug report or feature request](https://github.com/nathaneltitane/ldraw/issues)
 
