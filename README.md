@@ -32,7 +32,15 @@ That being said,the user may wish to build or install the following requirements
 
 ### What can I do with L²CU?
 
-L²CU is split into wseveral functions to make the most out of your Ldraw model files.
+L²CU is split into several functions to make the most out of your Ldraw model files.
+
+You can:
+- render
+- export (into various 3D standard formats)
+- modify (color, part or part with a specific color)
+- format (meta tags, steps, linting)
+
+You can also download and unpack the LDraw parts library if you need to install or update it as well as create the legacy 'parts.lst' file still used by certain editors (i.e.: MLCad)
 
 ### make-list
 
