@@ -115,12 +115,12 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ### Links
 
-[LDraw - The open standard for LEGO CAD](https://www.ldraw.org)
-[LeoCAD](https://github.com/leozide/leocad)
-[Blender - The free and open source 3D creation suite](https://www.blender.org)
-[ThreeJS - JavaScript 3D library](https://threejs.org)
-[LegoLinux - Where Lego meets Linux](https://legolinux.com)
-[Sketchfab](https://sketchfab.com)
+[LDraw](https://www.ldraw.org) - The open standard for LEGO CAD
+[LeoCAD](https://github.com/leozide/leocad) - A CAD program for creating virtual LEGO models
+[Blender](https://www.blender.org) - The free and open source 3D creation suite
+[ThreeJS](https://threejs.org) - JavaScript 3D library
+[LegoLinux](https://legolinux.com) - Where Lego meets Linux
+[Sketchfab](https://sketchfab.com) - Publish & find 3D models online
 
 ***
 
