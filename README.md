@@ -115,4 +115,14 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ### [Submit bug report or feature request](https://github.com/nathaneltitane/ldraw/issues)
 
+***
+
+### Links
+
 ### [LDraw - The open standard for LEGO CAD](https://www.ldraw.org)
+### [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's multiplatform LDraw compatible model editor
+### [Blender](https://www.blender.org/) - The free and open source 3D creation suite
+### [ThreeJS](https://threejs.org/)
+### [LegoLinux](https://legolinux.com)
+### [Sketchfab](https://sketchfab.com)).
+
