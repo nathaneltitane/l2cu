@@ -1,21 +1,47 @@
 ### L²CU: LDraw Linux Command line Utilities
 
-This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw related batch operations on multiple models and/or project files.
+This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related batch operations on multiple models and/or project files at the same time.
 
-It is mostly centered around the use of the BASH shell, opearates with maximum portability and uses a minimal set of dependencies.
+L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for efficientmanagement of Ldraw model files in various ways, be it part, color, submodel or format editing, where most of the modern editors fail to provide such obvious features.
 
-If required, the utilities verify the presence of the necessary applications and other dependencies before proceeding but the user may wish to build or install the following requirements prior to using these scripts for a more streamlined experience:
+The BASH shell is what makes the L²CU backbone: the now monolithic utilityaims to pearate while being optimized for portability and uses a very minimal set of dependencies to get the job done.
+
+
+### What does it do?
+
+L²CU also offers rendering and export features to standard 3D formats, making your models shareable and visible without compromising your build information (if you do not wish to share the actual model file).
+
+It supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
+
+You can rework the utility'S functions to match or ignore certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
+
+### How does it work?
+
+LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly.
+L²CU parses the model file, reads each line contained in it and processes the values to modify or format the file according to your needs.
+
+### What does it need?
+
+On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's request.
+That being said,the user may wish to build or install the following requirements prior to using this utility for convenience's sake:
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's multiplatform LDraw compatible model editor
 
 - [LDView](https://github.com/tcobbs/ldview) - Travis Cobb's real-time 3D viewer for displaying LDraw models [*]
 - [ldview](https://github.com/tcobbs/ldview) (ldview-osmesa) - the command line version of the LDView renderer [*]
+
+- [Blender](https://www.blender.org/) - The free and open source 3D creation suite
+
+- curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer (i.e.: apt, dnf, etc.)
+
   
-[*] Deprecated use in latest L2CU updates to the benefit of LeoCAD as an all in one solution for most part.
+###### [*] Deprecated in latest L²CU updates to the benefit of LeoCAD as an all in one solution for most functions.
 
-L2CU is split into 5 utilities that each handle a specific task, or set of tasks relative to a type of operation relative to the LDraw parts system or LDraw based digital Lego models (ldr) or model assemblies (mpd).
+### What can I do with L²CU?
 
-### [ldraw-make-list](https://github.com/nathaneltitane/ldraw/blob/master/ldraw-make-list)
+L²CU is split into wseveral functions to make the most out of your Ldraw model files.
+
+### mkae-list
 
 'ldraw-make-List' was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw package.
 It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within Ldraw/parts).
@@ -26,13 +52,13 @@ This utility comes in handy with the use of editors or other LDraw related appli
 
 The list that is generated is frequently used for legacy editors (such as MLCAD, which can be run using wine) to provide it with an index of parts to locate and use. Most modern editors generate a cached session dynamic index on launch and do nor require this list anymore.
 
-### [ldraw-model-export](https://github.com/nathaneltitane/ldraw/blob/master/ldraw-model-export)
+### export
 
 'ldraw-model-export', as its name implies, serves as a batch LDraw model file exporter, that can generate (with the use of leocad and blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s).
 
 Those exported formats can be used to then upload the models online for showcasing or presentation, using WebGL based services such as Sketchfab.
 
-### [ldraw-model-modify](https://github.com/nathaneltitane/ldraw/blob/master/ldraw-model-modify)
+### modify
 
 'ldraw-model-modify' serves as a bulk editing tool to enable batch editing and modification of LDraw based digital Lego model files and projects.
 
@@ -46,7 +72,7 @@ The user can modify any ldr or mpd file in one of four ways:
 - modify the color of a specific part to any other color for that same part (bind option)
 - strip and clean the model file for unwanted or extraneous meta tags and condense it to suitable parameters (format option)
 
-### [ldraw-model-render](https://github.com/nathaneltitane/ldraw/blob/master/ldraw-model-render)
+### render
 
 'ldraw-model-render' enables the user to generate preset, high defintion renders, of the selected LDraw model files or projects (using leocad as the main rendering engine).
 
@@ -76,18 +102,6 @@ view=(
 )
 
 Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences to generate the output desired using the visual settings and angles of your choice.
-
-### [ldraw-model-upload](https://github.com/nathaneltitane/ldraw/blob/master/ldraw-model-upload)
-
-'ldraw-model-upload' is a complementary utility to 'model-export'. It enables the user to batch upload the exported and optimized 3D formats to [Sketchfab] (https://sketchfab.com) for public or private hosting and viewing of the selected models.
-
-This utility is extremly useful in the case of multiple unique model uploads (new) or model updates, which would normally take several minutes of manual input per model, and thus making several updates or uploads a daunting task.
-
-The user must already be registered to the Sketchfab services and obtain the [API token] (https://sketchfab.com/settings/password) needed to enable communication with the hosting servers, for uploading, updating and setting environment and camera parameters to the uploaded files.
-
-The utility also warns of the limitation of free subscription accounts: the model file size limit is set to 50Mb. If and when possible, the exported format will be compressed to limit the file size and prevent any errors while uploading.
-
-An example of the output from both 'ldraw-model-export' and 'ldraw-model-upload' can be seen [here] (https://sketchfab.com/nathaneltitane/models): the models are optimized and fused single-object blend files exported from either mpd or ldr formats and uploaded or updated on a regular basis.
 
 Feel free to follow developments and new model builds at my [Blog](http://www.legolinux.com) or follow the [Sketchfab Blog](https://blog.sketchfab.com/tag/ldraw/) for *Sketchfab*/*LDraw* tutorials and editorials!
 
