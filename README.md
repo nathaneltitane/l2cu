@@ -14,6 +14,10 @@ It supports the standard 'single-part' model file extension (ldr) and the multip
 
 You can rework the utility'S functions to match or ignore certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
 
+For a quick preview of the most up-to-date capabilities, you can call the help dialog on your terminal emulator to see what's currently supported in L²CU
+
+`./l2cu.sh --help`
+
 ### How does it work?
 
 LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly.
