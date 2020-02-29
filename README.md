@@ -14,9 +14,7 @@ It supports the standard 'single-part' model file extension (ldr) and the multip
 
 You can rework the utility'S functions to match or ignore certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
 
-For a quick preview of the most up-to-date capabilities, you can call the help dialog on your terminal emulator to see what's currently supported in L²CU
-
-`./l2cu.sh --help`
+For a quick preview of the most up-to-date capabilities, you can call `./l2cu.sh --help` on your terminal emulator to see what's currently supported in L²CU.
 
 ### How does it work?
 
@@ -79,9 +77,9 @@ Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html)
 
 ### export
 
-This function serves as a 3D standard file exporter, that can generate (with the use of leocad and/or blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s) or project files.
+This function serves as a 3D standard file exporter. It can generate (with the use of Leocad and/or Blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s) or project files.
 
-Those exported formats can be used to then upload the models online for showcase purposes or to put in online personal or commercial galleries (think WebGL, [ThreeJS](https://threejs.org/), [Sketchfab](https://sketchfab.com)).
+Those exports can then be used to upload the models online for showcase purposes, displaying them online in personal or commercial galleries (think WebGL, [ThreeJS](https://threejs.org/), [LegoLinux](https://legolinux.com), [Sketchfab](https://sketchfab.com)).
 
 ### modify
 
