@@ -79,7 +79,7 @@ Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html)
 
 This function serves as a 3D standard file exporter. It can generate (with the use of Leocad and/or Blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s) or project files.
 
-Those exports can then be used to upload the models online for showcase purposes, displaying them online in personal or commercial galleries (think WebGL, [ThreeJS](https://threejs.org/), [LegoLinux](https://legolinux.com), [Sketchfab](https://sketchfab.com)).
+Those exports can then be used to upload the models online for showcase purposes, displaying them online in personal or commercial galleries (using WebGL: [ThreeJS](https://threejs.org/), [LegoLinux](https://legolinux.com), [Sketchfab](https://sketchfab.com)).
 
 ### modify
 
