@@ -1115,10 +1115,14 @@ then
 				echo ""
 
 				sed -i \
+					# substitute return carriage for newline
 					-e 's/\r\ /\n/g' \
 					-e 's/\r/\n/g'\
+					# remove lines containing empty dots
 					-e '/^\./d' \
+					# remove leading witespace
 					-e '/^ /d' \
+					# force newline after step meta
 					-e '/0 STEP/N;/^\(.*\)\n\1$/!P; D' $model
 			fi
 
