@@ -2,7 +2,7 @@
 
 # Author: Nathanel Titane - nathanel.titane@gmail.com
 
-# l2cu # linux ldraw command line utility #
+# L²CU # l2cu # linux ldraw command line utility #
 
 # colors --------------------------------------------------------------------- #
 
@@ -886,7 +886,7 @@ do
 				echo "${cyan}Converting $model ("$export_extension")...${reset}"
 				echo ""
 
-				# import 3DS file into blender to create optimized blend file
+				# import 3ds file into blender to create optimized blend file
 
 				blender --background --python "$beautify" "$export_file_3ds" >> /dev/null
 
@@ -988,7 +988,7 @@ then
 
 			hex_value="${hex_value,,}"
 
-			# reattribute input variable to lowercase name value
+			# attribute input variable to lowercase name value
 
 			ldraw_color_hex_value=${hex_value}
 
@@ -996,7 +996,7 @@ then
 			   [[ "$color_input" == "$ldraw_color_number" ]] || \
 			   [[ "$color_input" == "$ldraw_color_hex_value" ]]
 			then
-				# onfirmation
+				# confirmation
 
 				echo "Confirming input value:"
 				echo ""
@@ -1137,7 +1137,7 @@ then
 				then
 					author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
 
-					# Reformat line to specific string
+					# format line to specific string
 
 					line="0 !LEOCAD MODEL AUTHOR $author_string"
 
