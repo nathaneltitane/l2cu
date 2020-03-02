@@ -150,8 +150,14 @@ do
 
 # get ------------------------------------------------------------------------ #
 
-		-make-list)
+		-get)
 			option="get"
+			;;
+		-update)
+			get_option=update
+			;;
+		-unofficial)
+			get_option=unofficial
 			;;
 
 # make list ------------------------------------------------------------------ #
@@ -610,7 +616,6 @@ fi
 
 get_library() {
 
-	parts_url="https://www.ldraw.org/library/updates/complete.zip"
 	parts_archive=$(basename "$parts_url")
 
 	# download #
@@ -1540,6 +1545,20 @@ fi
 
 if [[  "$option" = "get" ]]
 then
+	complete_parts_url="https://www.ldraw.org/library/updates/complete.zip"
+	unofficial_parts_url="https://ldraw.org/library/unofficial/ldrawunf.zip"
+	update_parts_url="https://ldraw.org/library/unofficial/lcad1903.zip"
+	
+	if [[ "$get_option" = "update ]]
+	then
+		parts_url="$complete_parts_url" # workaround until html parsing is complete # TODO #
+	fi
+	
+	if [[ "$get_option" = "unofficial ]]
+	then
+		parts_url="$unofficial_parts_url"
+	fi
+
 	if [ -z "$directory" ]
 	then
 		echo "${red}${marker_question}${marker_yes_no}Specify download location?${reset}"
@@ -1560,9 +1579,9 @@ then
 		echo "${yellow}${marker_warning}No directory location specified.${reset}"
 		echo "${yellow}${marker_warning}Downloading into current directory.${reset}"
 		echo ""
-
-		get_library
 	fi
+	
+	get_library
 fi
 
 # make list ------------------------------------------------------------------ #
