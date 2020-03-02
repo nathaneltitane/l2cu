@@ -2,21 +2,23 @@
 
 This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related operations, on multiple models and/or project files at the same time.
 
-L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of Ldraw model files in many ways. Most of the modern editors fail to provide such obvious features and that is where this utility tries to fill the gap in a simple and user-friendly way.
+L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of tags properties and attributes.
 
-L²CU is a shell script, with BASH (Bourne Again Shell)  as its backbone: the now monolithic utility is optimized for portability and uses a very minimal set of dependencies to get the job done.
+Most older and even more modern editors miss that mark to provide such features and that is where L²CU tries to fill the gap in a simple, user-friendly way.
 
-### What does it do?
+### What can it do?
 
-L²CU also offers rendering and export features to standard 3D formats, making your models shareable and visible without compromising your build information (if you do not wish to share the actual model file).
+L²CU supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
 
-It supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
+It offers render, export, formatting and library download features: rendering and exporting makes LDraw modelsinteresting since they can turn your creations into image and 3D content (standard 3D formats), letting you publish and share them without compromising your build information (if you do not wish to share the actual model file).
 
-You can rework the utility'S functions to match or ignore certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
+You can also tweak or rework the utility's functions to match your preferences or work with certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
 
 For a quick preview of the most up-to-date capabilities, you can call `./l2cu.sh --help` on your terminal emulator to see what's currently supported in L²CU.
 
 ### How does it work?
+
+L²CU is a shell script, with BASH (Bourne Again Shell)  as its backbone: the now monolithic utility is optimized for portability and uses a very minimal set of dependencies to get the job done.
 
 LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly.
 L²CU parses the model file, reads each line contained in it and processes the values to modify or format the file according to your needs.
