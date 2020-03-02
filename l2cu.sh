@@ -135,7 +135,6 @@ do
 		-bind)
 			modify_option="bind"
 			;;
-
 		-lint)
 			modify_option="lint"
 			;;
