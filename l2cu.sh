@@ -968,8 +968,8 @@ then
 			if [[ -z $input ]]
 			then
 				echo "${yellow}${marker_warning}WARNING:${reset}"
-				echo "${yellow}${marker_warning}Empty value.${reset}"
-				echo "${yellow}${marker_warning}Please try again...${reset}"
+				echo "${yellow}${marker_warning}Input cannot be empty.${reset}"
+				echo "${yellow}${marker_warningTry again.${reset}"
 				echo ""
 			else
 				break
@@ -1321,8 +1321,41 @@ then
 						then
 							IFS=' '
 							read -r flag statement author_model author author_string <<< "$line"
+							
+							if [ ! -e "./author" ]
+							then
+								echo "${yellow}${marker_warning}${marker_yes_no}No author file found.${reset}"
+								echo "${cyan}${marker_question}${marker_yes_no}Create author file?${reset}"
+								echo ""
 
-							author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
+								read reply
+
+								if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+								then
+									echo "${cyan}${marker_info}Input author information:${reset}"
+									echo ""
+
+									parse_input
+									
+									author_input="$input"
+									
+									echo "$author_input" > ./author
+									
+									author_string=$(echo $(cat ./author))
+								else
+									echo "${red}${marker_warning}No author string/file specified.${reset}"
+									echo "${red}${marker_warning}Skipping.${reset}"
+									echo ""
+									
+									line=""
+								fi
+
+							else
+								if [ -e "./author" ]
+								then
+									author_string=$(echo $(cat ./author))
+								fi
+							fi
 
 							echo "$line" >> "$temporary_file"
 
