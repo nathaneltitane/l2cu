@@ -33,7 +33,7 @@ marker_yes_no=$(echo \[ Y/N ]\ )
 
 # version -------------------------------------------------------------------- #
 
-version="01-01-2020"
+version="03-01-2020"
 script=$(basename -- "$0")
 
 # usage ---------------------------------------------------------------------- #
@@ -140,6 +140,9 @@ do
 			;;
 		-lint)
 			modify_option="lint"
+			;;
+		-step)
+			modify_option="step"
 			;;
 		-overwrite)
 			overwrite_option="overwrite"
@@ -1102,11 +1105,6 @@ then
 
 			# model file linting
 
-			# substitute carriage returns for newline
-			# delete lines beginning with dot
-			# delete lines beginning with whitespace
-			# eliminate consecutive step tags
-
 			if [[ "$modify_option" = "lint" ]]
 			then
 				echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
@@ -1114,17 +1112,31 @@ then
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
 				echo ""
 
+					# substitute carriage returns for newline
+					# substitute multiple whitespace characters to one
+					# delete lines beginning with dot
+					# delete lines beginning with whitespace
+					# delete lines containing BACKGROUND meta
+					# delete lines containing PIVOT meta
+					# delete lines containing HIDDEN meta
+					# eliminate consecutive dot from faulty parsing # BUG #
+					# eliminate consecutive step tags
+
 				sed -i \
-					# substitute return carriage for newline
 					-e 's/\r\ /\n/g' \
+					-e 's/  */ /g' \
 					-e 's/\r/\n/g'\
-					# remove lines containing empty dots
 					-e '/^\./d' \
-					# remove leading witespace
 					-e '/^ /d' \
-					# force newline after step meta
-					-e '/0 STEP/N;/^\(.*\)\n\1$/!P; D' $model
+					-e '/BACKGROUND/d' \
+					-e '/PIVOT/d' \
+					-e '/HIDDEN/d' \
+					-e 's/\.\ \.*//g' \
+					-r ':a; N; /(0 STEP)[^\n]*\n\1/ s/\n.*//; ta; P; D' \
+																			$model
 			fi
+
+# modify: read model --------------------------------------------------------- #
 
 			# initialize line count
 
@@ -1139,11 +1151,10 @@ then
 
 				if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
 				then
+					IFS=' '
+					read -r flag statement author_model author author_string <<< "$line"
+
 					author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
-
-					# format line to specific string
-
-					line="0 !LEOCAD MODEL AUTHOR $author_string"
 
 					echo "$line" >> "$temporary_file"
 
@@ -1174,6 +1185,8 @@ then
 					# split part argument into part number and part extension
 
 					read part suffix <<< "$part_dat"
+
+					IFS=' '
 
 # modify: color -------------------------------------------------------------- #
 
@@ -1243,7 +1256,7 @@ then
 
 # modify: step --------------------------------------------------------------- #
 
-					# step submodel [ldr ] separation
+					# step submodel [ldr] separation
 
 					if [[ "$modify_option" = "step" ]]
 					then
@@ -1286,22 +1299,37 @@ then
 
 						elif [[ "$line" = *BACKGROUND* ]]
 						then
+							IFS=' '
+							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "$line"
+
 							: # pass
 
-						elif [[ "$line" = *GROUP* ]]
+						elif [[ "$line" = *"GROUP BEGIN"* ]]
 						then
+							IFS=' '
+							read -r flag statement group group_begin group_name <<< "$line"
+
 							: # pass
 
-						elif [[ "$line" = *ROTATION* ]]
+						elif [[ "$line" = *"GROUP END"* ]]
 						then
+							IFS=' '
+							read -r flag statement group group_end <<< "$line"
+
 							: # pass
 
 						elif [[ "$line" = *PIVOT* ]]
 						then
+							IFS=' '
+							read -r flag statement piece pivot pivot_coordinates <<< "$line"
+
 							: # pass
 
-						elif [[ "$line" = *PIVOT* ]]
+						elif [[ "$line" = *HIDDEN* ]]
 						then
+							IFS=' '
+							read -r flag statement piece hidden <<< "$line"
+
 							: # pass
 						else
 							# if line contains '!LPUB' tag
