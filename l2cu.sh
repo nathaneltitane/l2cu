@@ -212,7 +212,7 @@ do
 			echo -e "-overwrite \t Reads from and overwrites the original model file after modification."
 			echo -e ""
 			echo -e "GET:"
-			echo -e "-get \t\t Fetches the LDraw parts library."
+			echo -e "-get \t\t Download the LDraw parts library."
 			echo -e ""
 			echo -e "MAKE LIST:"
 			echo -e ""
