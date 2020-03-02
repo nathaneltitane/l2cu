@@ -26,7 +26,7 @@ L²CU parses the model file, reads each line contained in it and processes the v
 On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's request.
 That being said, the user may wish to build or install the following requirements prior to using this utility for convenience's sake:
 
-- [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's multiplatform LDraw compatible model editor
+- [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor
 
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
 
@@ -100,7 +100,14 @@ The user can modify any ldr or mpd file in one of four ways:
 
 ### get
 
-The 'get' function lets you download the official LDraw parts library. This is especially useful for quick updates or if you're getting started.
+The 'get' function lets you download and extract the LDraw parts library. This is especially useful for quick updates or if you're getting started.
+
+You can:
+
+- download the LDraw parts library using the -complete | -update | -unofficlal parameters.
+- download the 'complete' official LDraw parts library archive
+- download the 'update' officialLDraw parts library archive
+- download the complete 'unofficial' LDraw parts library archive
 
 ### 'make-list'
 
