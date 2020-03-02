@@ -510,8 +510,7 @@ do
 	if [[ -z "$binary" ]]
 	then
 		echo "${yellow}${marker_warning}The '$binary_name' binary not found.${reset}"
-		echo "${yellow}${marker_question}Specify location?${reset}"
-		echo "${marker_yes_no}"
+		echo "${yellow}${marker_question}${marker_yes_no}Specify location?${reset}"
 		echo ""
 
 		read reply
@@ -1124,45 +1123,6 @@ then
 
 			temporary_file="$model.tmp"
 
-# modify: lint --------------------------------------------------------------- #
-
-			# model file linting
-
-			if [[ "$modify_option" = "lint" ]]
-			then
-				echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
-				echo ""
-				echo "${marker_info}Model file................: ${cyan}$model${reset}"
-				echo ""
-
-					# substitute carriage returns for newline
-					# substitute multiple whitespace characters to one
-					# delete lines beginning with dot
-					# delete lines beginning with whitespace
-					# strip '(' character
-					# strip ')' character
-					# delete lines containing BACKGROUND meta
-					# delete lines containing PIVOT meta
-					# delete lines containing HIDDEN meta
-					# eliminate consecutive dot from faulty parsing # BUG #
-					# eliminate consecutive step tags
-
-				sed -i \
-					-e 's/\r\ /\n/g' \
-					-e 's/  */ /g' \
-					-e 's/\r/\n/g'\
-					-e '/^\./d' \
-					-e '/^ /d' \
-					-e 's/(//g' \
-					-e 's/)//g' \
-					-e '/BACKGROUND/d' \
-					-e '/PIVOT/d' \
-					-e '/HIDDEN/d' \
-					-e 's/\.\ \.*//g' \
-					-r ':a; N; /(0 STEP)[^\n]*\n\1/ s/\n.*//; ta; P; D' \
-																			$model
-			fi
-
 # modify: read model --------------------------------------------------------- #
 
 			# initialize line count
@@ -1275,6 +1235,45 @@ then
 						fi
 					fi
 
+# modify: lint --------------------------------------------------------------- #
+
+			# model file linting
+
+			if [[ "$modify_option" = "lint" ]]
+			then
+				echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
+				echo ""
+				echo "${marker_info}Model file................: ${cyan}$model${reset}"
+				echo ""
+
+					# substitute carriage returns for newline
+					# substitute multiple whitespace characters to one
+					# delete lines beginning with dot
+					# delete lines beginning with whitespace
+					# strip '(' character
+					# strip ')' character
+					# delete lines containing BACKGROUND meta
+					# delete lines containing PIVOT meta
+					# delete lines containing HIDDEN meta
+					# eliminate consecutive dot from faulty parsing # BUG #
+					# eliminate consecutive step tags
+
+				sed -i \
+					-e 's/\r\ /\n/g' \
+					-e 's/  */ /g' \
+					-e 's/\r/\n/g'\
+					-e '/^\./d' \
+					-e '/^ /d' \
+					-e 's/(//g' \
+					-e 's/)//g' \
+					-e '/BACKGROUND/d' \
+					-e '/PIVOT/d' \
+					-e '/HIDDEN/d' \
+					-e 's/\.\ \.*//g' \
+					-r ':a; N; /(0 STEP)[^\n]*\n\1/ s/\n.*//; ta; P; D' \
+																			$model
+			fi
+
 # modify: step --------------------------------------------------------------- #
 
 					# step submodel [ldr] separation
@@ -1295,7 +1294,7 @@ then
 
 # modify: format ------------------------------------------------------------- #
 
-					# format - file structure and META substitution
+					# file structure and meta substitution
 
 					if [[ "$modify_option" = "format" ]]
 					then
@@ -1362,18 +1361,7 @@ then
 
 							: # pass
 						else
-							# if line contains '!LPUB' tag
-
-							if [[ "$line" == *!LPUB* ]]
-							then
-								# skip header and footer lines containing matching patterns
-								# prevents model file syntax modification
-
-								echo "$line" >> "$temporary_file"
-
-								continue
-							fi
-								# if line contains '!LEOCAD' tag
+							# if line contains '!LEOCAD' tag
 
 							if [[ "$line" == *!LEOCAD* ]]
 							then
@@ -1463,10 +1451,8 @@ then
 
 			if [[ "$overwrite_option" = "overwrite" ]]
 			then
-				reply="yes"
-
 				echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
-				echo "${red}${marker_warning}writing changes to original model file!${reset}"
+				echo "${red}${marker_info}Writing changes to original model file!${reset}"
 				echo ""
 
 				sleep 1
@@ -1477,10 +1463,11 @@ then
 				echo ""
 
 				mv "$temporary_file" "${temporary_file%.tmp}"
+			fi
 
-			else
-				echo "${cyan}${marker_question}Would you like to write your changes to the original model file?${reset}"
-				echo "${marker_yes_no}"
+			if [ -z "$overwrite_option" ]
+			then
+				echo "${cyan}${marker_question}${marker_yes_no}Write changes to original model file?${reset}"
 				echo ""
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
 				echo ""
@@ -1489,7 +1476,8 @@ then
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					echo "${red}${marker_warning}Overwriting original model file!${reset}"
+					echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
+					echo "${red}${marker_info}Writing changes to original model file.${reset}"
 					echo ""
 
 					sleep 1
@@ -1502,7 +1490,9 @@ then
 					mv "$temporary_file" "${temporary_file%.tmp}"
 
 				else
-					echo "${yellow}${marker_warning}Invalid argument.${reset}"
+					echo "${yellow}${marker_warning}[ OVERWRITE ] option disabled.${reset}"
+					echo "${yellow}${marker_info}Writing changes to model file copy.${reset}"
+					echo ""
 					echo "Writing changes to model file copy."
 					echo ""
 
@@ -1519,8 +1509,7 @@ if [[  "$option" = "get" ]]
 then
 	if [ -z "$directory" ]
 	then
-		echo "${red}${marker_warning}Specify download location?${reset}"
-		echo "${marker_yes_no}"
+		echo "${red}${marker_question}${marker_yes_no}Specify download location?${reset}"
 		echo ""
 
 		read reply
@@ -1590,8 +1579,7 @@ then
 
 				directory="$browse/parts"
 			else
-				echo "${yellow}${marker_question}Download the latest LDraw parts library?${reset}"
-				echo "${marker_yes_no}"
+				echo "${yellow}${marker_question}${marker_yes_no}Download the latest LDraw parts library?${reset}"
 				echo ""
 
 				read reply
