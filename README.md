@@ -1,4 +1,4 @@
-### L²CU: LDraw Linux Command line Utilities
+### L²CU: LDraw Linux Command line Utility
 
 This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related operations, on multiple models and/or project files at the same time.
 
