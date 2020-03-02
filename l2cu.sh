@@ -1116,6 +1116,8 @@ then
 					# substitute multiple whitespace characters to one
 					# delete lines beginning with dot
 					# delete lines beginning with whitespace
+					# strip '(' character
+					# strip ')' character
 					# delete lines containing BACKGROUND meta
 					# delete lines containing PIVOT meta
 					# delete lines containing HIDDEN meta
@@ -1128,6 +1130,8 @@ then
 					-e 's/\r/\n/g'\
 					-e '/^\./d' \
 					-e '/^ /d' \
+					-e 's/(//g' \
+					-e 's/)//g' \
 					-e '/BACKGROUND/d' \
 					-e '/PIVOT/d' \
 					-e '/HIDDEN/d' \
@@ -1149,16 +1153,7 @@ then
 			do
 				line_number=$(( $line_number + 1 ))
 
-				if [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
-				then
-					IFS=' '
-					read -r flag statement author_model author author_string <<< "$line"
-
-					author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
-
-					echo "$line" >> "$temporary_file"
-
-				elif [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
+				if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
 				then
 					# skip header and footer lines containing matching patterns
 					# prevents model file syntax modification
@@ -1166,8 +1161,11 @@ then
 					echo "$line" >> "$temporary_file"
 					continue
 				else
+					# read lines and parse
+					# model_data is either a part file reference or a submodel
+
 					IFS=' '
-					read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
+					read -r flag color x y z a b c d e f g h i model_data <<< "$line"
 
 					vect_x="$a $b $c"
 					vect_y="$d $e $f"
@@ -1178,13 +1176,13 @@ then
 					# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
 					# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
 
-					# Set IFS
+					# set IFS
 
 					IFS='.'
 
 					# split part argument into part number and part extension
 
-					read part suffix <<< "$part_dat"
+					read part suffix <<< "$model_data"
 
 					IFS=' '
 
@@ -1297,6 +1295,15 @@ then
 						then
 							: # pass
 
+						elif [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
+						then
+							IFS=' '
+							read -r flag statement author_model author author_string <<< "$line"
+
+							author_string="Nathanel Titane - nathanel.titane@gmail.com - All rights reserved"
+
+							echo "$line" >> "$temporary_file"
+
 						elif [[ "$line" = *BACKGROUND* ]]
 						then
 							IFS=' '
@@ -1374,14 +1381,6 @@ then
 								IFS=' '
 								read -r flag statement file_name <<< "$line"
 
-								# strip (
-
-								clean_file_name="${file_name//\(/}"
-
-								# strip )
-
-								clean_file_name="${clean_file_name//\)/}"
-
 								# spaces to dashes
 
 								clean_file_name="${clean_file_name// /-}"
@@ -1394,26 +1393,18 @@ then
 
 								echo "$flag $statement $clean_file_name" >> "$temporary_file"
 							else
-								# parse all other lines and format according to regular expressions
+								# parse all other lines and format submodel string
 
 								IFS=' '
-								read -r flag color x y z a b c d e f g h i part_dat <<< "$line"
-
-								# strip (
-
-								clean_part="${part_dat//\(/}"
-
-								# strip )
-
-								clean_part="${clean_part//\)/}"
+								read -r flag color x y z a b c d e f g h i model_data <<< "$line"
 
 								# spaces to dashes
 
-								clean_part="${clean_part// /-}"
+								clean_model_data="${clean_model_data// /-}"
 
 								# string to lower case
 
-								clean_part="${clean_part,,}"
+								clean_model_data="${clean_model_data,,}"
 
 								vect_x="$a $b $c"
 								vect_y="$d $e $f"
