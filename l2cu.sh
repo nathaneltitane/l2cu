@@ -212,9 +212,11 @@ do
 			echo -e "-format \t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
 			echo -e "-overwrite \t Assumes 'Yes' and overwrites of the original model file after modifications."
 			echo -e ""
+			echo -e "GET:"
+			echo -e "-get \t\t Fetches the LDraw parts library."
+			echo -e ""
 			echo -e "MAKE LIST:"
 			echo -e ""
-			echo -e "-get \t\t Fetches the LDraw parts library."
 			echo -e "-description \t Sort list by part description."
 			echo -e "-number \t Sort list by part number."
 			echo -e ""
@@ -241,7 +243,7 @@ do
 	shift
 done
 
-# initial propmt clear #
+# initial propmt clear --------------------------------------------------------#
 
 echo ""
 
