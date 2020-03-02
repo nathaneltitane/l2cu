@@ -135,17 +135,24 @@ do
 		-bind)
 			modify_option="bind"
 			;;
-		-format)
-			modify_option="format"
-			;;
+
 		-lint)
 			modify_option="lint"
 			;;
 		-step)
 			modify_option="step"
 			;;
+		-format)
+			modify_option="format"
+			;;
 		-overwrite)
 			overwrite_option="overwrite"
+			;;
+
+# get ------------------------------------------------------------------------ #
+
+		-make-list)
+			option="get"
 			;;
 
 # make list ------------------------------------------------------------------ #
@@ -158,15 +165,6 @@ do
 			;;
 		-number)
 			sort_mode="number"
-			;;
-		-format)
-			option="format"
-			;;
-		-lint)
-			option="lint"
-			;;
-		-overwrite)
-			overwrite_option="overwrite"
 			;;
 
 # usage ---------------------------------------------------------------------- #
@@ -209,9 +207,9 @@ do
 			echo -e "-color \t\t Modifies a part's color attribute only."
 			echo -e "-part \t\t Modifies a part for another by number attribute only."
 			echo -e "-bind \t\t Matches a part to a specific color and modifies the color for that selection."
-			echo -e "-format \t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
 			echo -e "-lint \t\t Standardizes and formats model files for parsing."
 			echo -e "-step \t\t Separates ldr based submodels using steps."
+			echo -e "-format \t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
 			echo -e "-overwrite \t Assumes 'Yes' and overwrites of the original model file after modifications."
 			echo -e ""
 			echo -e "MAKE LIST:"
@@ -545,7 +543,7 @@ do
 	sleep 1
 done
 
-# dialog #
+# dialog ----------------------------------------------------------------------#
 
 dialog() {
 
@@ -609,6 +607,30 @@ then
 
 	directory=$(dialog) || exit
 fi
+
+get_library() {
+
+	parts_url="https://www.ldraw.org/library/updates/complete.zip"
+	parts_archive=$(basename "$parts_url")
+
+	# download #
+
+	echo "Downloading..."
+	echo ""
+
+	download "$parts_url" > "$directory/$parts_archive"
+
+	# extract #
+
+	echo "Extracting..."
+	echo ""
+
+	unzip "$parts_archive"
+
+	# rename #
+
+	mv "$parts_archive" ldraw.zip
+}
 
 sleep 1
 
@@ -1490,35 +1512,40 @@ then
 	done
 fi
 
+# get ------------------------------------------------------------------------ #
+
+if [[  "$option" = "get" ]]
+then
+	if [ -z "$directory" ]
+	then
+		echo "${red}${marker_warning}Specify download location?${reset}"
+		echo "${marker_yes_no}"
+		echo ""
+
+		read reply
+
+		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		then
+			# specify directory location or exit on 'cancel'
+
+			browse=$(dialog) || exit
+
+			directory="$browse"
+	else
+		directory="./"
+
+		echo "${yellow}${marker_warning}No directory location specified.${reset}"
+		echo "${yellow}${marker_warning}Downloading into current directory.${reset}"
+		echo ""
+
+		get_library
+	fi
+fi
+
 # make list ------------------------------------------------------------------ #
 
 if [[  "$option" = "make-list" ]]
 then
-
-	get_library() {
-
-		parts_url="https://www.ldraw.org/library/updates/complete.zip"
-		parts_archive=$(basename "$parts_url")
-
-		# download #
-
-		echo "Downloading..."
-		echo ""
-
-		download "$parts_url" > "$parts_archive"
-
-		# extract #
-
-		echo "Extracting..."
-		echo ""
-
-		unzip "$parts_archive"
-
-		# rename #
-
-		mv "$parts_archive" ldraw.zip
-	}
-
 	if [ -z "$directory" ]
 	then
 		echo "${red}${marker_warning}Is the LDraw parts library setup on this system?${reset}"
