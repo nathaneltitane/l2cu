@@ -94,7 +94,13 @@ The user can modify any ldr or mpd file in one of four ways:
 - modify any specific color for another (color option)
 - modify any specific part for another (part option)
 - modify the color of a specific part to any other color for that same part (bind option)
-- strip and clean the model file for unwanted or extraneous meta tags and condense it to suitable parameters (format option)
+- modify or eliminate unwanted or extraneous meta tags
+- strip special characters from model and submodel assemblies
+- condense the model or project file by removing unneded blank or extraneous lines that could otherwise corrupt the file
+
+### get
+
+The 'get' function lets you download the official LDraw parts library. This is especially useful for quick updates or if you're getting started.
 
 ### 'make-list'
 
