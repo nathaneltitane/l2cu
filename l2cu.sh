@@ -209,7 +209,7 @@ do
 			echo -e "-lint \t\t Standardizes and formats model files for parsing."
 			echo -e "-step \t\t Separates ldr based submodels using steps."
 			echo -e "-format \t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
-			echo -e "-overwrite \t Assumes 'Yes' and overwrites of the original model file after modifications."
+			echo -e "-overwrite \t Reads from and overwrites the original model file after modification."
 			echo -e ""
 			echo -e "GET:"
 			echo -e "-get \t\t Fetches the LDraw parts library."
