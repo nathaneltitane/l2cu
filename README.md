@@ -4,7 +4,7 @@ This project aims at providing any user running a Linux-based distribution with 
 
 L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of Ldraw model files in many ways. Most of the modern editors fail to provide such obvious features and that is where this utility tries to fill the gap in a simple and user-friendly way.
 
-The BASH shell is what makes the L²CU backbone: the now monolithic utilityaims to pearate while being optimized for portability and uses a very minimal set of dependencies to get the job done.
+L²CU is a shell script, with BASH (Bourne Again Shell)  as its backbone: the now monolithic utility is optimized for portability and uses a very minimal set of dependencies to get the job done.
 
 ### What does it do?
 
