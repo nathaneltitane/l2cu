@@ -10,9 +10,19 @@ Most older and even more modern editors miss that mark to provide such features 
 
 L²CU supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
 
-It offers render, export, formatting and library download features: rendering and exporting makes LDraw modelsinteresting since they can turn your creations into image and 3D content (standard 3D formats), letting you publish and share them without compromising your build information (if you do not wish to share the actual model file).
+It offers several features amongst which rendering and exporting your models: this is particularly interesting since it can turn your creations into image and 3D content (standard 3D formats), letting you publish and share them without compromising your build information (if you do not wish to share the actual model file).
 
 You can also tweak or rework the utility's functions to match your preferences or work with certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
+
+In short, L²CU is split into several functions to make the most out of your LDraw model files. 
+
+You can:
+- render your models
+- export your models (to various 3D standard formats)
+- modify your models(color, part or part with a specific color)
+- format your models in bulk (meta tags, steps, linting, etc.)
+- download and unpack the LDraw parts library
+- create the legacy 'parts.lst' file
 
 For a quick preview of the most up-to-date capabilities, you can call `./l2cu.sh --help` on your terminal emulator to see what's currently supported in L²CU.
 
@@ -33,18 +43,6 @@ That being said, the user may wish to build or install the following requirement
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
 
 - curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer (i.e.: apt, dnf, etc.)
-
-### What can I do with L²CU?
-
-L²CU is split into several functions to make the most out of your Ldraw model files.
-
-You can:
-- render
-- export (to various 3D standard formats)
-- modify (color, part or part with a specific color)
-- format (meta tags, steps, linting)
-
-You can also download and unpack the LDraw parts library if you need to install or update it as well as create the legacy 'parts.lst' file still used by certain editors (i.e.: MLCad)
 
 ### render
 
@@ -114,11 +112,11 @@ You can:
 ### 'make-list'
 
 The 'make-list' option was the initial project that inadvertantly started the L²CU project over 6 years ago. This function was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw parts library.
-It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'ldraw' directory (within ./Ldraw/parts).
+It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'LDraw' directory (within ./LDraw/parts).
 
 The user can create a list that sorts the parts in that directory either by part number or by description.
 
-This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the Ldraw parts directory contents.
+This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the LDraw parts directory contents.
 
 The parts list acts as an index and is often required for legacy editors (i.e.: MLCAD, which can be run using wine under Linux-based distributions).
 
@@ -130,7 +128,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ### Links
 
-- [LDraw](https://www.ldraw.org) - The open standard for LEGO CAD
+- [LDraw](https://www.LDraw.org) - The open standard for LEGO CAD
 - [LeoCAD](https://github.com/leozide/leocad) - A CAD program for creating virtual LEGO models
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
 - [ThreeJS](https://threejs.org) - JavaScript 3D library
@@ -139,4 +137,4 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ***
 
-[Submit bug report or feature request](https://github.com/nathaneltitane/ldraw/issues)
+[Submit bug report or feature request](https://github.com/nathaneltitane/LDraw/issues)
