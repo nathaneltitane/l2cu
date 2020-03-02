@@ -191,12 +191,12 @@ do
 			echo -e ""
 			echo -e "-render \t Renders model files using the following parameters:"
 			echo -e ""
-			echo -e "-full \t\t Renders series of images using options 0 to 3."
-			echo -e "-fixed \t\t Renders series of images using options 0 and 1."
-			echo -e "-quarter-back \t [ 0 ] Renders image using a quarter-back view preset. \t\t [Lat.:30, Lon.: -135]"
-			echo -e "-quarter-front \t [ 1 ] Renders image using a quarter-front view preset. \t [Lat.:30, Lon.: 45]"
-			echo -e "-back \t\t [ 2 ] Renders image using a back view preset. \t\t\t [Lat.:30, Lon.: 180]"
-			echo -e "-front \t\t [ 3 ] Renders image using a front view preset. \t\t [Lat.:30, Lon.: 0]"
+			echo -e "-full \t\t Render series of images using options 0 to 3."
+			echo -e "-fixed \t\t Render series of images using options 0 and 1."
+			echo -e "-quarter-back \t [ 0 ] Render image using a quarter-back view preset. \t\t [Lat.:30, Lon.: -135]"
+			echo -e "-quarter-front \t [ 1 ] Render image using a quarter-front view preset. \t [Lat.:30, Lon.: 45]"
+			echo -e "-back \t\t [ 2 ] Render image using a back view preset. \t\t\t [Lat.:30, Lon.: 180]"
+			echo -e "-front \t\t [ 3 ] Render image using a front view preset. \t\t [Lat.:30, Lon.: 0]"
 			echo -e ""
 			echo -e "EXPORT:"
 			echo -e ""
@@ -209,16 +209,19 @@ do
 			echo -e ""
 			echo -e "MODIFY:"
 			echo -e ""
-			echo -e "-color \t\t Modifies a part's color attribute only."
-			echo -e "-part \t\t Modifies a part for another by number attribute only."
-			echo -e "-bind \t\t Matches a part to a specific color and modifies the color for that selection."
-			echo -e "-lint \t\t Standardizes and formats model files for parsing."
-			echo -e "-step \t\t Separates ldr based submodels using steps."
-			echo -e "-format \t Strips and cleans file from older LDraw editor formats and sets output to UTF-8 standard."
-			echo -e "-overwrite \t Reads from and overwrites the original model file after modification."
+			echo -e "-color \t\t Modify a part's color attribute only."
+			echo -e "-part \t\t Modify a part for another by number attribute only."
+			echo -e "-bind \t\t Match a part to a specific color and modify the color for that selection."
+			echo -e "-lint \t\t Standardize and format model files for parsing."
+			echo -e "-step \t\t Separate ldr based submodels using step meta tags."
+			echo -e "-format \t Strip and clean model files from older LDraw editor formats and set output to UTF-8 standard."
+			echo -e "-overwrite \t Read from and overwrite the original model file after modification."
 			echo -e ""
 			echo -e "GET:"
-			echo -e "-get \t\t Download the LDraw parts library."
+			echo -e "-get \t\t Download the LDraw parts library. [-complete | -update | -unofficlal]"
+			echo -e "-complete \t Download the LDraw parts library - complete official archive."
+			echo -e "-update \t Download the LDraw parts library - update official archive."
+			echo -e "-unofficial \t Download the LDraw parts library - complete unofficial archive."
 			echo -e ""
 			echo -e "MAKE LIST:"
 			echo -e ""
@@ -1545,16 +1548,23 @@ fi
 
 if [[  "$option" = "get" ]]
 then
-	complete_parts_url="https://www.ldraw.org/library/updates/complete.zip"
-	unofficial_parts_url="https://ldraw.org/library/unofficial/ldrawunf.zip"
-	update_parts_url="https://ldraw.org/library/unofficial/lcad1903.zip"
+	parts_url="https://www.ldraw.org/library/updates/complete.zip"
 	
-	if [[ "$get_option" = "update ]]
+	complete_parts_url="https://www.ldraw.org/library/updates/complete.zip"
+	update_parts_url="https://ldraw.org/library/unofficial/lcad1903.zip"
+	unofficial_parts_url="https://ldraw.org/library/unofficial/ldrawunf.zip"
+
+	if [[ "$get_option" = "complete" ]]
+	then
+		parts_url="$complete_parts_url"
+	fi
+	
+	if [[ "$get_option" = "update" ]]
 	then
 		parts_url="$complete_parts_url" # workaround until html parsing is complete # TODO #
 	fi
 	
-	if [[ "$get_option" = "unofficial ]]
+	if [[ "$get_option" = "unofficial" ]]
 	then
 		parts_url="$unofficial_parts_url"
 	fi
