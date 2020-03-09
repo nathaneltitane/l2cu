@@ -6,17 +6,33 @@
 
 # colors --------------------------------------------------------------------- #
 
-if [[ -t 1 ]]
+if [ -z $(command -v tput) ]
 then
-	black=$(tput setaf 0)
-	red=$(tput setaf 1)
-	green=$(tput setaf 2)
-	yellow=$(tput setaf 3)
-	blue=$(tput setaf 4)
-	magenta=$(tput setaf 5)
-	cyan=$(tput setaf 6)
-	white=$(tput setaf 7)
-	reset=$(tput sgr0)
+	if [[ -t 1 ]]
+	then
+		black=$(echo -e \\e\[30m)
+		red=$(echo -e \\e\[31m)
+		green=$(echo -e \\e\[32m)
+		yellow=$(echo -e \\e\[33m)
+		blue=$(echo -e \\e\[34m)
+		magenta=$(echo -e \\e\[35m)
+		cyan=$(echo -e \\e\[36m)
+		white=$(echo -e \\e\[97m)
+		reset=$(echo -e \\e\[39m)
+	fi
+else
+	if [[ -t 1 ]]
+	then
+		black=$(tput setaf 0)
+		red=$(tput setaf 1)
+		green=$(tput setaf 2)
+		yellow=$(tput setaf 3)
+		blue=$(tput setaf 4)
+		magenta=$(tput setaf 5)
+		cyan=$(tput setaf 6)
+		white=$(tput setaf 7)
+		reset=$(tput sgr0)
+	fi
 fi
 
 # symbols -------------------------------------------------------------------- #
@@ -1329,7 +1345,7 @@ then
 						then
 							IFS=' '
 							read -r flag statement author_model author author_string <<< "$line"
-							
+
 							if [ ! -e "./author" ]
 							then
 								echo "${yellow}${marker_warning}${marker_yes_no}No author file found.${reset}"
@@ -1344,17 +1360,17 @@ then
 									echo ""
 
 									parse_input
-									
+
 									author_input="$input"
-									
+
 									echo "$author_input" > ./author
-									
+
 									author_string=$(echo $(cat ./author))
 								else
 									echo "${red}${marker_warning}No author string/file specified.${reset}"
 									echo "${red}${marker_warning}Skipping.${reset}"
 									echo ""
-									
+
 									line=""
 								fi
 
@@ -1549,7 +1565,7 @@ fi
 if [[  "$option" = "get" ]]
 then
 	parts_url="https://www.ldraw.org/library/updates/complete.zip"
-	
+
 	complete_parts_url="https://www.ldraw.org/library/updates/complete.zip"
 	update_parts_url="https://ldraw.org/library/unofficial/lcad1903.zip"
 	unofficial_parts_url="https://ldraw.org/library/unofficial/ldrawunf.zip"
@@ -1558,12 +1574,12 @@ then
 	then
 		parts_url="$complete_parts_url"
 	fi
-	
+
 	if [[ "$get_option" = "update" ]]
 	then
 		parts_url="$complete_parts_url" # workaround until html parsing is complete # TODO #
 	fi
-	
+
 	if [[ "$get_option" = "unofficial" ]]
 	then
 		parts_url="$unofficial_parts_url"
@@ -1590,7 +1606,7 @@ then
 		echo "${yellow}${marker_warning}Downloading into current directory.${reset}"
 		echo ""
 	fi
-	
+
 	get_library
 fi
 
