@@ -1,6 +1,6 @@
 ### L²CU: LDraw Linux Command line Utility
 
-<p align="center">
+<p align="right">
   <img src="https://img.shields.io/github/issues/nathaneltitane/ldraw?color=lightgrey&style=flat-square">
   <img src="https://img.shields.io/github/forks/nathaneltitane/ldraw?color=lightgrey&style=flat-square">
   <img src="https://img.shields.io/github/stars/nathaneltitane/ldraw?color=lightgrey&style=flat-square">
