@@ -1,5 +1,11 @@
 ### L²CU: LDraw Linux Command line Utility
 
+<p align="center">
+  <img src="https://img.shields.io/github/issues/nathaneltitane/ldraw?color=violet&style=flat-square">
+  <img src="https://img.shields.io/github/forks/nathaneltitane/ldraw?color=teal&style=flat-square">
+  <img src="https://img.shields.io/github/stars/nathaneltitane/ldraw?style=flat-square">
+</p>
+
 This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related operations, on multiple models and/or project files at the same time.
 
 L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of tags properties and attributes.
