@@ -225,6 +225,8 @@ do
 			echo -e ""
 			echo -e "MODIFY:"
 			echo -e ""
+			echo -e "-modify \t Modifies model files using the following parameters:"
+			echo -e ""
 			echo -e "-color \t\t Modify a part's color attribute only."
 			echo -e "-part \t\t Modify a part for another by number attribute only."
 			echo -e "-bind \t\t Match a part to a specific color and modify the color for that selection."
@@ -235,6 +237,7 @@ do
 			echo -e ""
 			echo -e "GET:"
 			echo -e "-get \t\t Download the LDraw parts library. [-complete | -update | -unofficlal]"
+			echo -e ""
 			echo -e "-complete \t Download the LDraw parts library - complete official archive."
 			echo -e "-update \t Download the LDraw parts library - update official archive."
 			echo -e "-unofficial \t Download the LDraw parts library - complete unofficial archive."
@@ -1512,8 +1515,6 @@ then
 				echo "${red}${marker_info}Writing changes to original model file!${reset}"
 				echo ""
 
-				sleep 1
-
 				echo "${yellow}${marker_warning}Writing file.${reset}"
 				echo ""
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
@@ -1536,8 +1537,6 @@ then
 					echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
 					echo "${red}${marker_info}Writing changes to original model file.${reset}"
 					echo ""
-
-					sleep 1
 
 					echo "${yellow}${marker_warning}Writing file.${reset}"
 					echo ""
