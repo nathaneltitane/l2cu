@@ -90,9 +90,9 @@ do
 			render_option="fixed"
 			render_preset="fixed"
 			;;
-		-outline)
-			render_option="outline"
-			render_preset="outline"
+		-flat)
+			render_option="flat"
+			render_preset="flat"
 			;;
 		-quarter-back)
 			render_option="quarter-back"
@@ -209,9 +209,10 @@ do
 			echo -e ""
 			echo -e "-full \t\t Render series of images using options 0 to 3."
 			echo -e "-fixed \t\t Render series of images using options 0 and 1."
-			echo -e "-quarter-back \t [ 0 ] Render image using a quarter-back view preset. \t\t [Lat.:30, Lon.: -135]"
+			echo -e "-flat \t\t Render series of images without shading."
+			echo -e "-quarter-back \t [ 0 ] Render image using a quarter-back view preset. \t [Lat.:30, Lon.: -135]"
 			echo -e "-quarter-front \t [ 1 ] Render image using a quarter-front view preset. \t [Lat.:30, Lon.: 45]"
-			echo -e "-back \t\t [ 2 ] Render image using a back view preset. \t\t\t [Lat.:30, Lon.: 180]"
+			echo -e "-back \t\t [ 2 ] Render image using a back view preset. \t\t [Lat.:30, Lon.: 180]"
 			echo -e "-front \t\t [ 3 ] Render image using a front view preset. \t\t [Lat.:30, Lon.: 0]"
 			echo -e ""
 			echo -e "EXPORT:"
@@ -745,7 +746,7 @@ do
 
 			# use render directory as root
 
-			outline_directory="${model%/*}/renders/outline"
+			flat_directory="${model%/*}/renders/flat"
 
 			# define render parameters for all presets
 
@@ -818,13 +819,13 @@ do
 				position=(3)
 			fi
 
-			if [[ "$render_preset" == "outline" ]]
+			if [[ "$render_preset" == "flat" ]]
 			then
 				position=(1)
 				shading=flat
 				line_width=0
 
-				renders_directory="$outline_directory"
+				renders_directory="$flat_directory"
 			fi
 
 			# render model using options
@@ -853,13 +854,13 @@ do
 
 				wait
 
-				# create outline splash image
+				# create flat splash image
 
-				if [[ "$render_option" == "outline" ]]
+				if [[ "$render_option" == "flat" ]]
 				then
 					# Rename renders to designated splash images
 
-					mv "$model_name-${view[1]}.${extension}" "${outline_directory}/outline.${extension}"
+					mv "$model_name-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
 				fi
 			done
 
