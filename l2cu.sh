@@ -49,7 +49,7 @@ marker_yes_no=$(echo \[ Y/N ]\ )
 
 # version -------------------------------------------------------------------- #
 
-version="03-01-2020"
+version="04-01-2020"
 script=$(basename -- "$0")
 
 # usage ---------------------------------------------------------------------- #
@@ -192,21 +192,21 @@ do
 
 		-h|--help)
 			echo -e "USAGE"
-			echo -e ""
+			echo
 			echo -e "./$script [EXTENSION OPTION] [OPTION] [PARAMETER]"
-			echo -e ""
+			echo
 			echo -e "Utility options:"
-			echo -e ""
+			echo
 			echo -e "-directory \t\t Specify directory to load models from."
-			echo -e ""
+			echo
 			echo -e "-all \t\t Selects ldr and mpd file formats as target."
 			echo -e "-ldr \t\t Selects ldr file format as target."
 			echo -e "-mpd \t\t Selects mpd file format as target."
-			echo -e ""
+			echo
 			echo -e "RENDER:"
-			echo -e ""
+			echo
 			echo -e "-render \t Renders model files using the following parameters:"
-			echo -e ""
+			echo
 			echo -e "-full \t\t Render series of images using options 0 to 3."
 			echo -e "-fixed \t\t Render series of images using options 0 and 1."
 			echo -e "-flat \t\t Render series of images without shading."
@@ -214,20 +214,20 @@ do
 			echo -e "-quarter-front \t [ 1 ] Render image using a quarter-front view preset. \t [Lat.:30, Lon.: 45]"
 			echo -e "-back \t\t [ 2 ] Render image using a back view preset. \t\t [Lat.:30, Lon.: 180]"
 			echo -e "-front \t\t [ 3 ] Render image using a front view preset. \t\t [Lat.:30, Lon.: 0]"
-			echo -e ""
+			echo
 			echo -e "EXPORT:"
-			echo -e ""
+			echo
 			echo -e "-export \t Exports model files using the following parameters:"
-			echo -e ""
+			echo
 			echo -e "-3ds \t\t Export 3ds file format only."
 			echo -e "-blender \t Export blender file format only."
 			echo -e "-collada \t Export collada file format only."
 			echo -e "-wavefront \t Export wavefront (obj and mtl as zip archive) file format only."
-			echo -e ""
+			echo
 			echo -e "MODIFY:"
-			echo -e ""
+			echo
 			echo -e "-modify \t Modifies model files using the following parameters:"
-			echo -e ""
+			echo
 			echo -e "-color \t\t Modify a part's color attribute only."
 			echo -e "-part \t\t Modify a part for another by number attribute only."
 			echo -e "-bind \t\t Match a part to a specific color and modify the color for that selection."
@@ -235,36 +235,36 @@ do
 			echo -e "-step \t\t Separate ldr based submodels using step meta tags."
 			echo -e "-format \t Strip and clean model files from older LDraw editor formats and set output to UTF-8 standard."
 			echo -e "-overwrite \t Read from and overwrite the original model file after modification."
-			echo -e ""
+			echo
 			echo -e "GET:"
 			echo -e "-get \t\t Download the LDraw parts library. [-complete | -update | -unofficlal]"
-			echo -e ""
+			echo
 			echo -e "-complete \t Download the LDraw parts library - complete official archive."
 			echo -e "-update \t Download the LDraw parts library - update official archive."
 			echo -e "-unofficial \t Download the LDraw parts library - complete unofficial archive."
-			echo -e ""
+			echo
 			echo -e "MAKE LIST:"
-			echo -e ""
+			echo
 			echo -e "-description \t Sort list by part description."
 			echo -e "-number \t Sort list by part number."
-			echo -e ""
+			echo
 			echo -e "USAGE:"
-			echo -e ""
+			echo
 			echo -e "-h, --help \t Show help and usage."
 			echo -e "-v, --version \t Show ${script} version."
 			exit
 			;;
 		-v|--version)
-			echo -e ""
+			echo
 			echo -e "$script $version"
-			echo -e ""
+			echo
 			exit
 			;;
 		*)
-			echo -e ""
+			echo
 			echo -e "$script: Unknown option $1"
 			echo -e "Type './$script --help' for help and usage information."
-			echo -e ""
+			echo
 			exit
 			;;
 		esac
@@ -273,7 +273,7 @@ done
 
 # initial propmt clear ------------------------------------------------------- #
 
-echo ""
+echo
 
 # generate temporary file
 
@@ -518,7 +518,7 @@ fi
 # test for utility dependencies and requirements
 
 echo "${yellow}${marker_info}Verifying utility requirements...${reset}"
-echo ""
+echo
 
 sleep 1
 
@@ -540,7 +540,7 @@ do
 	then
 		echo "${yellow}${marker_warning}The '$binary_name' binary not found.${reset}"
 		echo "${yellow}${marker_question}${marker_yes_no}Specify location?${reset}"
-		echo ""
+		echo
 
 		read reply
 
@@ -556,7 +556,7 @@ do
 			echo "${yellow}${marker_info}Install '$binary_name' using your system's package manager.${reset}"
 			echo "${Yellow}${marker_info}Restart this utility when '$binary_name' is installed.${reset}"
 			echo "Exiting."
-			echo ""
+			echo
 
 			exit 1
 		fi
@@ -566,7 +566,7 @@ do
 	elif [[ ! -z "$binary" ]]
 	then
 		echo "${green}${marker_yes}'$binary' binary found on system.${reset}"
-		echo ""
+		echo
 	fi
 
 	sleep 1
@@ -614,7 +614,7 @@ dialog() {
 		echo "${red}${marker_no}No dialog binary present on system.${reset}"
 		echo "${yellow}${marker_info}This utility must be run using the 'directory' option.${reset}"
 		echo "Exiting."
-		echo ""
+		echo
 
 		exit 1
 	fi
@@ -644,14 +644,14 @@ get_library() {
 	# download #
 
 	echo "Downloading..."
-	echo ""
+	echo
 
 	download "$parts_url" > "$directory/$parts_archive"
 
 	# extract #
 
 	echo "Extracting..."
-	echo ""
+	echo
 
 	unzip "$parts_archive"
 
@@ -664,20 +664,20 @@ sleep 1
 
 # confirm options before processing
 
-echo ""
+echo
 echo "${marker_info}Utility started using the ${cyan}$extension_option${reset} extension option."
 echo "${marker_info}Utility started using the ${cyan}$option${reset} option."
-echo ""
+echo
 
 if [[ "$option" = "render" ]]
 then
 	echo "${marker_info}Utility started using the ${cyan}$render_option${reset} camera preset."
-	echo ""
+	echo
 
 elif [[ "$option" = "export" ]]
 then
 	echo "${marker_info}Utility started using the ${cyan}$export_name${reset} export parameter."
-	echo ""
+	echo
 fi
 
 if [[ "$option" = "overwrite" ]]
@@ -685,11 +685,11 @@ then
 	echo "${red}${marker_warning}WARNING:${reset}"
 	echo "${red}${marker_warning}Utility started using the overwrite option.${reset}"
 	echo "${red}${marker_warning}Parsed model modification will be written to file directly!${reset}"
-	echo ""
+	echo
 fi
 
 echo "Proceeding..."
-echo ""
+echo
 
 sleep 1
 
@@ -831,7 +831,7 @@ do
 			# render model using options
 
 			echo "${marker_info}Rendering in..............: ${cyan}$renders_directory${reset}"
-			echo ""
+			echo
 
 			for coordinates in ${position[@]}
 			do
@@ -848,7 +848,7 @@ do
 
 				echo "${marker_info}Rendering.................: ${cyan}${model_name^^}${reset}"
 				echo "${marker_info}View......................: ${cyan}${view[coordinates]^^}${reset}"
-				echo ""
+				echo
 
 				run_leocad "$model" $coordinates
 
@@ -865,7 +865,7 @@ do
 			done
 
 			echo "${marker_info}Output....................: ${green}$renders_directory/${model_name}-${view[$coordinates]}.${extension}${reset}"
-			echo ""
+			echo
 		fi
 
 # export --------------------------------------------------------------------- #
@@ -895,7 +895,7 @@ do
 
 				echo "${marker_info}Exporting.................: ${cyan}$model${reset}"
 				echo "${marker_info}Format....................: ${cyan}${export_name}${reset}"
-				echo ""
+				echo
 
 				leocad "$model" "-$export_option" "$export_file" >> /dev/null
 
@@ -937,7 +937,7 @@ do
 				run_leocad
 
 				echo "${cyan}Converting $model ("$export_extension")...${reset}"
-				echo ""
+				echo
 
 				# import 3ds file into blender to create optimized blend file
 
@@ -971,15 +971,15 @@ do
 				model_upload_message_2="${red}${marker_info}Model file size is above ${model_size_threshold}MB [ $model_size ]"
 			fi
 
-			echo ""
+			echo
 			echo "Model name................: $model_name"
 			echo "Model size................: $model_size"
-			echo ""
+			echo
 			echo "${model_size_message}"
-			echo ""
+			echo
 			echo "${model_upload_message_1}"
 			echo "${model_upload_message_2}"
-			echo ""
+			echo
 		fi
 	done
 done
@@ -997,8 +997,8 @@ then
 			then
 				echo "${yellow}${marker_warning}WARNING:${reset}"
 				echo "${yellow}${marker_warning}Input cannot be empty.${reset}"
-				echo "${yellow}${marker_warningTry again.${reset}"
-				echo ""
+				echo "${yellow}${marker_warning}Try again.${reset}"
+				echo
 			else
 				break
 			fi
@@ -1043,7 +1043,7 @@ then
 
 			# attribute input variable to lowercase name value
 
-			ldraw_color_hex_value=${hex_value}
+			ldraw_color_hex_value="${hex_value}"
 
 			if [[ "$color_input" == "$ldraw_color_name" ]] || \
 			   [[ "$color_input" == "$ldraw_color_number" ]] || \
@@ -1052,11 +1052,11 @@ then
 				# confirmation
 
 				echo "Confirming input value:"
-				echo ""
+				echo
 				echo "${marker_info}Color name................: ${cyan}${ldraw_color_name}${reset}"
 				echo "${marker_info}Color number..............: ${cyan}${ldraw_color_number}${reset}"
 				echo "${marker_info}Color hexadecimal value...: ${cyan}${ldraw_color_hex_value}${reset}"
-				echo ""
+				echo
 
 				return "$ldraw_color_number"
 			fi
@@ -1065,7 +1065,7 @@ then
 
 		echo "${red}${marker_no}No available color matches the input.${reset}"
 		echo "Exiting.${reset}"
-		echo ""
+		echo
 
 		exit 1
 	}
@@ -1208,10 +1208,10 @@ then
 							color="$new_color"
 
 							echo "${marker_info}Modifying.................: ${cyan}$model${reset}"
-							echo ""
+							echo
 							echo "${marker_info}Changing..................: ${yellow}$old_color${reset}"
 							echo "${marker_info}Setting...................: ${green}$new_color${reset} "
-							echo ""
+							echo
 						else
 							: # pass
 						fi
@@ -1229,10 +1229,10 @@ then
 
 							echo "${marker_info}Modifying.................: ${cyan}$model${reset}"
 
-							echo ""
+							echo
 							echo "${marker_info}Changing..................: ${yellow}$old_part${reset}"
 							echo "${marker_info}Setting...................: ${green}$new_part${reset} "
-							echo ""
+							echo
 						else
 							: # pass
 						fi
@@ -1251,12 +1251,12 @@ then
 								color="$new_color"
 
 								echo "${marker_info}Modifying.................: ${cyan}$model${reset}"
-								echo ""
+								echo
 								echo "${marker_info}Part......................: ${cyan}$part${reset}"
-								echo ""
+								echo
 								echo "${marker_info}Changing..................: ${yellow}$old_color${reset}"
 								echo "${marker_info}Setting...................: ${green}$new_color${reset} "
-								echo ""
+								echo
 							else
 								: # pass
 							fi
@@ -1270,9 +1270,9 @@ then
 			if [[ "$modify_option" = "lint" ]]
 			then
 				echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
-				echo ""
+				echo
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
-				echo ""
+				echo
 
 					# substitute carriage returns for newline
 					# substitute multiple whitespace characters to one
@@ -1354,14 +1354,14 @@ then
 							then
 								echo "${yellow}${marker_warning}${marker_yes_no}No author file found.${reset}"
 								echo "${cyan}${marker_question}${marker_yes_no}Create author file?${reset}"
-								echo ""
+								echo
 
 								read reply
 
 								if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 								then
 									echo "${cyan}${marker_info}Input author information:${reset}"
-									echo ""
+									echo
 
 									parse_input
 
@@ -1373,7 +1373,7 @@ then
 								else
 									echo "${red}${marker_warning}No author string/file specified.${reset}"
 									echo "${red}${marker_warning}Skipping.${reset}"
-									echo ""
+									echo
 
 									line=""
 								fi
@@ -1514,12 +1514,12 @@ then
 			then
 				echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
 				echo "${red}${marker_info}Writing changes to original model file!${reset}"
-				echo ""
+				echo
 
 				echo "${yellow}${marker_warning}Writing file.${reset}"
-				echo ""
+				echo
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
-				echo ""
+				echo
 
 				mv "$temporary_file" "${temporary_file%.tmp}"
 			fi
@@ -1527,9 +1527,9 @@ then
 			if [ -z "$overwrite_option" ]
 			then
 				echo "${cyan}${marker_question}${marker_yes_no}Write changes to original model file?${reset}"
-				echo ""
+				echo
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
-				echo ""
+				echo
 
 				read reply
 
@@ -1537,21 +1537,21 @@ then
 				then
 					echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
 					echo "${red}${marker_info}Writing changes to original model file.${reset}"
-					echo ""
+					echo
 
 					echo "${yellow}${marker_warning}Writing file.${reset}"
-					echo ""
+					echo
 					echo "${marker_info}Model file................: ${cyan}$model${reset}"
-					echo ""
+					echo
 
 					mv "$temporary_file" "${temporary_file%.tmp}"
 
 				else
 					echo "${yellow}${marker_warning}[ OVERWRITE ] option disabled.${reset}"
 					echo "${yellow}${marker_info}Writing changes to model file copy.${reset}"
-					echo ""
+					echo
 					echo "Writing changes to model file copy."
-					echo ""
+					echo
 
 					mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.$extension"
 				fi
@@ -1588,7 +1588,7 @@ then
 	if [ -z "$directory" ]
 	then
 		echo "${red}${marker_question}${marker_yes_no}Specify download location?${reset}"
-		echo ""
+		echo
 
 		read reply
 
@@ -1599,15 +1599,16 @@ then
 			browse=$(dialog) || exit
 
 			directory="$browse"
-	else
-		directory="./"
+		else
+			directory="./"
 
-		echo "${yellow}${marker_warning}No directory location specified.${reset}"
-		echo "${yellow}${marker_warning}Downloading into current directory.${reset}"
-		echo ""
+			echo "${yellow}${marker_warning}No directory location specified.${reset}"
+			echo "${yellow}${marker_warning}Downloading into current directory.${reset}"
+			echo
+		fi
+
+		get_library
 	fi
-
-	get_library
 fi
 
 # make list ------------------------------------------------------------------ #
@@ -1618,7 +1619,7 @@ then
 	then
 		echo "${red}${marker_warning}Is the LDraw parts library setup on this system?${reset}"
 		echo "${marker_yes_no}"
-		echo ""
+		echo
 
 		read reply
 
@@ -1635,7 +1636,7 @@ then
 				echo "${green}${marker_yes}LDraw parts library exists.${reset}"
 				echo "${green}${marker_yes}Operating within the LDraw parts directory.${reset}"
 				echo "Continuing."
-				echo ""
+				echo
 
 				directory="$browse/parts"
 			else
@@ -1645,7 +1646,7 @@ then
 			echo "${yellow}${marker_warning}LDraw parts directory not found.${reset}"
 			echo "${yellow}${marker_question}Specify the LDraw parts library directory location to continue?${reset}"
 			echo "${marker_yes_no}"
-			echo ""
+			echo
 
 			read reply
 
@@ -1658,14 +1659,14 @@ then
 				directory="$browse/parts"
 			else
 				echo "${yellow}${marker_question}${marker_yes_no}Download the latest LDraw parts library?${reset}"
-				echo ""
+				echo
 
 				read reply
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
 					echo "${yellow}Specify setup location.${reset}"
-					echo ""
+					echo
 
 					# specify directory location or exit on 'cancel'
 
@@ -1678,14 +1679,14 @@ then
 					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
 				else
 					echo "${red}${marker_no}LDraw parts directory not setup on system.${reset}"
-					echo ""
+					echo
 					echo "${yellow}${marker_warning}The parts.lst file may be needed for some legacy editors to function.${reset}"
-					echo ""
+					echo
 					echo "${cyan}${marker_info}Visit http://www.ldraw.org to get started.${reset}"
 					echo "${cyan}${marker_info}You can download and extract the LDraw parts library on your system manually.${reset}"
 					echo "${cyan}${marker_info}Restart and run this utility using the 'make-list' option to generate the parts list.${reset}"
 					echo "Exiting."
-					echo ""
+					echo
 
 					exit 1
 				fi
@@ -1699,9 +1700,9 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		echo "${yellow}${marker_warning}Previous instance of the 'parts.lst file found.${reset}"
+		echo "${yellow}${marker_warning}Previous instance of the parts.lst file found.${reset}"
 		echo "${cyan}${marker_info}Backing up...${reset}"
-		echo ""
+		echo
 
 		sleep 1
 
@@ -1717,19 +1718,19 @@ then
 		echo "${yellow}${marker_warning}No sorting method specified.${reset}"
 		echo "${cyan}${marker_question}Which sorting method should be used for parsing the parts list?${reset}"
 		echo "[ [dD]escription / [nN]umber ]"
-		echo ""
+		echo
 
 		read reply
 	fi
 
-	if [-z "$reply" ]
+	if [ -z "$reply" ]
 	then
 		exit 1
 	else
 		# parse parts list
 
 		echo "Processing..."
-		echo ""
+		echo
 
 		sleep 1
 
@@ -1761,14 +1762,17 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					echo -ne "${marker_info}Parts count...............: ${cyan}$((count++))${reset}"'\r'
+					echo -n "${marker_info}Parts count...............: ${cyan}$((count++))${reset}"
+					echo -e "\r"
 				fi
 			done
 		done
 
 		# keep counter visible while looping
 
-		echo ""
+		echo
+
+		separator=' '
 
 		# apply sorting method
 
@@ -1776,11 +1780,11 @@ then
 		do
 			if [[ "$reply" = [dD] ]] || [[ "$sort_mode" == "description" ]]
 			then
-				sort -b -d -k 2 -t ' ' -o "$list" "$list"
+				sort -b -d -k 2 -t "$separator" -o "$list" "$list"
 
 			elif [[ "$reply" = [nN] ]] || [[ "$sort_mode" == "number" ]]
 			then
-				sort -b -n -k 1 -t ' ' -o "$list" "$list"
+				sort -b -n -k 1 -t "$separator" -o "$list" "$list"
 			fi
 		done
 
@@ -1794,5 +1798,5 @@ then
 	fi
 fi
 
-echo "${green}${marker_yes}Done.${reset}"
-echo ""
+echo -e "${green}${marker_yes}Done.${reset}"
+echo
