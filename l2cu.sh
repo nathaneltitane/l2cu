@@ -955,31 +955,24 @@ do
 			model_size_threshold="25"
 			model_size_number="${model_size%MB}"
 
-			# if less than threshold
+			# if lesser than threshold
 
 			if [[ "$model_size_number" -le "$model_size_threshold" ]]
 			then
-				model_size_message="${green}${marker_yes}File size threshold not exceeded - [ $model_size ]${reset}"
+				echo "${green}${marker_yes}File size threshold not exceeded - [ $model_size ]${reset}"
+				echo
 
 			# if greater than threshold
 
 			elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
 			then
-				model_size_message="${red}${marker_yes}File size threshold exceeded - [ $model_size ]${reset}"
-
-				model_upload_message_1="${red}${marker_warning}WARNING:${reset}"
-				model_upload_message_2="${red}${marker_info}Model file size is above ${model_size_threshold}MB [ $model_size ]"
+				echo "${red}${marker_no}File size threshold exceeded - [ $model_size ]${reset}"
+				echo
+				echo "${red}${marker_warning}WARNING:${reset}"
+				echo "${red}${marker_info}Model file size is above recommended threshold of ${model_size_threshold}MB${reset}"
+				echo "${yellow}${marker_info}You may experience higher than average loading times.${reset}"
+				echo
 			fi
-
-			echo
-			echo "Model name................: $model_name"
-			echo "Model size................: $model_size"
-			echo
-			echo "${model_size_message}"
-			echo
-			echo "${model_upload_message_1}"
-			echo "${model_upload_message_2}"
-			echo
 		fi
 	done
 done
