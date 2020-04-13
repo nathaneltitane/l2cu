@@ -1274,32 +1274,30 @@ then
 				echo "${marker_info}Model file................: ${cyan}$model${reset}"
 				echo
 
-					# substitute carriage returns for newline
-					# substitute multiple whitespace characters to one
-					# delete lines beginning with dot
-					# delete lines beginning with whitespace
-					# strip '(' character
-					# strip ')' character
+					# delete lines containing empty parsing string # BUG #
+					# delete lines beginning with whitespace character
+					# delete lines beginning with dot character
 					# delete lines containing BACKGROUND meta
 					# delete lines containing PIVOT meta
 					# delete lines containing HIDDEN meta
-					# eliminate consecutive dot from faulty parsing # BUG #
-					# eliminate consecutive step tags
+					# strip '(' character
+					# strip ')' character
+					# substitute carriage return for newline
+					# substitute multiple whitespace characters to one
 
 				sed -i \
-					-e 's/\r\ /\n/g' \
-					-e 's/  */ /g' \
-					-e 's/\r/\n/g'\
-					-e '/^\./d' \
+					-e '/  *\./d' \
 					-e '/^ /d' \
-					-e 's/(//g' \
-					-e 's/)//g' \
+					-e '/^\./d' \
 					-e '/BACKGROUND/d' \
 					-e '/PIVOT/d' \
 					-e '/HIDDEN/d' \
-					-e 's/\.\ \.*//g' \
-					-r ':a; N; /(0 STEP)[^\n]*\n\1/ s/\n.*//; ta; P; D' \
-																			$model
+					-e 's/(//g' \
+					-e 's/)//g' \
+					-e 's/\r//g' \
+					-e 's/  */ /g' \
+					-e '/^$/d' \
+									$model
 			fi
 
 # modify: step --------------------------------------------------------------- #
