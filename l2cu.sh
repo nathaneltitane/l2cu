@@ -228,10 +228,10 @@ do
 			echo
 			echo -e "-modify \t Modifies model files using the following parameters:"
 			echo
+			echo -e "-lint \t\t Standardize and format model files for parsing."
 			echo -e "-color \t\t Modify a part's color attribute only."
 			echo -e "-part \t\t Modify a part for another by number attribute only."
 			echo -e "-bind \t\t Match a part to a specific color and modify the color for that selection."
-			echo -e "-lint \t\t Standardize and format model files for parsing."
 			echo -e "-step \t\t Separate ldr based submodels using step meta tags."
 			echo -e "-format \t Strip and clean model files from older LDraw editor formats and set output to UTF-8 standard."
 			echo -e "-overwrite \t Read from and overwrite the original model file after modification."
@@ -1164,6 +1164,51 @@ then
 			do
 				line_number=$(( $line_number + 1 ))
 
+# modify: lint --------------------------------------------------------------- #
+
+				# model file linting
+
+				if [[ "$modify_option" = "lint" ]]
+				then
+					echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
+					echo
+					echo "${marker_info}Model file................: ${cyan}$model${reset}"
+					echo
+
+						# substitute carriage return for newline
+						# substitute lines containing empty parsing string # BUG #
+						# substitute multiple whitespace characters to one
+
+						# delete lines beginning with whitespace character
+						# delete lines beginning with dot character
+						# delete lines containing BACKGROUND meta
+						# delete lines containing PIVOT meta
+						# delete lines containing HIDDEN meta
+						# strip '(' character
+						# strip ')' character
+
+					sed \
+						-e 's/\r//g' \
+						-e 's/0 STEP  *\./0 STEP/g' \
+						-e 's/  */ /g' \
+						-e '/  *\./d' \
+						-e '/^ /d' \
+						-e '/^\./d' \
+						-e '/BACKGROUND/d' \
+						-e '/PIVOT/d' \
+						-e '/HIDDEN/d' \
+						-e 's/(//g' \
+						-e 's/)//g' \
+						-e '/^$/d' "$model" > "$temporary_file"
+
+						# exit to avoid line breakdown iteration and overwrite
+
+						break
+				fi
+
+				# line breakdown for other functions
+
+
 				if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
 				then
 					# skip header and footer lines containing matching patterns
@@ -1262,43 +1307,6 @@ then
 							fi
 						fi
 					fi
-
-# modify: lint --------------------------------------------------------------- #
-
-			# model file linting
-
-			if [[ "$modify_option" = "lint" ]]
-			then
-				echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
-				echo
-				echo "${marker_info}Model file................: ${cyan}$model${reset}"
-				echo
-
-					# delete lines containing empty parsing string # BUG #
-					# delete lines beginning with whitespace character
-					# delete lines beginning with dot character
-					# delete lines containing BACKGROUND meta
-					# delete lines containing PIVOT meta
-					# delete lines containing HIDDEN meta
-					# strip '(' character
-					# strip ')' character
-					# substitute carriage return for newline
-					# substitute multiple whitespace characters to one
-
-				sed -i \
-					-e '/  *\./d' \
-					-e '/^ /d' \
-					-e '/^\./d' \
-					-e '/BACKGROUND/d' \
-					-e '/PIVOT/d' \
-					-e '/HIDDEN/d' \
-					-e 's/(//g' \
-					-e 's/)//g' \
-					-e 's/\r//g' \
-					-e 's/  */ /g' \
-					-e '/^$/d' \
-									$model
-			fi
 
 # modify: step --------------------------------------------------------------- #
 
