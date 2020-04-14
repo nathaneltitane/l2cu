@@ -1761,8 +1761,8 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					echo -n "${marker_info}Parts count...............: ${cyan}$((count++))${reset}"
-					echo -e "\r"
+					echo -e "\r${marker_info}Parts count...............: ${cyan}$((count++))${reset}\c"
+					echo
 				fi
 			done
 		done
