@@ -4,7 +4,7 @@
 
 # L²CU # l2cu # linux ldraw command line utility #
 
-# colors --------------------------------------------------------------------- #
+# colors ------------------------------------------------------------------ #
 
 if [ -z $(command -v tput) ]
 then
@@ -37,15 +37,171 @@ fi
 
 # symbols -------------------------------------------------------------------- #
 
-marker_question=$(echo \[ ? ]\ )
-marker_info=$(echo \[ i ]\ )
-marker_warning=$(echo \[ ! ]\ )
-marker_maru=$(echo \[ 〇 ]\ )
-marker_sankaku=$(echo \[ △ ]\ )
-marker_batsu=$(echo \[ ✕ ]\ )
-marker_yes=$(echo \[ ✓ ]\ )
-marker_no=$(echo \[ ✕ ]\ )
-marker_yes_no=$(echo \[ Y/N ]\ )
+marker_batsu='[ ✕ ]'
+marker_fwd='[ > ]'
+marker_info='[ i ]'
+marker_input='[ + ]'
+marker_maru='[ ○ ]'
+marker_bako='[ □ ]'
+marker_no='[ ✕ ]'
+marker_question='[ ? ]'
+marker_rev='[ < ]'
+marker_sankaku='[ △ ]'
+marker_stp='[ - ]'
+marker_warning='[ ! ]'
+marker_yes='[ ✓ ]'
+marker_yes_no='[ Y/N ]'
+
+# functions ------------------------------------------------------------------ #
+
+# highlight
+
+console.red () {
+	echo "${red}"$@"${reset}"
+}
+
+console.green () {
+	echo "${green}"$@"${reset}"
+}
+
+console.yellow () {
+	echo "${yellow}"$@"${reset}"
+}
+
+console.blue () {
+	echo "${blue}"$@"${reset}"
+}
+
+console.magenta () {
+	echo "${magenta}"$@"${reset}"
+}
+
+console.cyan () {
+	echo "${cyan}"$@"${reset}"
+}
+
+# prompts #
+
+# marker_batsu
+
+console.batsu () {
+	echo "${red}${marker_batsu}" $@"${reset}"
+}
+
+# marker_fwd
+
+console.fwd () {
+	echo "${white}${marker_fwd}" $@"${reset}"
+}
+
+# marker_info
+
+console.info () {
+	echo "${cyan}${marker_info}" $@"${reset}"
+}
+
+# marker_input
+
+console.input () {
+	echo "${magenta}${marker_input}" $@"${reset}"
+}
+
+# marker_maru
+
+console.maru () {
+	echo "${green}${marker_maru}" $@"${reset}"
+}
+
+# marker_no
+
+console.error () {
+	echo "${red}${marker_no}" $@"${reset}"
+}
+
+# marker_question
+
+console.question () {
+	echo "${magenta}${marker_question}" $@"${reset}"
+}
+
+# marker_rev
+
+console.rev () {
+	echo "${white}${marker_rev}" $@"${reset}"
+}
+
+# marker_sankaku
+
+console.sankaku () {
+	echo "${blue}${marker_sankaku}" $@"${reset}"
+}
+
+# marker_stp
+
+console.stp () {
+	echo "${white}${marker_stp}" $@"${reset}"
+}
+
+# marker_warning
+
+console.warning () {
+	echo "${yellow}${marker_warning}" $@"${reset}"
+}
+
+# marker_yes
+
+console.success () {
+	echo "${green}${marker_yes}" $@"${reset}"
+}
+
+# marker_yes_no
+
+console.choice () {
+	echo "${magenta}${marker_yes_no}" $@"${reset}"
+}
+
+# countdown #
+
+console.countdown () {
+	seconds=$1
+	shift
+
+	while [ $seconds -gt 0 ]
+	do
+		echo -e "\r${marker_warning} WAITING [ ${yellow}$((seconds--))${reset} ] SECONDS...\c"
+
+		sleep 1
+	done
+
+	# additional echo required because of carriage return clear
+
+	echo
+}
+
+console.spinner () {
+	# catch PID of last command
+
+	PID=$!
+
+	# spinner string content
+
+	before="[ "
+	spinner="/—\|"
+	after="]"
+	message="$1"
+
+	i=1
+
+	echo
+
+	while [ -d /proc/$PID ]
+	do
+		echo -ne "\r${before} \b${spinner:i++%${#spinner}:1} ${after} ${message}\c "
+		sleep 0.125
+	done
+
+	echo
+}
 
 # version -------------------------------------------------------------------- #
 
@@ -517,7 +673,7 @@ fi
 
 # test for utility dependencies and requirements
 
-echo "${yellow}${marker_info}Verifying utility requirements...${reset}"
+console.info "Verifying utility requirements..."
 echo
 
 sleep 1
@@ -538,8 +694,9 @@ do
 
 	if [[ -z "$binary" ]]
 	then
-		echo "${yellow}${marker_warning}The '$binary_name' binary not found.${reset}"
-		echo "${yellow}${marker_question}${marker_yes_no}Specify location?${reset}"
+		console.warning "The '$binary_name' binary not found."
+		console.question "Specify location?"
+		console.choice
 		echo
 
 		read reply
@@ -552,10 +709,10 @@ do
 
 			binary="$binary_path/$binary"
 		else
-			echo "${red}${marker_no}No '$binary_name' binary installed on system.${reset}"
-			echo "${yellow}${marker_info}Install '$binary_name' using your system's package manager.${reset}"
-			echo "${Yellow}${marker_info}Restart this utility when '$binary_name' is installed.${reset}"
-			echo "Exiting."
+			console.error "No '$binary_name' binary installed on system."
+			console.info "Install '$binary_name' using your system's package manager."
+			console.info "Restart this utility when '$binary_name' is installed."
+			console.fwd "Exiting."
 			echo
 
 			exit 1
@@ -565,7 +722,7 @@ do
 
 	elif [[ ! -z "$binary" ]]
 	then
-		echo "${green}${marker_yes}'$binary' binary found on system.${reset}"
+		console.success "'$binary' binary found on system."
 		echo
 	fi
 
@@ -611,9 +768,9 @@ dialog() {
 	then
 		dialog=$(g_dialog)
 	else
-		echo "${red}${marker_no}No dialog binary present on system.${reset}"
-		echo "${yellow}${marker_info}This utility must be run using the 'directory' option.${reset}"
-		echo "Exiting."
+		console.error "No dialog binary present on system."
+		console.info "This utility must be run using the 'directory' option."
+		console.fwd "Exiting."
 		echo
 
 		exit 1
@@ -629,7 +786,7 @@ download() {
 
 if [[ -z "$directory" ]]
 then
-	echo "${cyan}${marker_question}Load model files from:${reset}"
+	console.question "Load model files from:"
 	echo""
 
 	# specify directory location or exit on 'cancel'
@@ -643,17 +800,11 @@ get_library() {
 
 	# download #
 
-	echo "Downloading..."
-	echo
-
-	download "$parts_url" > "$directory/$parts_archive"
+	download "$parts_url" > "$directory/$parts_archive" & spinner "Downloading..."
 
 	# extract #
 
-	echo "Extracting..."
-	echo
-
-	unzip "$parts_archive"
+	unzip "$parts_archive" & spinner "Extracting..."
 
 	# rename #
 
@@ -665,30 +816,30 @@ sleep 1
 # confirm options before processing
 
 echo
-echo "${marker_info}Utility started using the ${cyan}$extension_option${reset} extension option."
-echo "${marker_info}Utility started using the ${cyan}$option${reset} option."
+console.info "Utility started using the ${cyan}$extension_option extension option."
+console.info "Utility started using the ${cyan}$option option."
 echo
 
 if [[ "$option" = "render" ]]
 then
-	echo "${marker_info}Utility started using the ${cyan}$render_option${reset} camera preset."
+	console.info "Utility started using the ${cyan}$render_option camera preset."
 	echo
 
 elif [[ "$option" = "export" ]]
 then
-	echo "${marker_info}Utility started using the ${cyan}$export_name${reset} export parameter."
+	console.info "Utility started using the ${cyan}$export_name export parameter."
 	echo
 fi
 
 if [[ "$option" = "overwrite" ]]
 then
-	echo "${red}${marker_warning}WARNING:${reset}"
-	echo "${red}${marker_warning}Utility started using the overwrite option.${reset}"
-	echo "${red}${marker_warning}Parsed model modification will be written to file directly!${reset}"
+	console.warning "WARNING:"
+	console.warning "Utility started using the overwrite option."
+	console.warning "Parsed model modification will be written to file directly!"
 	echo
 fi
 
-echo "Proceeding..."
+console.fwd "Proceeding..."
 echo
 
 sleep 1
@@ -830,7 +981,7 @@ do
 
 			# render model using options
 
-			echo "${marker_info}Rendering in..............: ${cyan}$renders_directory${reset}"
+			console.info "Rendering in..............: ${cyan}$renders_directory"
 			echo
 
 			for coordinates in ${position[@]}
@@ -846,8 +997,8 @@ do
 
 				# render #
 
-				echo "${marker_info}Rendering.................: ${cyan}${model_name^^}${reset}"
-				echo "${marker_info}View......................: ${cyan}${view[coordinates]^^}${reset}"
+				console.info "Rendering.................: ${cyan}${model_name^^}"
+				console.info "View......................: ${cyan}${view[coordinates]^^}"
 				echo
 
 				run_leocad "$model" $coordinates
@@ -864,7 +1015,7 @@ do
 				fi
 			done
 
-			echo "${marker_info}Output....................: ${green}$renders_directory/${model_name}-${view[$coordinates]}.${extension}${reset}"
+			console.info "Output....................: ${green}$renders_directory/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
@@ -893,8 +1044,8 @@ do
 
 			run_leocad () {
 
-				echo "${marker_info}Exporting.................: ${cyan}$model${reset}"
-				echo "${marker_info}Format....................: ${cyan}${export_name}${reset}"
+				console.info "Exporting.................: $model"
+				console.info "Format....................: ${cyan}${export_name}"
 				echo
 
 				leocad "$model" "-$export_option" "$export_file" >> /dev/null
@@ -936,7 +1087,7 @@ do
 			then
 				run_leocad
 
-				echo "${cyan}Converting $model ("$export_extension")...${reset}"
+				console.info "Converting $model ("$export_extension")..."
 				echo
 
 				# import 3ds file into blender to create optimized blend file
@@ -959,18 +1110,18 @@ do
 
 			if [[ "$model_size_number" -le "$model_size_threshold" ]]
 			then
-				echo "${green}${marker_yes}File size threshold not exceeded - [ $model_size ]${reset}"
+				console.success "File size threshold not exceeded - [ $model_size ]"
 				echo
 
 			# if greater than threshold
 
 			elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
 			then
-				echo "${red}${marker_no}File size threshold exceeded - [ $model_size ]${reset}"
+				console.error "File size threshold exceeded - [ $model_size ]"
 				echo
-				echo "${red}${marker_warning}WARNING:${reset}"
-				echo "${red}${marker_info}Model file size is above recommended threshold of ${model_size_threshold}MB${reset}"
-				echo "${yellow}${marker_info}You may experience higher than average loading times.${reset}"
+				console.warning "WARNING:"
+				console.info "Model file size is above recommended threshold of ${model_size_threshold}MB"
+				console.info "You may experience higher than average loading times."
 				echo
 			fi
 		fi
@@ -988,9 +1139,9 @@ then
 
 			if [[ -z $input ]]
 			then
-				echo "${yellow}${marker_warning}WARNING:${reset}"
-				echo "${yellow}${marker_warning}Input cannot be empty.${reset}"
-				echo "${yellow}${marker_warning}Try again.${reset}"
+				console.warning "WARNING:"
+				console.warning "Input cannot be empty."
+				console.warning "Try again."
 				echo
 			else
 				break
@@ -1044,11 +1195,11 @@ then
 			then
 				# confirmation
 
-				echo "Confirming input value:"
+				console.fwd "Confirming input value:"
 				echo
-				echo "${marker_info}Color name................: ${cyan}${ldraw_color_name}${reset}"
-				echo "${marker_info}Color number..............: ${cyan}${ldraw_color_number}${reset}"
-				echo "${marker_info}Color hexadecimal value...: ${cyan}${ldraw_color_hex_value}${reset}"
+				console.info "Color name................: ${cyan}${ldraw_color_name}"
+				console.info "Color number..............: ${cyan}${ldraw_color_number}"
+				console.info "Color hexadecimal value...: ${cyan}${ldraw_color_hex_value}"
 				echo
 
 				return "$ldraw_color_number"
@@ -1056,8 +1207,8 @@ then
 
 		done < "$colors"
 
-		echo "${red}${marker_no}No available color matches the input.${reset}"
-		echo "Exiting.${reset}"
+		console.error "No available color matches the input."
+		echo "Exiting."
 		echo
 
 		exit 1
@@ -1074,14 +1225,14 @@ then
 
 	if [[ "$modify_option" = "color" ]]
 	then
-		echo "${cyan}Enter the color description [ name / number / hexadecimal ] to modify.${reset}"
+		console.input "Enter the color description [ name / number / hexadecimal ] to modify."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
 		old_color="$ldraw_color_number"
 
-		echo "${cyan}Enter the color description [ name / number / hexadecimal ] to set.${reset}"
+		console.input "Enter the color description [ name / number / hexadecimal ] to set."
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -1091,14 +1242,14 @@ then
 
 	if [[ "$modify_option" = "part" ]]
 	then
-		echo "${cyan}Enter the part number to modify.${reset}"
+		console.input "Enter the part number to modify."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
 		old_part="$part_input"
 
-		echo "${cyan}Enter the part number to set as replacement.${reset}"
+		console.input "Enter the part number to set as replacement."
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -1108,21 +1259,21 @@ then
 
 	if [[ "$modify_option" = "bind" ]]
 	then
-		echo "${cyan}Enter the part number to modify.${reset}"
+		console.input "Enter the part number to modify."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
 		part_selection="$part_input"
 
-		echo "${cyan}Enter the matching color description [ name | number | hexadecimal ] modify for the selected part.${reset}"
+		console.input "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
 		old_color="$ldraw_color_number"
 
-		echo "${cyan}Enter the new color description [ name | number | hexadecimal ] to set for the selected part.${reset}"
+		console.input "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
 		parse_colors
 
 		# $? returning wrong arbitrary value for $new_color
@@ -1163,9 +1314,9 @@ then
 
 				if [[ "$modify_option" = "lint" ]]
 				then
-					echo "${yellow}${marker_warning}Cleaning up model file.${reset}"
+					console.warning "Cleaning up model file."
 					echo
-					echo "${marker_info}Model file................: ${cyan}$model${reset}"
+					console.info "Model file................: $model"
 					echo
 
 						# substitute carriage return for newline
@@ -1245,10 +1396,10 @@ then
 						then
 							color="$new_color"
 
-							echo "${marker_info}Modifying.................: ${cyan}$model${reset}"
+							console.info "Modifying.................: $model"
 							echo
-							echo "${marker_info}Changing..................: ${yellow}$old_color${reset}"
-							echo "${marker_info}Setting...................: ${green}$new_color${reset} "
+							console.info "Changing..................: ${yellow}$old_color"
+							console.info "Setting...................: ${green}$new_color "
 							echo
 						else
 							: # pass
@@ -1265,11 +1416,11 @@ then
 						then
 							part="$new_part"
 
-							echo "${marker_info}Modifying.................: ${cyan}$model${reset}"
+							console.info "Modifying.................: $model"
 
 							echo
-							echo "${marker_info}Changing..................: ${yellow}$old_part${reset}"
-							echo "${marker_info}Setting...................: ${green}$new_part${reset} "
+							console.info "Changing..................: ${yellow}$old_part"
+							console.info "Setting...................: ${green}$new_part "
 							echo
 						else
 							: # pass
@@ -1288,12 +1439,12 @@ then
 							then
 								color="$new_color"
 
-								echo "${marker_info}Modifying.................: ${cyan}$model${reset}"
+								console.info "Modifying.................: $model"
 								echo
-								echo "${marker_info}Part......................: ${cyan}$part${reset}"
+								console.info "Part......................: ${cyan}$part"
 								echo
-								echo "${marker_info}Changing..................: ${yellow}$old_color${reset}"
-								echo "${marker_info}Setting...................: ${green}$new_color${reset} "
+								console.info "Changing..................: ${yellow}$old_color"
+								console.info "Setting...................: ${green}$new_color "
 								echo
 							else
 								: # pass
@@ -1351,15 +1502,16 @@ then
 
 							if [ ! -e "./author" ]
 							then
-								echo "${yellow}${marker_warning}${marker_yes_no}No author file found.${reset}"
-								echo "${cyan}${marker_question}${marker_yes_no}Create author file?${reset}"
+								console.warning "No author file found."
+								console.question "Create author file?"
+								console.choice
 								echo
 
 								read reply
 
 								if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 								then
-									echo "${cyan}${marker_info}Input author information:${reset}"
+									console.input "Enter author information:"
 									echo
 
 									parse_input
@@ -1370,8 +1522,8 @@ then
 
 									author_string=$(echo $(cat ./author))
 								else
-									echo "${red}${marker_warning}No author string/file specified.${reset}"
-									echo "${red}${marker_warning}Skipping.${reset}"
+									console.warning "No author string/file specified."
+									console.fwd "Skipping."
 									echo
 
 									line=""
@@ -1511,13 +1663,13 @@ then
 
 			if [[ "$overwrite_option" = "overwrite" ]]
 			then
-				echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
-				echo "${red}${marker_info}Writing changes to original model file!${reset}"
+				console.warning "[ OVERWRITE ] option enabled!"
+				console.info "Writing changes to original model file!"
 				echo
 
-				echo "${yellow}${marker_warning}Writing file.${reset}"
+				console.warning "Writing file."
 				echo
-				echo "${marker_info}Model file................: ${cyan}$model${reset}"
+				console.info "Model file................: $model"
 				echo
 
 				mv "$temporary_file" "${temporary_file%.tmp}"
@@ -1525,31 +1677,32 @@ then
 
 			if [ -z "$overwrite_option" ]
 			then
-				echo "${cyan}${marker_question}${marker_yes_no}Write changes to original model file?${reset}"
+				console.question "Write changes to original model file?"
+				console.choice
 				echo
-				echo "${marker_info}Model file................: ${cyan}$model${reset}"
+				console.info "Model file................: $model"
 				echo
 
 				read reply
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					echo "${red}${marker_warning}[ OVERWRITE ] option enabled!${reset}"
-					echo "${red}${marker_info}Writing changes to original model file.${reset}"
+					console.warning "[ OVERWRITE ] option enabled!"
+					console.info "Writing changes to original model file."
 					echo
 
-					echo "${yellow}${marker_warning}Writing file.${reset}"
+					console.warning "Writing file."
 					echo
-					echo "${marker_info}Model file................: ${cyan}$model${reset}"
+					console.info "Model file................: $model"
 					echo
 
 					mv "$temporary_file" "${temporary_file%.tmp}"
 
 				else
-					echo "${yellow}${marker_warning}[ OVERWRITE ] option disabled.${reset}"
-					echo "${yellow}${marker_info}Writing changes to model file copy.${reset}"
+					console.warning "[ OVERWRITE ] option disabled."
+					console.info "Writing changes to model file copy."
 					echo
-					echo "Writing changes to model file copy."
+					console.fwd "Writing changes to model file copy."
 					echo
 
 					mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.$extension"
@@ -1586,7 +1739,8 @@ then
 
 	if [ -z "$directory" ]
 	then
-		echo "${red}${marker_question}${marker_yes_no}Specify download location?${reset}"
+		console.question "Specify download location?"
+		console.choice
 		echo
 
 		read reply
@@ -1601,8 +1755,8 @@ then
 		else
 			directory="./"
 
-			echo "${yellow}${marker_warning}No directory location specified.${reset}"
-			echo "${yellow}${marker_warning}Downloading into current directory.${reset}"
+			console.warning "No directory location specified."
+			console.warning "Downloading into current directory."
 			echo
 		fi
 
@@ -1616,8 +1770,8 @@ if [[  "$option" = "make-list" ]]
 then
 	if [ -z "$directory" ]
 	then
-		echo "${red}${marker_warning}Is the LDraw parts library setup on this system?${reset}"
-		echo "${marker_yes_no}"
+		console.warning "Is the LDraw parts library setup on this system?"
+		console.choice
 		echo
 
 		read reply
@@ -1632,19 +1786,19 @@ then
 
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
-				echo "${green}${marker_yes}LDraw parts library exists.${reset}"
-				echo "${green}${marker_yes}Operating within the LDraw parts directory.${reset}"
-				echo "Continuing."
+				console.success "LDraw parts library exists."
+				console.success "Operating within the LDraw parts directory."
+				console.fwd "Continuing."
 				echo
 
 				directory="$browse/parts"
 			else
-				echo "LDraw library directory not recognized: 'parts' directory not found."
+				console.error "LDraw library directory not recognized: 'parts' directory not found."
 			fi
 		else
-			echo "${yellow}${marker_warning}LDraw parts directory not found.${reset}"
-			echo "${yellow}${marker_question}Specify the LDraw parts library directory location to continue?${reset}"
-			echo "${marker_yes_no}"
+			console.warning "LDraw parts directory not found."
+			console.question "Specify the LDraw parts library directory location to continue?"
+			console.choice
 			echo
 
 			read reply
@@ -1657,14 +1811,15 @@ then
 
 				directory="$browse/parts"
 			else
-				echo "${yellow}${marker_question}${marker_yes_no}Download the latest LDraw parts library?${reset}"
+				console.question "Download the latest LDraw parts library?"
+				console.choice
 				echo
 
 				read reply
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					echo "${yellow}Specify setup location.${reset}"
+					echo "${yellow}Specify setup location."
 					echo
 
 					# specify directory location or exit on 'cancel'
@@ -1677,13 +1832,13 @@ then
 
 					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
 				else
-					echo "${red}${marker_no}LDraw parts directory not setup on system.${reset}"
+					console.error "LDraw parts directory not setup on system."
 					echo
-					echo "${yellow}${marker_warning}The parts.lst file may be needed for some legacy editors to function.${reset}"
+					console.warning "The parts.lst file may be needed for some legacy editors to function."
 					echo
-					echo "${cyan}${marker_info}Visit http://www.ldraw.org to get started.${reset}"
-					echo "${cyan}${marker_info}You can download and extract the LDraw parts library on your system manually.${reset}"
-					echo "${cyan}${marker_info}Restart and run this utility using the 'make-list' option to generate the parts list.${reset}"
+					console.info "Visit http://www.ldraw.org to get started."
+					console.info "You can download and extract the LDraw parts library on your system manually."
+					console.info "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo "Exiting."
 					echo
 
@@ -1699,8 +1854,8 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		echo "${yellow}${marker_warning}Previous instance of the parts.lst file found.${reset}"
-		echo "${cyan}${marker_info}Backing up...${reset}"
+		console.warning "Previous instance of the parts.lst file found."
+		console.info "Backing up..."
 		echo
 
 		sleep 1
@@ -1712,10 +1867,10 @@ then
 
 	if [[ "$sort_mode" == "description" ]] || [[ "$sort_mode" == "number" ]]
 	then
-		echo "${cyan}${marker_info}Utility startedusing the $sort_mode option flag.${reset}"
+		console.info "Utility startedusing the $sort_mode option flag."
 	else
-		echo "${yellow}${marker_warning}No sorting method specified.${reset}"
-		echo "${cyan}${marker_question}Which sorting method should be used for parsing the parts list?${reset}"
+		console.warning "No sorting method specified."
+		console.question "Which sorting method should be used for parsing the parts list?"
 		echo "[ [dD]escription / [nN]umber ]"
 		echo
 
@@ -1761,7 +1916,7 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					echo -e "\r${marker_info}Parts count...............: ${cyan}$((count++))${reset}\c"
+					console.info "Parts count...............: ${cyan}$((count++))\c"
 					echo
 				fi
 			done
@@ -1797,5 +1952,5 @@ then
 	fi
 fi
 
-echo -e "${green}${marker_yes}Done.${reset}"
+console.success "Done."
 echo
