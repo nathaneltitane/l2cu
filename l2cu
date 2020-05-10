@@ -816,18 +816,18 @@ sleep 1
 # confirm options before processing
 
 echo
-console.info "Utility started using the ${cyan}$extension_option extension option."
-console.info "Utility started using the ${cyan}$option option."
+console.info "Utility started using the $extension_option extension option."
+console.info "Utility started using the $option option."
 echo
 
 if [[ "$option" = "render" ]]
 then
-	console.info "Utility started using the ${cyan}$render_option camera preset."
+	console.info "Utility started using the $render_option camera preset."
 	echo
 
 elif [[ "$option" = "export" ]]
 then
-	console.info "Utility started using the ${cyan}$export_name export parameter."
+	console.info "Utility started using the $export_name export parameter."
 	echo
 fi
 
@@ -981,7 +981,7 @@ do
 
 			# render model using options
 
-			console.info "Rendering in..............: ${cyan}$renders_directory"
+			console.info "Rendering in..............: $renders_directory"
 			echo
 
 			for coordinates in ${position[@]}
@@ -997,8 +997,8 @@ do
 
 				# render #
 
-				console.info "Rendering.................: ${cyan}${model_name^^}"
-				console.info "View......................: ${cyan}${view[coordinates]^^}"
+				console.info "Rendering.................: ${model_name^^}"
+				console.info "View......................: ${view[coordinates]^^}"
 				echo
 
 				run_leocad "$model" $coordinates
@@ -1015,7 +1015,7 @@ do
 				fi
 			done
 
-			console.info "Output....................: ${green}$renders_directory/${model_name}-${view[$coordinates]}.${extension}"
+			console.info "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
@@ -1045,7 +1045,7 @@ do
 			run_leocad () {
 
 				console.info "Exporting.................: $model"
-				console.info "Format....................: ${cyan}${export_name}"
+				console.info "Format....................: ${export_name}"
 				echo
 
 				leocad "$model" "-$export_option" "$export_file" >> /dev/null
@@ -1197,9 +1197,9 @@ then
 
 				console.fwd "Confirming input value:"
 				echo
-				console.info "Color name................: ${cyan}${ldraw_color_name}"
-				console.info "Color number..............: ${cyan}${ldraw_color_number}"
-				console.info "Color hexadecimal value...: ${cyan}${ldraw_color_hex_value}"
+				console.info "Color name................: ${ldraw_color_name}"
+				console.info "Color number..............: ${ldraw_color_number}"
+				console.info "Color hexadecimal value...: ${ldraw_color_hex_value}"
 				echo
 
 				return "$ldraw_color_number"
@@ -1208,7 +1208,7 @@ then
 		done < "$colors"
 
 		console.error "No available color matches the input."
-		echo "Exiting."
+		console.fwd "Exiting."
 		echo
 
 		exit 1
@@ -1398,8 +1398,8 @@ then
 
 							console.info "Modifying.................: $model"
 							echo
-							console.info "Changing..................: ${yellow}$old_color"
-							console.info "Setting...................: ${green}$new_color "
+							console.info "Changing..................: $old_color"
+							console.info "Setting...................: $new_color "
 							echo
 						else
 							: # pass
@@ -1419,8 +1419,8 @@ then
 							console.info "Modifying.................: $model"
 
 							echo
-							console.info "Changing..................: ${yellow}$old_part"
-							console.info "Setting...................: ${green}$new_part "
+							console.info "Changing..................: $old_part"
+							console.info "Setting...................: $new_part "
 							echo
 						else
 							: # pass
@@ -1441,10 +1441,10 @@ then
 
 								console.info "Modifying.................: $model"
 								echo
-								console.info "Part......................: ${cyan}$part"
+								console.info "Part......................: $part"
 								echo
-								console.info "Changing..................: ${yellow}$old_color"
-								console.info "Setting...................: ${green}$new_color "
+								console.info "Changing..................: $old_color"
+								console.info "Setting...................: $new_color "
 								echo
 							else
 								: # pass
@@ -1819,7 +1819,7 @@ then
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					echo "${yellow}Specify setup location."
+					console.fwd "Specify setup location."
 					echo
 
 					# specify directory location or exit on 'cancel'
@@ -1839,7 +1839,8 @@ then
 					console.info "Visit http://www.ldraw.org to get started."
 					console.info "You can download and extract the LDraw parts library on your system manually."
 					console.info "Restart and run this utility using the 'make-list' option to generate the parts list."
-					echo "Exiting."
+					echo
+					console.fwd "Exiting."
 					echo
 
 					exit 1
@@ -1871,7 +1872,7 @@ then
 	else
 		console.warning "No sorting method specified."
 		console.question "Which sorting method should be used for parsing the parts list?"
-		echo "[ [dD]escription / [nN]umber ]"
+		console.question "[ [dD]escription / [nN]umber ]"
 		echo
 
 		read reply
@@ -1883,7 +1884,7 @@ then
 	else
 		# parse parts list
 
-		echo "Processing..."
+		console.fwd "Processing..."
 		echo
 
 		sleep 1
@@ -1916,7 +1917,7 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					console.info "Parts count...............: ${cyan}$((count++))\c"
+					console.info "Parts count...............: $((count++))\c"
 					echo
 				fi
 			done
