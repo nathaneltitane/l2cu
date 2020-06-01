@@ -692,7 +692,7 @@ do
 
 	# if binary is not found or unspecified
 
-	if [[ -z "$binary" ]]
+	if [[ $(command -v ${package}) = "" ]]
 	then
 		console.warning "The '$binary_name' binary not found."
 		console.question "Specify location?"
