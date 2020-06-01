@@ -208,7 +208,7 @@ console.spinner () {
 # version -------------------------------------------------------------------- #
 
 version="04-01-2020"
-script=$(basename -- "$0")
+script=$(basename -- "${BASH_SOURCE[0]}")
 
 # usage ---------------------------------------------------------------------- #
 
@@ -737,7 +737,7 @@ dialog() {
 
 	# dialog window title
 
-	title="${script%.sh} - Load model files"
+	title="${script%.sh} - ${1}"
 
 	# gtk dialog - zenity
 
@@ -762,11 +762,11 @@ dialog() {
 
 	# define dialog usage
 
-	if [ -z $(command -v zenity) ]
+	if [[ $(command -v zenity) = "" ]]
 	then
 		dialog=$(k_dialog)
 	elif
-	[ -z $(command -v kdialog) ]
+	[[ $(command -v kdialog) = "" ]]
 	then
 		dialog=$(g_dialog)
 	else
@@ -793,7 +793,7 @@ then
 
 	# specify directory location or exit on 'cancel'
 
-	directory=$(dialog) || exit
+	directory=$(dialog "Load model files") || exit
 fi
 
 get_library() {
@@ -1751,7 +1751,7 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(dialog) || exit
+			browse=$(dialog "Save to") || exit
 
 			directory="$browse"
 		else
@@ -1782,7 +1782,7 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(dialog) || exit
+			browse=$(dialog "Load LDraw library") || exit
 
 			cd "$browse" || exit
 
