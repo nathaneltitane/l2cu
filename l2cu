@@ -4,6 +4,8 @@
 
 # L²CU # l2cu # linux ldraw command line utility #
 
+#!/bin/bash
+
 # colors ------------------------------------------------------------------ #
 
 if [ -z $(command -v tput) ]
@@ -52,9 +54,7 @@ marker_warning='[ ! ]'
 marker_yes='[ ✓ ]'
 marker_yes_no='[ Y/N ]'
 
-# functions ------------------------------------------------------------------ #
-
-# highlight
+# highlights ----------------------------------------------------------------- #
 
 console.red () {
 	echo "${red}"$@"${reset}"
@@ -80,7 +80,7 @@ console.cyan () {
 	echo "${cyan}"$@"${reset}"
 }
 
-# prompts #
+# prompts -------------------------------------------------------------------- #
 
 # marker_batsu
 
@@ -160,7 +160,7 @@ console.choice () {
 	echo "${magenta}${marker_yes_no}" $@"${reset}"
 }
 
-# countdown #
+# countdown ------------------------------------------------------------------ #
 
 console.countdown () {
 	seconds=$1
@@ -177,6 +177,8 @@ console.countdown () {
 
 	echo
 }
+
+# spinner -------------------------------------------------------------------- #
 
 console.spinner () {
 	# catch PID of last command
