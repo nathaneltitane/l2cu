@@ -1,0 +1,265 @@
+#!/bin/bash
+
+# Author: Nathanel Titane - nathanel.titane@gmail.com
+
+# leocad build #
+
+# variables ------------------------------------------------------------------ #
+
+print_architecture="$(dpkg --print-architecture)"
+
+# version -------------------------------------------------------------------- #
+
+version="06-01-2020"
+script=$(basename -- "${BASH_SOURCE[0]}")
+
+# functions #
+
+# dialog --------------------------------------------------------------------- #
+
+dialog() {
+
+	# dialog window title
+
+	title="${script%.sh} - ${1}"
+
+	# gtk dialog - zenity
+
+	g_dialog() {
+		zenity \
+			--file-selection \
+			--multiple\
+			--directory \
+			--separator=$'\n' \
+			--title="$title" "$@"
+	}
+
+	# kde dialog - kdialog
+
+	k_dialog() {
+		kdialog \
+			--getopenfilename \
+			--multiple \
+			--separate-output \
+			--title "$title" "$@"
+	}
+
+	# define dialog usage
+
+	if [[ $(command -v zenity) = "" ]]
+	then
+		dialog=$(k_dialog)
+	elif
+	[[ $(command -v kdialog) = "" ]]
+	then
+		dialog=$(g_dialog)
+	else
+		console.error "No dialog binary present on system."
+		console.info "This utility must be run using the 'directory' option."
+		console.fwd "Exiting."
+		echo
+
+		exit 1
+	fi
+}
+
+# defaults #
+
+option=qt5
+
+while (($#))
+do
+	case "$1" in
+		-4|--qt4)
+			option=qt4
+			;;
+		-5|--qt5)
+			option=qt5
+			;;
+		-h|--help)
+			echo -e "Usage:"
+			echo -e "./$script [OPTION]"
+			echo -e "Utility options:"
+			echo -e "-4, --qt4 \t Builds application using Qt4 libraries."
+			echo -e "-5, --qt5 \t Builds application using Qt5 libraries."
+			echo -e ""
+			echo -e "-h, --help \t\t Show help options."
+			echo -e "-v, --version \t\t Print version."
+			exit
+			;;
+		-v|--version)
+			echo -e "$script $version"
+			exit
+			;;
+		*)
+			echo -e ""
+			echo -e "$script: Unknown option $1"
+			echo -e "Defaulting to option $option"
+			echo -e "Try '$script --help' for options information."
+			echo -e ""
+			;;
+		esac
+	shift
+done
+
+# initial propmt clear ------------------------------------------------------- #
+
+echo
+
+# install #
+
+console.info "Installing required build packages and utilities..."
+
+install_list=(
+    git
+    g++
+    make
+    zlib1g-dev
+)
+
+console.info "Verifying build dependencies..."
+
+if [[ "$option" == "qt4" ]]
+then
+	# Qt4 packages and libraries
+
+	install_list+=(
+		qt4-default
+	)
+fi
+
+if [[ "$option" == "qt5" ]]
+then
+	# Qt5 packages and libraries
+
+	install_list+=(
+		libqt5opengl5
+		libqt5printsupport5
+		libqt5xml5
+		libqt5concurrent5
+		qttools5-dev-tools
+		qt5-default
+	)
+fi
+
+for package in ${install_list[@]}
+do
+	console.info "Installing ${package} and applicable dependencies..."
+	echo
+
+	yes | apt install ${package}
+	echo
+done
+
+# specify editor variables and sources
+
+ldraw_editor=(
+	leocad
+)
+source=(
+	https://github.com/leozide/leocad.git
+)
+
+# make temporary directory
+
+directory=$(mktemp -d)
+trap 'rm -rf "$directory"' EXIT
+
+tree_directory="$directory/git"
+build_directory="$tree_directory/$ldraw_editor"
+source_binary_directory="$build_directory/build/release"
+
+binary_directory="/usr/bin"
+home="/home/${SUDO_USER:-$USER}"
+configuration_directory="$home/.config/"
+ldraw_applications_directory="/media/MEGA/Lego"
+ldraw_binary_directory="/media/MEGA/Lego/$ldraw_editor"
+
+if [[ "$directory" ]]
+then
+	: # pass
+
+elif [[ ! "$directory" ]]
+then
+	console.warning "Warning:"
+	console.warning "No base directory specified."
+	console.warning "Select a directory in which the build process will be carried out."
+	echo
+
+	# specify directory location or exit on 'cancel'
+
+	directory=$(dialog "Select a directory") || exit
+else
+	console.error "WARNING:"
+	console.error "No directory specified."
+	echo
+	console.fwd "Aborting."
+	echo
+
+	exit 1
+fi
+
+if [[ ! -d "$tree_directory" ]]
+then
+	mkdir -p "$tree_directory"
+fi
+
+if [[ "$ldraw_binary_directory" ]]
+then
+	: # pass
+
+elif [[ ! "$ldraw_binary_directory" ]]
+then
+	console.warning "WARNING:"
+	console.warning "No base system directory specified for binary operation."
+	console.warning "Select a directory in which the built binary will be copied to."
+	echo
+
+	# Specify directory location or exit on 'Cancel'
+
+	ldraw_binary_directory=$(dialog "Select a directory") || exit
+else
+	console.error "WARNING:"
+	console.error "No directory specified."
+	echo
+	console.fwd "Aborting."
+	echo
+
+	exit 1
+fi
+
+console.info "Cloning source tree from '$source'..."
+echo
+
+if [ -d "$build_$directory" ]
+then
+	rm -rf "$build_directory"
+	wait
+fi
+
+cd "$tree_directory" || exit
+
+git clone "$source" "$build_directory"
+
+# build #
+
+cd "$build_directory" || exit
+
+qmake ${ldraw_editor}.pro
+
+make -s & console.spinner "Building..."
+
+console.info "Copying updated binary ($ldraw_editor)..."
+echo
+
+cd "$source_binary_directory" || exit
+
+if [[ "$(which $ldraw_editor)" != "" ]]
+then
+	rm -rf "$(which $ldraw_editor)"
+fi
+
+cp "$source_binary_directory/$ldraw_editor"  "$binary_directory/$ldraw_editor"
+
+console.success "Done."
+echo
