@@ -4,6 +4,10 @@
 
 # leocad build #
 
+# dependencies --------------------------------------------------------------- # 
+
+source console
+
 # variables ------------------------------------------------------------------ #
 
 print_architecture="$(dpkg --print-architecture)"
@@ -247,9 +251,7 @@ cd "$build_directory" || exit
 
 qmake ${ldraw_editor}.pro
 
-make &
-
-console.spinner "Building..."
+make -s & console.spinner "Building..."
 echo
 
 console.info "Copying updated binary ($ldraw_editor)..."
