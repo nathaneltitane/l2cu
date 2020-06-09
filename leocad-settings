@@ -4,7 +4,11 @@
 
 # leocad settings #
 
-# variables #
+# dependencies --------------------------------------------------------------- # 
+
+source console
+
+# variables ------------------------------------------------------------------ #
 
 binary_directory="/usr/bin"
 
