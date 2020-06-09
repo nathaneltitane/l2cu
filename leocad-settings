@@ -54,7 +54,7 @@ Path=
 
 [Settings]
 AASamples=1
-AllowLOD=0
+AllowLOD=1
 AutoLoadMostRecent=0
 
 Categories="@ByteArray(
