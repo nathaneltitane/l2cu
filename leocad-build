@@ -192,7 +192,7 @@ then
 
 	# specify directory location or exit on 'cancel'
 
-	directory=$(dialog "Select a directory") || exit
+	directory=$(dialog "Select a directory") || exit 1
 else
 	console.error "WARNING:"
 	console.error "No directory specified."
@@ -221,7 +221,7 @@ then
 
 	# Specify directory location or exit on 'Cancel'
 
-	ldraw_binary_directory=$(dialog "Select a directory") || exit
+	ldraw_binary_directory=$(dialog "Select a directory") || exit 1
 else
 	console.error "WARNING:"
 	console.error "No directory specified."
@@ -232,7 +232,7 @@ else
 	exit 1
 fi
 
-console.info "Cloning source tree from '$source'..."
+console.info "Cloning '${source}'..."
 echo
 
 if [ -d "$build_$directory" ]
@@ -241,23 +241,23 @@ then
 	wait
 fi
 
-cd "$tree_directory" || exit
+cd "$tree_directory" || exit 1
 
 git clone "$source" "$build_directory"
 
 # build #
 
-cd "$build_directory" || exit
+cd "$build_directory" || exit 1
 
 qmake ${ldraw_editor}.pro
 
 make -s & console.spinner "Building..."
 echo
 
-console.info "Copying updated binary ($ldraw_editor)..."
+console.info "Copying updated binary."
 echo
 
-cd "$source_binary_directory" || exit
+cd "$source_binary_directory" || exit 1
 
 if [[ "$(which $ldraw_editor)" != "" ]]
 then
