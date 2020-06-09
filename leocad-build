@@ -111,10 +111,10 @@ echo
 console.info "Installing required build packages and utilities..."
 
 install_list=(
-    git
-    g++
-    make
-    zlib1g-dev
+	git
+	g++
+	make
+	zlib1g-dev
 )
 
 console.info "Verifying build dependencies..."
@@ -247,7 +247,10 @@ cd "$build_directory" || exit
 
 qmake ${ldraw_editor}.pro
 
-make -s & console.spinner "Building..."
+make &
+
+console.spinner "Building..."
+echo
 
 console.info "Copying updated binary ($ldraw_editor)..."
 echo
