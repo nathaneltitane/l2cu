@@ -27,7 +27,7 @@ fi
 
 cd "$leocad_directory" || exit
 
-console.info "Writing configuration (leocad)..."
+console.info "Writing configuration."
 
 cat << 'FILE' > "$leocad_directory"/LeoCAD.conf
 [Defaults]
@@ -310,6 +310,8 @@ FILE
 
 sudo chmod -R 777 "$leocad_directory"/*
 
+print_architecture="$(dpkg --print-architecture)"
+
 # launcher #
 
 cat <<- FILE > "$system_applications_directory"/leocad.desktop
@@ -318,7 +320,20 @@ Encoding=UTF-8
 Name=LeoCAD
 GenericName=LDraw Model Editor
 Comment=LDraw Model Editor
-Exec=/usr/bin/leocad
+FILE
+
+if [[ "$print_architecture" = "arm64" ]]
+then
+	cat <<- FILE >> "$system_applications_directory"/leocad.desktop
+	Exec=env LD_PRELOAD=/lib/libandroid-shmem-aarch64.so /usr/bin/leocad
+	FILE
+else
+	cat <<- FILE >> "$system_applications_directory"/leocad.desktop
+	Exec=/usr/bin/leocad
+	FILE
+fi
+
+cat <<- FILE >> "$system_applications_directory"/leocad.desktop
 Icon=leocad
 Terminal=false
 Type=Application
