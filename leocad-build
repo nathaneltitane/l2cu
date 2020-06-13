@@ -4,7 +4,7 @@
 
 # leocad build #
 
-# dependencies --------------------------------------------------------------- # 
+# dependencies --------------------------------------------------------------- #
 
 source console
 
@@ -251,7 +251,9 @@ cd "$build_directory" || exit 1
 
 qmake ${ldraw_editor}.pro
 
-make -s & console.spinner "Building..."
+make -s &
+
+console.spinner "Building..."
 echo
 
 console.info "Copying updated binary."

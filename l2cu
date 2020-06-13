@@ -429,7 +429,93 @@ do
 	shift
 done
 
-# initial propmt clear ------------------------------------------------------- #
+# dialog --------------------------------------------------------------------- #
+
+dialog () {
+
+	# dialog window title
+
+	title="${script%.sh} - ${1}"
+
+	# gtk dialog - zenity
+
+	g_dialog () {
+		zenity \
+			--file-selection \
+			--multiple\
+			--directory \
+			--separator=$'\n' \
+			--title="$title" "$@"
+	}
+
+	# kde dialog - kdialog
+
+	k_dialog () {
+		kdialog \
+			--getopenfilename \
+			--multiple \
+			--separate-output \
+			--title "$title" "$@"
+	}
+
+	# define dialog usage
+
+	if [[ $(command -v zenity) = "" ]]
+	then
+		dialog=$(k_dialog)
+	elif
+	[[ $(command -v kdialog) = "" ]]
+	then
+		dialog=$(g_dialog)
+	else
+		console.error "No dialog binary present on system."
+		console.info "This utility must be run using the 'directory' option."
+		console.fwd "Exiting."
+		echo
+
+		exit 1
+	fi
+}
+
+# download ------------------------------------------------------------------- #
+
+download () {
+
+	curl -L -S  # "$@"
+}
+
+# if 'directory' option is not passed
+
+if [[ -z "$directory" ]]
+then
+	console.question "Load model files from:"
+	echo""
+
+	# specify directory location or exit on 'cancel'
+
+	directory=$(dialog "Load model files") || exit
+fi
+
+# get library ---------------------------------------------------------------- #
+
+get_library () {
+
+	parts_archive=$(basename "$parts_url")
+
+	# download #
+
+	download "$parts_url" > "$directory/$parts_archive" & spinner "Downloading..."
+
+	# extract #
+
+	unzip "$parts_archive" & spinner "Extracting..."
+
+	# rename #
+
+	mv "$parts_archive" ldraw.zip
+}
+
+# initial prompt clear ------------------------------------------------------- #
 
 echo
 
@@ -694,7 +780,7 @@ do
 
 	# if binary is not found or unspecified
 
-	if [[ $(command -v ${package}) = "" ]]
+	if [[ ${binary} = "" ]]
 	then
 		console.warning "The '$binary_name' binary not found."
 		console.question "Specify location?"
@@ -707,7 +793,7 @@ do
 		then
 			# specify binary location or exit on 'cancel'
 
-			binary_path=$(dialog) || exit
+			binary_path=$(dialog "Specify location") || exit 1
 
 			binary="$binary_path/$binary"
 		else
@@ -730,88 +816,6 @@ do
 
 	sleep 1
 done
-
-# dialog --------------------------------------------------------------------- #
-
-dialog() {
-
-	# dialog window title
-
-	title="${script%.sh} - ${1}"
-
-	# gtk dialog - zenity
-
-	g_dialog() {
-		zenity \
-			--file-selection \
-			--multiple\
-			--directory \
-			--separator=$'\n' \
-			--title="$title" "$@"
-	}
-
-	# kde dialog - kdialog
-
-	k_dialog() {
-		kdialog \
-			--getopenfilename \
-			--multiple \
-			--separate-output \
-			--title "$title" "$@"
-	}
-
-	# define dialog usage
-
-	if [[ $(command -v zenity) = "" ]]
-	then
-		dialog=$(k_dialog)
-	elif
-	[[ $(command -v kdialog) = "" ]]
-	then
-		dialog=$(g_dialog)
-	else
-		console.error "No dialog binary present on system."
-		console.info "This utility must be run using the 'directory' option."
-		console.fwd "Exiting."
-		echo
-
-		exit 1
-	fi
-}
-
-download() {
-
-	curl -L -S  # "$@"
-}
-
-# if 'directory' option is not passed
-
-if [[ -z "$directory" ]]
-then
-	console.question "Load model files from:"
-	echo""
-
-	# specify directory location or exit on 'cancel'
-
-	directory=$(dialog "Load model files") || exit
-fi
-
-get_library() {
-
-	parts_archive=$(basename "$parts_url")
-
-	# download #
-
-	download "$parts_url" > "$directory/$parts_archive" & spinner "Downloading..."
-
-	# extract #
-
-	unzip "$parts_archive" & spinner "Extracting..."
-
-	# rename #
-
-	mv "$parts_archive" ldraw.zip
-}
 
 sleep 1
 
