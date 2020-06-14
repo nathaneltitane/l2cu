@@ -864,9 +864,7 @@ do
 
 		model_file_name="${model_file%.*}"
 
-		# strip first 3 characters from model file name '00-'
-
-		model_name="${model_file_name:3}"
+		model_name="${model_file_name}"
 
 # render --------------------------------------------------------------------- #
 
