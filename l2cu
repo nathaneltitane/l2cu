@@ -817,8 +817,6 @@ do
 	sleep 1
 done
 
-sleep 1
-
 # confirm options before processing
 
 echo
