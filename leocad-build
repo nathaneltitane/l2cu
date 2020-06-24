@@ -7,7 +7,8 @@
 # variables ------------------------------------------------------------------ #
 
 print_architecture="$(dpkg --print-architecture)"
-source=https://github.com/leozide/leocad.git
+
+source="https://github.com/leozide/leocad.git"
 
 binary_directory="/usr/bin"
 
@@ -19,14 +20,12 @@ system_applications_directory="/usr/share/applications"
 ldraw_directory="/media/MEGA/Lego"
 ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 
-leocad_directory="$configuration_directory/LeoCAD Software"
-
 # version -------------------------------------------------------------------- #
 
 version="06-01-2020"
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-# defaults #
+# defaults ------------------------------------------------------------------- #
 
 option=qt5
 
@@ -126,9 +125,9 @@ fi
 
 clear
 
-# install #
+# install -------------------------------------------------------------------- #
 
-console.info "Installing required build packages and utilities..."
+console.info "Installing required packages."
 echo
 
 install_list=(
@@ -137,9 +136,6 @@ install_list=(
 	make
 	zlib1g-dev
 )
-
-console.info "Verifying build dependencies..."
-echo
 
 if [[ "$option" == "qt4" ]]
 then
@@ -166,7 +162,7 @@ fi
 
 for package in ${install_list[@]}
 do
-	console.info "Installing ${package} and applicable dependencies..."
+	console.info "Installing ${package}..."
 	echo
 
 	yes | apt install ${package}
@@ -182,7 +178,7 @@ cd "$directory" || exit 1
 
 git clone "$source" "$directory"
 
-# build #
+# build
 
 qmake leocad.pro
 
@@ -193,17 +189,20 @@ echo
 
 cd "$directory"/build/release || exit 1
 
+console.info "Copying updated binary."
+echo
+
 if [[ "$(which leocad)" != "" ]]
 then
 	rm -rf "$(which leocad)"
 fi
 
-console.info "Copying updated binary."
-echo
-
 cp "$directory"/build/release/leocad  "$binary_directory"/leocad
 
 # launcher ------------------------------------------------------------------- #
+
+console.info "Writing launcher."
+echo
 
 cat <<- FILE > "$system_applications_directory"/leocad.desktop
 [Desktop Entry]
@@ -234,7 +233,7 @@ FILE
 
 chmod +x "$system_applications_directory"/leocad.desktop
 
-# settings ------------------------------------------------------------------- #
+# configuration--------------------------------------------------------------- #
 
 if [ ! -d "$configuration_directory/LeoCAD Software" ]
 then
@@ -244,6 +243,7 @@ fi
 cd "$configuration_directory/LeoCAD Software" || exit 1
 
 console.info "Writing configuration."
+echo
 
 cat << 'FILE' > "$configuration_directory/LeoCAD Software"/LeoCAD.conf
 [Defaults]
