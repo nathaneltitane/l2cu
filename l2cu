@@ -346,7 +346,7 @@ do
 			sort_mode="number"
 			;;
 
-# usage ---------------------------------------------------------------------- #
+# help ----------------------------------------------------------------------- #
 
 		-h|--help)
 			echo -e "USAGE"
@@ -493,7 +493,7 @@ then
 
 	# specify directory location or exit on 'cancel'
 
-	directory=$(dialog "Load model files") || exit
+	directory=$(dialog "Load model files") || exit 1
 fi
 
 # get library ---------------------------------------------------------------- #
@@ -817,7 +817,11 @@ do
 	sleep 1
 done
 
-# confirm options before processing
+# initial prompt clear ------------------------------------------------------- #
+
+clear
+
+# confirmation --------------------------------------------------------------- #
 
 echo
 console.info "Utility started using the $extension_option extension option."
@@ -848,7 +852,7 @@ echo
 
 sleep 1
 
-# parse #
+# parse ---------------------------------------------------------------------- #
 
 for extension in ${extensions_list[@]}
 do
@@ -995,7 +999,7 @@ do
 					mkdir -p "$renders_directory"
 				fi
 
-				cd "$renders_directory" || exit
+				cd "$renders_directory" || exit 1
 
 				# render #
 
@@ -1062,7 +1066,7 @@ do
 				mkdir -p "$exports_directory"
 			fi
 
-			cd "$exports_directory" || exit
+			cd "$exports_directory" || exit 1
 
 			# export #
 
@@ -1731,7 +1735,9 @@ then
 
 	if [[ "$get_option" = "update" ]]
 	then
-		parts_url="$complete_parts_url" # workaround until html parsing is complete # TODO #
+		# workaround until html parsing is complete # TODO #
+
+		parts_url="$complete_parts_url"
 	fi
 
 	if [[ "$get_option" = "unofficial" ]]
@@ -1751,7 +1757,7 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(dialog "Save to") || exit
+			browse=$(dialog "Save to") || exit 1
 
 			directory="$browse"
 		else
@@ -1782,9 +1788,9 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(dialog "Load LDraw library") || exit
+			browse=$(dialog "Load LDraw library") || exit 1
 
-			cd "$browse" || exit
+			cd "$browse" || exit 1
 
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
@@ -1809,7 +1815,7 @@ then
 			then
 				# specify directory location or exit on 'cancel'
 
-				browse=$(dialog) || exit
+				browse=$(dialog) || exit 1
 
 				directory="$browse/parts"
 			else
@@ -1826,9 +1832,9 @@ then
 
 					# specify directory location or exit on 'cancel'
 
-					setup_directory=$(dialog) || exit
+					setup_directory=$(dialog) || exit 1
 
-					cd "$setup_directory" || exit
+					cd "$setup_directory" || exit 1
 
 					get_library
 
@@ -1851,7 +1857,7 @@ then
 		fi
 	fi
 
-	cd "$directory" || exit
+	cd "$directory" || exit 1
 
 	# parts list verification and backup
 
