@@ -1951,11 +1951,11 @@ then
 			fi
 		done
 
-		# merge #
+		# merge
 
 		cat "._.lst" ".~.lst" >> parts.lst
 
-		# cleanup #
+		# cleanup
 
 		rm -rf "._.lst" ".~.lst"
 	fi
