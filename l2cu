@@ -4,8 +4,6 @@
 
 # L²CU # l2cu # linux ldraw command line utility #
 
-#!/bin/bash
-
 # colors ------------------------------------------------------------------ #
 
 if [ -z $(command -v tput) ]
