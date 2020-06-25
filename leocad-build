@@ -233,7 +233,7 @@ FILE
 
 chmod +x "$system_applications_directory"/leocad.desktop
 
-# configuration--------------------------------------------------------------- #
+# configuration -------------------------------------------------------------- #
 
 if [ ! -d "$configuration_directory/LeoCAD Software" ]
 then
@@ -525,6 +525,8 @@ LastCheck=
 FILE
 
 sudo chmod -R 777 "$configuration_directory/LeoCAD Software"/*
+
+# complete ------------------------------------------------------------------- #
 
 console.success "Done."
 echo
