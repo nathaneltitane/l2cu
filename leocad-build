@@ -4,6 +4,14 @@
 
 # leocad build #
 
+# script --------------------------------------------------------------------- #
+
+script=$(basename -- "${BASH_SOURCE[0]}")
+
+# version -------------------------------------------------------------------- #
+
+version="06-01-2020"
+
 # variables ------------------------------------------------------------------ #
 
 print_architecture="$(dpkg --print-architecture)"
@@ -19,11 +27,6 @@ system_applications_directory="/usr/share/applications"
 
 ldraw_directory="/media/MEGA/Lego"
 ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
-
-# version -------------------------------------------------------------------- #
-
-version="06-01-2020"
-script=$(basename -- "${BASH_SOURCE[0]}")
 
 # defaults ------------------------------------------------------------------- #
 
