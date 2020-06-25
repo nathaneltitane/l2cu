@@ -502,15 +502,15 @@ get_library () {
 
 	parts_archive=$(basename "$parts_url")
 
-	# download #
+	# download
 
 	download "$parts_url" > "$directory/$parts_archive" & spinner "Downloading..."
 
-	# extract #
+	# extract
 
 	unzip "$parts_archive" & spinner "Extracting..."
 
-	# rename #
+	# rename
 
 	mv "$parts_archive" ldraw.zip
 }
@@ -1001,7 +1001,7 @@ do
 
 				cd "$renders_directory" || exit 1
 
-				# render #
+				# render
 
 				console.info "Rendering.................: ${model_name^^}"
 				console.info "View......................: ${view[coordinates]^^}"
@@ -1068,7 +1068,7 @@ do
 
 			cd "$exports_directory" || exit 1
 
-			# export #
+			# export
 
 			if [[ "$export_option" = "3ds" ]] || \
 			   [[ "$export_option" = "dae" ]] || \
@@ -1100,7 +1100,7 @@ do
 
 				blender --background --python "$beautify" "$export_file_3ds" >> /dev/null
 
-				# cleanup #
+				# cleanup
 
 				rm -rf "$export_file_3ds"
 			fi
@@ -1307,7 +1307,7 @@ then
 
 			line_number=0
 
-			# parse #
+			# parse
 
 			while IFS=
 			read -r line
