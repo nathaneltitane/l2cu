@@ -163,13 +163,27 @@ then
 	)
 fi
 
+# install #
+
 for package in ${install_list[@]}
 do
-	console.info "Installing ${package}..."
-	echo
+	[[ $(command -v ${package}) = "" ]]
+	then
+		console.warning "Required package '${package}' not present."
+		echo
+		console.fwd "Installing..."
+		echo
 
-	yes | apt install ${package}
-	echo
+		echo yes | apt install ${package}
+		echo
+	else
+		console.success "Required package '${package}' already installed."
+		echo
+		console.fwd "Continuing..."
+		echo
+
+		:
+	fi
 done
 
 # make temporary directory
