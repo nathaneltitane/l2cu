@@ -358,11 +358,15 @@ get_library () {
 
 	# download
 
-	download "$parts_url" > "$directory/$parts_archive" & spinner "Downloading..."
+	download "$parts_url" > "$directory/$parts_archive" &
+	console.spinner "Downloading..."
+	echo
 
 	# extract
 
-	unzip "$parts_archive" & spinner "Extracting..."
+	unzip "$parts_archive" &
+	console.spinner "Extracting..."
+	echo
 
 	# rename
 
