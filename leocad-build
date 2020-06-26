@@ -163,7 +163,7 @@ then
 	)
 fi
 
-# install #
+# install -------------------------------------------------------------------- #
 
 for package in ${install_list[@]}
 do
