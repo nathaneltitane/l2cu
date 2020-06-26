@@ -359,12 +359,14 @@ get_library () {
 	# download
 
 	download "$parts_url" > "$directory/$parts_archive" &
+
 	console.spinner "Downloading..."
 	echo
 
 	# extract
 
 	unzip "$parts_archive" &
+
 	console.spinner "Extracting..."
 	echo
 
@@ -377,7 +379,7 @@ get_library () {
 
 clear
 
-# make temporary file: export ------------------------------------------------ #
+# make temporary file: export -sleep 1----------------------------------------------- #
 
 if [[ "$option" == "export" ]]
 then
