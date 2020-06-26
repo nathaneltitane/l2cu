@@ -379,7 +379,7 @@ get_library () {
 
 clear
 
-# make temporary file: export -sleep 1----------------------------------------------- #
+# make temporary file: export ------------------------------------------------ #
 
 if [[ "$option" == "export" ]]
 then
