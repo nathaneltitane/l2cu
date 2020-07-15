@@ -167,7 +167,7 @@ fi
 
 for package in ${install_list[@]}
 do
-	[[ $(command -v ${package}) = "" ]]
+	if [[ $(command -v ${package}) = "" ]]
 	then
 		console.warning "Required package '${package}' not present."
 		echo
