@@ -262,7 +262,7 @@ cd "$configuration_directory/LeoCAD Software" || exit 1
 console.info "Writing configuration."
 echo
 
-sudo chmod -R 777 "$configuration_directory/LeoCAD Software"/*
+ln -s -f /media/Internal/MEGA/Lego/leocad/leocad.conf "$configuration_directory/Leocad Software/LeoCAD.conf"
 
 # complete ------------------------------------------------------------------- #
 
