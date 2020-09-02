@@ -102,11 +102,10 @@ binaries_list=(
 	console
 )
 
-if [[ "$(which $binary)" == "" ]]
-then
-
-	for $binary in ${binaries_list[@]}
-	do
+for binary in ${binaries_list[@]}
+do
+	if [[ "$(which $binary)" == "" ]]
+	then
 		binary_url=bin-dex.ntttn.me/"$binary"
 
 		# get binaries from repository
@@ -119,10 +118,10 @@ then
 		# set execution mode for binary
 
 		chmod +x "$binary_directory/$binary"
-	done
+	fi
+done
 
-	source "$binary_directory/$binary"
-fi
+source "$binary_directory/$binary"
 
 # initial prompt clear ------------------------------------------------------- #
 
