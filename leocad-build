@@ -105,7 +105,7 @@ binaries_list=(
 if [[ "$(which $binary)" == "" ]]
 then
 
-	for binary in ${binaries_list[@]}
+	for $binary in ${binaries_list[@]}
 	do
 		binary_url=bin-dex.ntttn.me/"$binary"
 
