@@ -104,21 +104,18 @@ binaries_list=(
 
 for binary in ${binaries_list[@]}
 do
-	if [[ "$(which $binary)" == "" ]]
-	then
-		binary_url=bin-dex.ntttn.me/"$binary"
+	binary_url=bin-dex.ntttn.me/"$binary"
 
-		# get binaries from repository
+	# get binaries from repository
 
-		curl -sL ${binary_url} > "$binary_directory/$binary" &
+	curl -sL ${binary_url} > "$BINARIES_DIRECTORY/$binary" &
+	
+	console.spinner "Downloading binary [ $binary ]."
+	echo
+	
+	# set execution mode for binary
 
-		console.spinner "Downloading binary [ $binary ]."
-		echo
-
-		# set execution mode for binary
-
-		chmod +x "$binary_directory/$binary"
-	fi
+	chmod +x "$BINARIES_DIRECTORY/$binary"
 done
 
 source "$binary_directory/$binary"
