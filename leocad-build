@@ -258,7 +258,7 @@ cd "$configuration_directory/LeoCAD Software" || exit 1
 console.info "Writing configuration."
 echo
 
-ln -s -f /media/internal/MEGA/Lego/leocad/leocad.conf "$configuration_directory/LeoCAD Software/LeoCAD.conf"
+ln -s -f /media/Internal/MEGA/Lego/leocad/leocad.conf "$configuration_directory/LeoCAD Software/LeoCAD.conf"
 
 # complete ------------------------------------------------------------------- #
 
