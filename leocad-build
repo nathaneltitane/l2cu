@@ -41,41 +41,6 @@ fi
 
 # usage #
 
-while (($#))
-do
-	case "$1" in
-		-4|--qt4)
-			option=qt4
-			;;
-		-5|--qt5)
-			option=qt5
-			;;
-		-h|--help)
-			echo -e "Usage:"
-			echo -e "./$script [OPTION]"
-			echo -e "Utility options:"
-			echo -e "-4, --qt4 \t Builds application using Qt4 libraries."
-			echo -e "-5, --qt5 \t Builds application using Qt5 libraries."
-			echo -e ""
-			echo -e "-h, --help \t\t Show help options."
-			echo -e "-v, --version \t\t Print version."
-			exit
-			;;
-		-v|--version)
-			echo -e "$script $version"
-			exit
-			;;
-		*)
-			echo -e ""
-			echo -e "$script: Unknown option $1"
-			echo -e "Defaulting to option $option"
-			echo -e "Try '$script --help' for options information."
-			echo -e ""
-			;;
-		esac
-	shift
-done
-
 # functions #
 
 console.spinner () {
