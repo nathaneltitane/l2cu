@@ -18,7 +18,7 @@ print_architecture="$(dpkg --print-architecture)"
 
 source="https://github.com/leozide/leocad.git"
 
-binary="leocad"
+build_binary="leocad"
 old_binary="$(which $binary)"
 binary_directory="/usr/bin"
 
@@ -221,7 +221,7 @@ fi
 
 cd "$build_directory"/build/release || exit 1
 
-cp "$build_directory"/build/release/leocad  "$binary_directory"/leocad
+cp "$build_directory"/build/release/"$build_binary"  "$binary_directory"/"$build_binary"
 
 # launcher #
 
