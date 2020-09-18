@@ -4,20 +4,22 @@
 
 # leocad build #
 
-# script --------------------------------------------------------------------- #
+# script #
 
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-# version -------------------------------------------------------------------- #
+# version #
 
 version="06-01-2020"
 
-# variables ------------------------------------------------------------------ #
+# variables #
 
 print_architecture="$(dpkg --print-architecture)"
 
 source="https://github.com/leozide/leocad.git"
 
+binary="leocad"
+old_binary="$(which $binary)"
 binary_directory="/usr/bin"
 
 home="/home/${SUDO_USER:-$USER}"
@@ -28,11 +30,11 @@ system_applications_directory="/usr/share/applications"
 ldraw_directory="/media/MEGA/Lego"
 ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 
-# defaults ------------------------------------------------------------------- #
+# defaults #
 
 option=qt5
 
-# usage ---------------------------------------------------------------------- #
+# usage #
 
 while (($#))
 do
@@ -69,7 +71,7 @@ do
 	shift
 done
 
-# functions ------------------------------------------------------------------ #
+# functions #
 
 console.spinner () {
 	# catch PID of last command
@@ -96,7 +98,7 @@ console.spinner () {
 	echo
 }
 
-# dependencies --------------------------------------------------------------- #
+# dependencies #
 
 binaries_list=(
 	console
@@ -108,26 +110,23 @@ do
 
 	# get binaries from repository
 
-	curl -sL ${binary_url} > "$BINARIES_DIRECTORY/$binary" &
+	curl -sL ${binary_url} > "$binary_directory/$binary" &
 	
 	console.spinner "Downloading binary [ $binary ]."
 	echo
 	
 	# set execution mode for binary
 
-	chmod +x "$BINARIES_DIRECTORY/$binary"
+	chmod +x "$binary_directory/$binary"
 done
 
 source "$binary_directory/$binary"
 
-# initial prompt clear ------------------------------------------------------- #
+# initial prompt clear #
 
 clear
 
-# install -------------------------------------------------------------------- #
-
-console.info "Installing required packages."
-echo
+# packages #
 
 install_list=(
 	git
@@ -159,7 +158,10 @@ then
 	)
 fi
 
-# install -------------------------------------------------------------------- #
+# install #
+
+console.info "Installing required packages."
+echo
 
 for package in ${install_list[@]}
 do
@@ -182,37 +184,46 @@ do
 	fi
 done
 
-# make temporary directory
+# make temporary build directory
 
-directory=$(mktemp -d)
-trap 'rm -rf "$directory"' EXIT
+build_directory=$(mktemp -d)
+trap 'rm -rf "$build_directory"' EXIT
 
-cd "$directory" || exit 1
+cd "$build_directory" || exit 1
 
-git clone "$source" "$directory"
+git clone "$source" "$build_directory"
 
-# build
+# build #
+
+# compile project
 
 qmake leocad.pro
 
+# build binary
+
 make -s &
+
+echo
 
 console.spinner "Building..."
 echo
 
-cd "$directory"/build/release || exit 1
+# update system binary
 
-console.info "Copying updated binary."
-echo
+# verify previous install/build existence
 
-if [[ "$(which leocad)" != "" ]]
+if [[ "$old_binary" != "" ]]
 then
-	rm -rf "$(which leocad)"
+	cp "$old_binary" "$old_binary".bak
 fi
 
-cp "$directory"/build/release/leocad  "$binary_directory"/leocad
+# copy new binary
 
-# launcher ------------------------------------------------------------------- #
+cd "$build_directory"/build/release || exit 1
+
+cp "$build_directory"/build/release/leocad  "$binary_directory"/leocad
+
+# launcher #
 
 console.info "Writing launcher."
 echo
@@ -246,7 +257,9 @@ FILE
 
 chmod +x "$system_applications_directory"/leocad.desktop
 
-# configuration -------------------------------------------------------------- #
+# configuration #
+
+# verify configuration directory existence
 
 if [ ! -d "$configuration_directory/LeoCAD Software" ]
 then
@@ -255,12 +268,14 @@ fi
 
 cd "$configuration_directory/LeoCAD Software" || exit 1
 
+# write configuration
+
 console.info "Writing configuration."
 echo
 
 ln -s -f /media/Internal/MEGA/Lego/leocad/leocad.conf "$configuration_directory/LeoCAD Software/LeoCAD.conf"
 
-# complete ------------------------------------------------------------------- #
+# complete #
 
 console.success "Done."
 echo
