@@ -50,9 +50,6 @@ do
 		-5|--qt5)
 			option=qt5
 			;;
-		"")
-			option=qt5
-			;;
 		-h|--help)
 			echo -e "Usage:"
 			echo -e "./$script [OPTION]"
@@ -132,7 +129,7 @@ source "$binary_directory/$binary"
 
 # initial prompt clear #
 
-clear
+# clear
 
 # packages #
 
