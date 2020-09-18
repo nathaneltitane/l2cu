@@ -10,7 +10,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version #
 
-version="06-01-2020"
+version="09-01-2020"
 
 # variables #
 
@@ -33,6 +33,11 @@ ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 # defaults #
 
 option=$1
+
+if [ -z "$option" ]
+then
+	option="qt5"
+fi
 
 # usage #
 
@@ -70,11 +75,6 @@ do
 		esac
 	shift
 done
-
-if [ -z "$option" ]
-then
-	option="qt5"
-fi
 
 # functions #
 
