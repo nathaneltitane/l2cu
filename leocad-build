@@ -32,7 +32,12 @@ ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 
 # defaults #
 
-option=qt5
+option=$1
+
+if [ -z "$option" ]
+then
+	option="qt5"
+fi
 
 # usage #
 
