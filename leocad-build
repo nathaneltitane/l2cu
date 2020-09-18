@@ -30,7 +30,14 @@ system_applications_directory="/usr/share/applications"
 ldraw_directory="/media/MEGA/Lego"
 ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 
+# defaults #
 
+option=$1
+
+if [ -z "$option" ]
+then
+	option="qt5"
+fi
 
 # usage #
 
@@ -41,6 +48,9 @@ do
 			option=qt4
 			;;
 		-5|--qt5)
+			option=qt5
+			;;
+		"")
 			option=qt5
 			;;
 		-h|--help)
@@ -68,15 +78,6 @@ do
 		esac
 	shift
 done
-
-# defaults #
-
-option=$1
-
-if [ -z "$option" ]
-then
-	option="qt5"
-fi
 
 # functions #
 
