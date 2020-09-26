@@ -1,16 +1,9 @@
 #!/bin/bash
 
-# Author: Nathanel Titane - nathanel.titane@gmail.com
+# dependencies #
 
-# leocad build #
-
-# script #
-
-script=$(basename -- "${BASH_SOURCE[0]}")
-
-# version #
-
-version="09-01-2020"
+source /data/data/com.termux/files/usr/bin/console
+source /data/data/com.termux/files/usr/bin/globals
 
 # variables #
 
@@ -30,105 +23,6 @@ system_applications_directory="/usr/share/applications"
 ldraw_directory="/media/MEGA/Lego"
 ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 
-# variables #
-
-option=$1
-
-# set defaults
-
-if [ -z $option ]
-then
-	option="qt5"
-fi
-
-# usage #
-
-while (($#))
-do
-	case "$1" in
-		-4|--qt4)
-			option=qt4
-			;;
-		-5|--qt5)
-			option=qt5
-			;;
-		-h|--help)
-			echo -e "Usage:"
-			echo -e "./$script [OPTION]"
-			echo -e "Utility options:"
-			echo -e "-4, --qt4 \t Builds application using Qt4 libraries."
-			echo -e "-5, --qt5 \t Builds application using Qt5 libraries."
-			echo -e ""
-			echo -e "-h, --help \t\t Show help options."
-			echo -e "-v, --version \t\t Print version."
-			exit
-			;;
-		-v|--version)
-			echo -e "$script $version"
-			exit
-			;;
-		*)
-			echo -e ""
-			echo -e "$script: Unknown option $1"
-			echo -e "Defaulting to option $option"
-			echo -e "Try '$script --help' for options information."
-			echo -e ""
-			;;
-		esac
-	shift
-done
-
-# functions #
-
-console.spinner () {
-	# catch PID of last command
-
-	PID=$!
-
-	# spinner string content
-
-	before="[ "
-	spinner="/—\|"
-	after="]"
-	message="$1"
-
-	i=1
-
-	echo
-
-	while [ -d /proc/$PID ]
-	do
-		echo -ne "\r${before} \b${spinner:i++%${#spinner}:1} ${after} ${message}\c "
-		sleep 0.125
-	done
-
-	echo
-}
-
-# dependencies #
-
-binaries_list=(
-	console
-)
-
-for binary in ${binaries_list[@]}
-do
-	binary_url=bin-dex.ntttn.me/"$binary"
-
-	# get binaries from repository
-
-	curl -sL ${binary_url} > "$binary_directory/$binary" &
-	
-	console.spinner "Downloading binary [ $binary ]."
-	echo
-	
-	# set execution mode for binary
-
-	chmod +x "$binary_directory/$binary"
-done
-
-source "$binary_directory/$binary"
-
 # initial prompt clear #
 
 # clear
@@ -140,30 +34,15 @@ install_list=(
 	g++
 	make
 	zlib1g-dev
+	libqt5concurrent5
+	libqt5opengl5
+	libqt5opengl5-dev
+	libqt5printsupport5
+	libqt5xml5
+	qt5-default
+	qttools5-dev
+	qttools5-dev-tools
 )
-
-if [[ "$option" == "qt4" ]]
-then
-	# qt4 packages and libraries
-
-	install_list+=(
-		qt4-default
-	)
-fi
-
-if [[ "$option" == "qt5" ]]
-then
-	# qt5 packages and libraries
-
-	install_list+=(
-		libqt5opengl5
-		libqt5printsupport5
-		libqt5xml5
-		libqt5concurrent5
-		qttools5-dev-tools
-		qt5-default
-	)
-fi
 
 # install #
 
@@ -179,7 +58,9 @@ do
 		console.fwd "Installing..."
 		echo
 
-		echo yes | apt install ${package}
+		# use 'apt-get install --no-install-recommends' to keep bloat to a minimum
+
+		echo yes | apt-get install --no-install-recommends ${package}
 		echo
 	else
 		console.success "Required package '${package}' already installed."
@@ -191,6 +72,12 @@ do
 	fi
 done
 
+# cleanup
+
+apt-get clean
+
+# build #
+
 # make temporary build directory
 
 build_directory=$(mktemp -d)
@@ -200,18 +87,15 @@ cd "$build_directory" || exit 1
 
 git clone "$source" "$build_directory"
 
-# build #
-
 # compile project
 
 qmake leocad.pro
 
-# build binary
+# compile binary
 
-make -s &
+make -s > /dev/null &
 
 echo
-
 console.spinner "Building..."
 echo
 
@@ -230,7 +114,14 @@ cd "$build_directory"/build/release || exit 1
 
 cp "$build_directory"/build/release/"$build_binary"  "$binary_directory"/"$build_binary"
 
+# remove build directory
+
+rm -rf "$build_directory"
+
 # launcher #
+
+# create architecture dependant launcher:
+# add LD_PRELOAD to optimize performance on arm64 systems
 
 console.info "Writing launcher."
 echo
@@ -275,9 +166,9 @@ fi
 
 cd "$configuration_directory/LeoCAD Software" || exit 1
 
-# write configuration
+# link configuration
 
-console.info "Writing configuration."
+console.info "Linking configuration."
 echo
 
 ln -s -f /media/Internal/MEGA/Lego/leocad/leocad.conf "$configuration_directory/LeoCAD Software/LeoCAD.conf"
