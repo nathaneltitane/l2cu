@@ -5,7 +5,11 @@
 source /data/data/com.termux/files/usr/bin/console
 source /data/data/com.termux/files/usr/bin/globals
 
+# usage #
+
 # variables #
+
+script=$(basename -- "${BASH_SOURCE[0]}")
 
 print_architecture="$(dpkg --print-architecture)"
 
@@ -25,7 +29,7 @@ ldraw_parts_directory="/media/MEGA/Lego/ldraw/"
 
 # initial prompt clear #
 
-# clear
+clear
 
 # packages #
 
@@ -55,13 +59,13 @@ do
 	then
 		console.warning "Required package '${package}' not present."
 		echo
-		console.fwd "Installing..."
-		echo
 
 		# use 'apt-get install --no-install-recommends' to keep bloat to a minimum
 
-		echo yes | apt-get install --no-install-recommends ${package}
-		echo
+		echo yes | apt-get install --no-install-recommends ${package}  >> "${PREFIX}"/var/log/"${script}".log 2>&1 &
+
+			console.spinner "Installing [ ${package} ]..."
+			echo
 	else
 		console.success "Required package '${package}' already installed."
 		echo
@@ -78,6 +82,10 @@ apt-get clean
 
 # build #
 
+clear
+
+console.fwd "Preparing build..."
+
 # make temporary build directory
 
 build_directory=$(mktemp -d)
@@ -93,13 +101,15 @@ qmake leocad.pro
 
 # compile binary
 
-make -s > /dev/null &
+make -s >> "${PREFIX}"/var/log/"${script}".log 2>&1 &
 
-echo
 console.spinner "Building..."
 echo
 
-# update system binary
+# update #
+
+console.fwd "Updating binary..."
+echo
 
 # verify previous install/build existence
 
