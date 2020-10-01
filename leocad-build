@@ -86,6 +86,7 @@ apt-get clean
 clear
 
 console.fwd "Preparing build..."
+echo
 
 # make temporary build directory
 
