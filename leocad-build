@@ -35,6 +35,7 @@ clear
 
 install_list=(
 	git
+	hub
 	g++
 	make
 	zlib1g-dev
