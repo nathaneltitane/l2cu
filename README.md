@@ -139,4 +139,4 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ***
 
-[Submit bug report or feature request](https://github.com/nathaneltitane/LDraw/issues)
+[Submit bug report or feature request](https://github.com/nathaneltitane/l2cu/issues)
