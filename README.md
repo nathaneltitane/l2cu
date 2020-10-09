@@ -111,16 +111,16 @@ You can:
 
 ### 'make-list'
 
-The 'make-list' option was the initial project that inadvertantly started the L²CU project over 6 years ago. This function was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw parts library.
-It serves the exact same function, which is to parse and generate an updated list of all the parts located under the main 'LDraw' directory (within ./LDraw/parts).
+The 'make-list' option was the initial project that inadvertantly started L²CU over 6 years ago.
 
-The user can create a list that sorts the parts in that directory either by part number or by description.
+This (now) function was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw parts library.
+It serves the exact same purpose, which is to parse and generate an updated list of all the parts located under the main 'LDraw' directory (within ./LDraw/parts).
 
-This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on such a text based index to parse the LDraw parts directory contents.
+The user can create a list that sorts the parts in that directory either by part [n]umber or by part [d]escription.
 
-The parts list acts as an index and is often required for legacy editors (i.e.: MLCAD, which can be run using wine under Linux-based distributions).
+This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on the oldtext based index (parts.lst) to load parts into the editor (i.e.: [MLCAD](http://mlcad.lm-software.com/), which can be run using [Wine](https://www.winehq.org/) when using Linux-based distributions).
 
-Most modern editors now generate a cached, per-session dynamic index on launch and do not require this list anymore.
+Modern editors now generate a cached dynamic index or database on application launch and do not require this list generator anymore.
 
 To find examples that make use of L²CU, or to simply browse my models, you can visit my [Blog](https://legolinux.com) which is hosted at [GitHub](https://github.com/nathaneltitane/legolinux.github.io) as well.
 
@@ -134,6 +134,8 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 - [ThreeJS](https://threejs.org) - JavaScript 3D library
 - [LegoLinux](https://legolinux.com) - Where Lego meets Linux
 - [Sketchfab](https://sketchfab.com) - Publish & find 3D models online
+- [MLCAD](http://mlcad.lm-software.com/)
+- [Wine](https://www.winehq.org/)
 
 ***
 
