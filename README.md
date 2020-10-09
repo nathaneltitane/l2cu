@@ -134,8 +134,8 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 - [ThreeJS](https://threejs.org) - JavaScript 3D library
 - [LegoLinux](https://legolinux.com) - Where Lego meets Linux
 - [Sketchfab](https://sketchfab.com) - Publish & find 3D models online
-- [MLCAD](http://mlcad.lm-software.com/)
-- [Wine](https://www.winehq.org/)
+- [MLCAD](http://mlcad.lm-software.com/) - Mike's Lego CAD
+- [Wine](https://www.winehq.org/) - Windows compatibility layer for POSIX-compliant operating systems
 
 ***
 
