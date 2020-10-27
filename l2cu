@@ -897,306 +897,303 @@ do
 				echo
 			fi
 		fi
-	done
-done
 
 # modify #
 
-if [[ "${option}" == "modify" ]]
-then
-	parse_input () {
-		while true
-		do
-			read input
+        if [[ "${option}" == "modify" ]]
+        then
+            parse_input () {
+                while true
+                do
+                    read input
 
-			if [[ -z $input ]]
-			then
-				console.wrn "WARNING:"
-				console.wrn "Input cannot be empty."
-				console.wrn "Try again."
-				echo
-			else
-				break
-			fi
-		done
-	}
+                    if [[ -z $input ]]
+                    then
+                        console.wrn "WARNING:"
+                        console.wrn "Input cannot be empty."
+                        console.wrn "Try again."
+                        echo
+                    else
+                        break
+                    fi
+                done
+            }
 
-	parse_colors () {
-		parse_input
+            parse_colors () {
+                parse_input
 
-		# set to lowercase for input match
+                # set to lowercase for input match
 
-		color_input="${input,,}"
+                color_input="${input,,}"
 
-		while IFS=$' '
-		read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
-		do
-			# color input entries cleanup
+                while IFS=$' '
+                read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
+                do
+                    # color input entries cleanup
 
-			# color name
+                    # color name
 
-			# remove underscores from name
+                    # remove underscores from name
 
-			space_name="${ldraw_color_name//_/ }"
+                    space_name="${ldraw_color_name//_/ }"
 
-			# set name to lowercase for input match
+                    # set name to lowercase for input match
 
-			name="${space_name,,}"
+                    name="${space_name,,}"
 
-			# reattribute input variable to lowercase name value
+                    # reattribute input variable to lowercase name value
 
-			ldraw_color_name="${name}"
+                    ldraw_color_name="${name}"
 
-			# color hex value
+                    # color hex value
 
-			# remove pound from name
+                    # remove pound from name
 
-			hex_value="${ldraw_color_hex_value//#/}"
+                    hex_value="${ldraw_color_hex_value//#/}"
 
-			# set name to lowercase for input match
+                    # set name to lowercase for input match
 
-			hex_value="${hex_value,,}"
+                    hex_value="${hex_value,,}"
 
-			# attribute input variable to lowercase name value
+                    # attribute input variable to lowercase name value
 
-			ldraw_color_hex_value="${hex_value}"
+                    ldraw_color_hex_value="${hex_value}"
 
-			if [[ "${color_input}" == "${ldraw_color_name}" ]]		||	\
-			   [[ "${color_input}" == "${ldraw_color_numbe}r" ]]	||	\
-			   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
-			then
-				# confirmation
+                    if [[ "${color_input}" == "${ldraw_color_name}" ]]		||	\
+                    [[ "${color_input}" == "${ldraw_color_numbe}r" ]]	||	\
+                    [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
+                    then
+                        # confirmation
 
-				console.fwd "Confirming input value..."
-				echo
-				console.inf "Color name................: ${ldraw_color_name}"
-				console.inf "Color number..............: ${ldraw_color_number}"
-				console.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
-				echo
+                        console.fwd "Confirming input value..."
+                        echo
+                        console.inf "Color name................: ${ldraw_color_name}"
+                        console.inf "Color number..............: ${ldraw_color_number}"
+                        console.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
+                        echo
 
-				return "${ldraw_color_number}"
-			fi
+                        return "${ldraw_color_number}"
+                    fi
 
-		done < "${colors}"
+                done < "${colors}"
 
-		console.err  "No available color matches the input."
-		echo
-		console.fwd "Exiting..."
-		echo
+                console.err  "No available color matches the input."
+                echo
+                console.fwd "Exiting..."
+                echo
 
-		exit 1
-	}
+                exit 1
+            }
 
-	parse_parts () {
-		parse_input
-		part_input="${input}"
+            parse_parts () {
+                parse_input
+                part_input="${input}"
 
-		return "${part_input}"
-	}
+                return "${part_input}"
+            }
 
-	# get input
+        # get input
 
-                        if [[ "${modify_option}" = "color" ]]
- 
-							if [ -f "./author" ]
-							then
-								author_string=$(echo $(cat ./author))
-                            fi
-                            
-                            if [ ! -f "./author" ]
-                            then
-                                echo
+                if [[ "${modify_option}" = "color" ]]
+                then
 
-                                parse_input
+                    if [ -f "./author" ]
+                    then
+                        author_string=$(echo $(cat ./author))
+                    fi
+                    
+                    if [ ! -f "./author" ]
+                    then
+                        echo
 
-                                author_input="$input"
+                        parse_input
 
-                                echo "$author_input" > ./author
+                        author_input="$input"
 
-                                author_string=$(echo $(cat ./author))
-                            else
-                                console.wrn "No author string/file specified."
-                                echo
-                                console.fwd "Skipping..."
-                                echo
+                        echo "$author_input" > ./author
 
-                                line=""
-                            fi
+                        author_string=$(echo $(cat ./author))
+                    else
+                        console.wrn "No author string/file specified."
+                        echo
+                        console.fwd "Skipping..."
+                        echo
 
-						echo "${line}" >> "${temporary_file}"
+                        line=""
+                    fi
 
-						if [[ "${line}" = *BACKGROUND* ]]
-						then
-							IFS=' '
-							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
+                echo "${line}" >> "${temporary_file}"
 
-							: # pass
+                if [[ "${line}" = *BACKGROUND* ]]
+                then
+                    IFS=' '
+                    read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
 
-						elif [[ "${line}" = *"GROUP BEGIN"* ]]
-						then
-							IFS=' '
-							read -r flag statement group group_begin group_name <<< "${line}"
+                    : # pass
 
-							: # pass
+                elif [[ "${line}" = *"GROUP BEGIN"* ]]
+                then
+                    IFS=' '
+                    read -r flag statement group group_begin group_name <<< "${line}"
 
-						elif [[ "${line}" = *"GROUP END"* ]]
-						then
-							IFS=' '
-							read -r flag statement group group_end <<< "${line}"
+                    : # pass
 
-							: # pass
+                elif [[ "${line}" = *"GROUP END"* ]]
+                then
+                    IFS=' '
+                    read -r flag statement group group_end <<< "${line}"
 
-						elif [[ "${line}" = *PIVOT* ]]
-						then
-							IFS=' '
-							read -r flag statement piece pivot pivot_coordinates <<< "${line}"
+                    : # pass
 
-							: # pass
+                elif [[ "${line}" = *PIVOT* ]]
+                then
+                    IFS=' '
+                    read -r flag statement piece pivot pivot_coordinates <<< "${line}"
 
-						elif [[ "${line}" = *HIDDEN* ]]
-						then
-							IFS=' '
-							read -r flag statement piece hidden <<< "${line}"
+                    : # pass
 
-							: # pass
-						else
-							# if line contains '!LEOCAD' tag
+                elif [[ "${line}" = *HIDDEN* ]]
+                then
+                    IFS=' '
+                    read -r flag statement piece hidden <<< "${line}"
 
-							if [[ "${line}" == *!LEOCAD* ]]
-							then
-								# skip header and footer lines containing matching patterns
-								# prevents model file syntax modification
+                    : # pass
+                else
+                    # if line contains '!LEOCAD' tag
 
-								echo "${line}" >> "${temporary_file}"
+                    if [[ "${line}" == *!LEOCAD* ]]
+                    then
+                        # skip header and footer lines containing matching patterns
+                        # prevents model file syntax modification
 
-								continue
-							fi
+                        echo "${line}" >> "${temporary_file}"
 
-							# if line contains 'NOFILE' tag
+                        :
+                    fi
 
-							if [[ "${line}" == *NOFILE* ]]
-							then
-								# skip header and footer lines containing matching patterns
-								# prevents model file syntax modification
+                    # if line contains 'NOFILE' tag
 
-								echo "${line}" >> "${temporary_file}"
+                    if [[ "${line}" == *NOFILE* ]]
+                    then
+                        # skip header and footer lines containing matching patterns
+                        # prevents model file syntax modification
 
-								continue
-							fi
+                        echo "${line}" >> "${temporary_file}"
 
-							# if line contains 'FILE' tag
+                        :
+                    fi
 
-							if [[ "${line}" == *FILE* ]]
-							then
-								IFS=' '
-								read -r flag statement file_name <<< "${line}"
+                    # if line contains 'FILE' tag
 
-								# spaces to dashes
+                    if [[ "${line}" == *FILE* ]]
+                    then
+                        IFS=' '
+                        read -r flag statement file_name <<< "${line}"
 
-								clean_file_name="${clean_file_name// /-}"
+                        # spaces to dashes
 
-								# string to lower case
+                        clean_file_name="${clean_file_name// /-}"
 
-								clean_file_name="${clean_file_name,,}"
+                        # string to lower case
 
-								# write changes to tempporary file
+                        clean_file_name="${clean_file_name,,}"
 
-								echo "${flag} ${statement} ${clean_file_name}" >> "${temporary_file}"
-							else
-								# parse all other lines and format submodel string
+                        # write changes to tempporary file
 
-								IFS=' '
-								read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
+                        echo "${flag} ${statement} ${clean_file_name}" >> "${temporary_file}"
+                    else
+                        # parse all other lines and format submodel string
 
-								# spaces to dashes
+                        IFS=' '
+                        read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
 
-								clean_model_data="${clean_model_data// /-}"
+                        # spaces to dashes
 
-								# string to lower case
+                        clean_model_data="${clean_model_data// /-}"
 
-								clean_model_data="${clean_model_data,,}"
+                        # string to lower case
 
-								vect_x="${a} ${b} ${c}"
-								vect_y="${d} ${e} ${f}"
-								vect_z="${g} ${h} ${i}"
+                        clean_model_data="${clean_model_data,,}"
 
-								# ⎡ a d g 0 ⎤	⎡ a b c x ⎤
-								# ⎢ b e h 0 ⎥	⎢ d e f y ⎥
-								# ⎢ c f i 0 ⎥	⎢ g h i z ⎥
-								# ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
+                        vect_x="${a} ${b} ${c}"
+                        vect_y="${d} ${e} ${f}"
+                        vect_z="${g} ${h} ${i}"
 
-							fi
-						fi
-					fi
+                        # ⎡ a d g 0 ⎤	⎡ a b c x ⎤
+                        # ⎢ b e h 0 ⎥	⎢ d e f y ⎥
+                        # ⎢ c f i 0 ⎥	⎢ g h i z ⎥
+                        # ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
 
-					# reset IFS
+                    fi
+                fi
+            fi
 
-					IFS=" "
+            # reset IFS
 
-					# write changes to tempporary file
+            IFS=" "
 
-					echo -e "${flag}" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${part}.${suffix}" >> "${temporary_file}"
-				fi
+            # write changes to tempporary file
 
-			done < "${model}" # feed model file into loop for parsing
+            echo -e "${flag}" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${part}.${suffix}" >> "${temporary_file}"
+        fi
 
-			# Set current date stamp
+    done < "${model}" # feed model file into loop for parsing
 
-			stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+    # Set current date stamp
+
+    stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
 # modify: overwrite #
 
-			# write changes to file?
+    # write changes to file?
 
-			if [[ "${overwrite_option}" = "overwrite" ]]
-			then
-				console.wrn "[ OVERWRITE ] option enabled!"
-				console.inf "Writing changes to original model file!"
-				echo
+    if [[ "${overwrite_option}" = "overwrite" ]]
+    then
+        console.wrn "[ OVERWRITE ] option enabled!"
+        console.inf "Writing changes to original model file!"
+        echo
 
-				console.wrn "Writing file."
-				echo
-				console.inf "Model file................: ${model}"
-				echo
+        console.wrn "Writing file."
+        echo
+        console.inf "Model file................: ${model}"
+        echo
 
-				mv "${temporary_file}" "${temporary_file%.tmp}"
-			fi
+        mv "${temporary_file}" "${temporary_file%.tmp}"
+    fi
 
-			if [ -z "${overwrite_option}" ]
-			then
-				console.ask  "Write changes to original model file?"
-				
-				echo
-								echo
+    if [ -z "${overwrite_option}" ]
+    then
+        console.ask  "Write changes to original model file?"
+        
+        echo
+                        echo
 
-				read reply
+        read reply
 
-				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-				then
-					console.wrn "[ OVERWRITE ] option enabled!"
-					console.inf "Writing changes to original model file."
-					echo
+        if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+        then
+            console.wrn "[ OVERWRITE ] option enabled!"
+            console.inf "Writing changes to original model file."
+            echo
 
-					console.wrn "Writing file."
-					echo
-					console.inf "Model file................: ${model}"
-					echo
+            console.wrn "Writing file."
+            echo
+            console.inf "Model file................: ${model}"
+            echo
 
-					mv "${temporary_file}" "${temporary_file%.tmp}"
+            mv "${temporary_file}" "${temporary_file%.tmp}"
 
-				else
-					console.wrn "[ OVERWRITE ] option disabled."
-					console.inf "Writing changes to model file copy."
-					echo
-					console.fwd "Writing changes to model file copy..."
-					echo
+        else
+            console.wrn "[ OVERWRITE ] option disabled."
+            console.inf "Writing changes to model file copy."
+            echo
+            console.fwd "Writing changes to model file copy..."
+            echo
 
-					mv "${temporary_file}" "${temporary_file%.tmp}_modified_$stamp.${extension}"
-				fi
-			fi
-		done
-	done
-fi
+            mv "${temporary_file}" "${temporary_file%.tmp}_modified_$stamp.${extension}"
+        fi
+    fi
+done
 
 # get #
 
@@ -1258,10 +1255,10 @@ then
 	if [ -z "$directory" ]
 	then
 		console.wrn "Is the LDraw parts library setup on this system?"
-		
 		echo
 
 		read reply
+		
 		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 		then
 			# specify directory location or exit on 'cancel'
@@ -1269,7 +1266,7 @@ then
 			browse=$(dialog "Load LDraw library") || exit 1
 
 			cd "$browse" || exit 1
-
+			
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
 				console.scs "LDraw parts library exists."
@@ -1285,12 +1282,12 @@ then
 		else
 			console.wrn "LDraw parts directory not found."
 			console.ask  "Specify the LDraw parts library directory location to continue?"
-			
 			echo
 
 			read reply
 
-						then
+            if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+            then
 				# specify directory location or exit on 'cancel'
 
 				browse=$(dialog) || exit 1
