@@ -337,7 +337,7 @@ then
 
 elif [[ "${option}" = "export" ]]
 then
-	console.inf "Utility started using the $export_name export parameter."
+	console.inf "Utility started using the ${export_name} export parameter."
 	echo
 fi
 
