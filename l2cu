@@ -1253,7 +1253,7 @@ fi
 
 # make list #
 
-if [[  "${option}" = "make-list" ]]
+if [[ "${option}" = "make-list" ]]
 then
 	if [ -z "${directory}" ]
 	then
@@ -1314,7 +1314,7 @@ then
 
 					setup_directory=$(console.dialog) || exit 1
 
-					cd "$setup_directory" || exit 1
+					cd "${setup_directory}" || exit 1
 
 					get_library
 
@@ -1344,7 +1344,8 @@ then
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
 		console.wrn "Previous instance of the parts.lst file found."
-		console.inf "Backing up..."
+		echo
+		console.fwd "Backing up..."
 		echo
 
 		mv parts.lst parts.lst.bak
@@ -1357,6 +1358,7 @@ then
 		console.inf "Utility startedusing the $sort_mode option flag."
 	else
 		console.wrn "No sorting method specified."
+		echo
 		console.ask "Which sorting method should be used for parsing the parts list?"
 		console.ask "[ [dD]escription / [nN]umber ]"
 		echo
@@ -1385,20 +1387,20 @@ then
 				header="$(head -n 1 "${part}")"
 				description="${header:2}"
 
-				if [[ "$description" == *~Moved* ]]
+				if [[ "${description}" == *~Moved* ]]
 				then
 					: # pass
 				else
-					if [[ "$description" == *_* ]]
+					if [[ "${description}" == *_* ]]
 					then
-						printf '%-30s %-s\n' "$filename" "$description" >> "._.lst"
+						printf '%-30s %-s\n' "${filename}" "${description}" >> "._.lst"
 
-					elif [[ "$description" == *~* ]]
+					elif [[ "${description}" == *~* ]]
 					then
-						printf '%-30s %-s\n' "$filename" "$description" >> ".~.lst"
+						printf '%-30s %-s\n' "${filename}" "${description}" >> ".~.lst"
 
 					else
-						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
+						printf '%-30s %-s\n' "${filename}" "${description}" >> parts.lst
 					fi
 
 					console.inf "Parts count...............: $((count++))\c"
@@ -1417,13 +1419,13 @@ then
 
 		for list in "._.lst" ".~.lst" parts.lst
 		do
-			if [[ "${reply}" = [dD] ]] || [[ "$sort_mode" == "description" ]]
+			if [[ "${reply}" = [dD] ]] || [[ "${sort_mode}" == "description" ]]
 			then
-				sort -b -d -k 2 -t "$separator" -o "$list" "$list"
+				sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
 
-			elif [[ "${reply}" = [nN] ]] || [[ "$sort_mode" == "number" ]]
+			elif [[ "${reply}" = [nN] ]] || [[ "${sort_mode}" == "number" ]]
 			then
-				sort -b -n -k 1 -t "$separator" -o "$list" "$list"
+				sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
 			fi
 		done
 
