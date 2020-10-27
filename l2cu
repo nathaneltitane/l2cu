@@ -2,14 +2,14 @@
 
 # Author: Nathanel Titane - nathanel.titane@gmail.com
 
-# L²CU # l2cu # linux ldraw command line utility #
+# LÂ²CU # l2cu # linux ldraw command line utility #
 
-# version #
+# version -------------------------------------------------------------------- #
 
-version="01-11-2020"
+version="04-01-2020"
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-# usage #
+# usage ---------------------------------------------------------------------- #
 
 while (($#))
 do
@@ -19,7 +19,7 @@ do
 			directory="$1"
 			;;
 
-# file types #
+# file types ----------------------------------------------------------------- #
 
 		-all)
 			extension_option="all"
@@ -34,7 +34,7 @@ do
 			extensions_list=(mpd)
 			;;
 
-# rendering #
+# rendering ------------------------------------------------------------------ #
 
 		-render)
 			option="render"
@@ -68,7 +68,7 @@ do
 			render_preset="front"
 			;;
 
-# exports #
+# exports -------------------------------------------------------------------- #
 
 		-export)
 			option="export"
@@ -94,7 +94,7 @@ do
 			export_name="Wavefront"
 			;;
 
-# modify #
+# modify --------------------------------------------------------------------- #
 
 		-modify)
 			option="modify"
@@ -121,7 +121,7 @@ do
 			overwrite_option="overwrite"
 			;;
 
-# get #
+# get ------------------------------------------------------------------------ #
 
 		-get)
 			option="get"
@@ -133,7 +133,7 @@ do
 			get_option=unofficial
 			;;
 
-# make list #
+# make list ------------------------------------------------------------------ #
 
 		-make-list)
 			option="make-list"
@@ -145,7 +145,7 @@ do
 			sort_mode="number"
 			;;
 
-# help #
+# help ----------------------------------------------------------------------- #
 
 		-h|--help)
 			echo -e "USAGE"
@@ -213,14 +213,14 @@ do
 			;;
 		-v|--version)
 			echo
-			echo -e "${script} ${version}"
+			echo -e "$script $version"
 			echo
 			exit
 			;;
 		*)
 			echo
-			echo -e "${script}: Unknown option ${1}"
-			echo -e "Type './${script} --help' for help and usage information."
+			echo -e "$script: Unknown option $1"
+			echo -e "Type './$script --help' for help and usage information."
 			echo
 			exit
 			;;
@@ -228,11 +228,62 @@ do
 	shift
 done
 
-# dependencies #
+# functions ------------------------------------------------------------------ #
 
-curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
+console.spinner () {
+	# catch PID of last command
 
-# dialog #
+	PID=$!
+
+	# spinner string content
+
+	before="[ "
+	spinner="/â\|"
+	after="]"
+	message="$1"
+
+	i=1
+
+	echo
+
+	while [ -d /proc/$PID ]
+	do
+		echo -ne "\r${before} \b${spinner:i++%${#spinner}:1} ${after} ${message}\c "
+		sleep 0.125
+	done
+
+	echo
+}
+
+# dependencies --------------------------------------------------------------- #
+
+binaries_list=(
+	console
+)
+
+if [[ "$(which $binary)" == "" ]]
+then
+
+	for binary in ${binaries_list[@]}
+	do
+		binary_url=bin-dex.ntttn.me/"$binary"
+
+		# get binaries from repository
+
+		curl -sL ${binary_url} > "$binary_directory/$binary" &
+
+		console.spinner "Downloading binary [ $binary ]."
+		echo
+
+		# set execution mode for binary
+
+		chmod +x "$binary_directory/$binary"
+	done
+
+	source "$binary_directory/$binary"
+fi
+
+# dialog --------------------------------------------------------------------- #
 
 dialog () {
 
@@ -243,55 +294,55 @@ dialog () {
 	# gtk dialog - zenity
 
 	g_dialog () {
-		zenity						\
-			--file-selection		\
-			--multiple				\
-			--directory				\
-			--separator=$'\n'		\
-			--title="$title"		"${@}"
+		zenity \
+			--file-selection \
+			--multiple\
+			--directory \
+			--separator=$'\n' \
+			--title="$title" "$@"
 	}
 
 	# kde dialog - kdialog
 
 	k_dialog () {
-		kdialog						\
-			--getopenfilename		\
-			--multiple				\
-			--separate-output		\
-			--title "$title"		"${@}"
+		kdialog \
+			--getopenfilename \
+			--multiple \
+			--separate-output \
+			--title "$title" "$@"
 	}
 
 	# define dialog usage
 
-	if [[ -z $(command -v zenity) ]]
+	if [[ $(command -v zenity) = "" ]]
 	then
 		dialog=$(k_dialog)
 	elif
-	[[ -z $(command -v kdialog) ]]
+	[[ $(command -v kdialog) = "" ]]
 	then
 		dialog=$(g_dialog)
 	else
-		console.err  "No dialog binary present on system."
-		console.inf "This utility must be run using the 'directory' option."
-		echo
-		console.fwd "Exiting..."
+		console.error "No dialog binary present on system."
+		console.info "This utility must be run using the 'directory' option."
+		console.fwd "Exiting."
 		echo
 
 		exit 1
 	fi
 }
 
-# download #
+# download ------------------------------------------------------------------- #
 
 download () {
-	curl -sL "${@}"
+
+	curl -L -S  # "$@"
 }
 
 # if 'directory' option is not passed
 
-if [[ -z "${directory}" ]]
+if [[ -z "$directory" ]]
 then
-	console.ask  "Load model files from:"
+	console.question "Load model files from:"
 	echo""
 
 	# specify directory location or exit on 'cancel'
@@ -299,17 +350,17 @@ then
 	directory=$(dialog "Load model files") || exit 1
 fi
 
-# get library #
+# get library ---------------------------------------------------------------- #
 
 get_library () {
 
-	parts_archive=$(basename "${parts_url}")
+	parts_archive=$(basename "$parts_url")
 
 	# download
 
-	download "${parts_url}" > "${directory}"/"${parts_archive}" &
+	download "$parts_url" > "$directory/$parts_archive" &
 
-	console.dwl "Downloading..."
+	console.spinner "Downloading..."
 	echo
 
 	# extract
@@ -321,23 +372,23 @@ get_library () {
 
 	# rename
 
-	mv "${parts_archive}" ldraw.zip
+	mv "$parts_archive" ldraw.zip
 }
 
-# initial prompt clear #
+# initial prompt clear ------------------------------------------------------- #
 
 clear
 
-# make temporary file: export #
+# make temporary file: export ------------------------------------------------ #
 
-if [[ "${option}" == "export" ]]
+if [[ "$option" == "export" ]]
 then
 	beautify=$(mktemp /tmp/beautify.XXXXXX)
 	trap 'rm -rf "$beautify"' EXIT
 
 	# push blender conversion script to temporary file
 
-	cat > "${beautify}" <<- 'PYTHON'
+	cat > "$beautify" <<- 'PYTHON'
 	#!/usr/bin/env python3
 
 	import os
@@ -411,16 +462,16 @@ then
 	PYTHON
 fi
 
-# make temporary file: modify #
+# make temporary file: modify ------------------------------------------------ #
 
-if [[  ${option} == "modify" ]]
+if [[  $option == "modify" ]]
 then
 	colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
 	trap 'rm -rf "$colors"' EXIT
 
 	# push ldraw colors list to temporary file
 
-	cat > "${colors}" <<- 'COLORS'
+	cat > "$colors" <<- 'COLORS'
 	Black                                   0          #05131D
 	Blue                                    1          #0055BF
 	Green                                   2          #257A3E
@@ -572,10 +623,10 @@ fi
 
 # test for utility dependencies and requirements
 
-console.inf "Verifying utility dependencies and requirements."
+console.info "Verifying utility requirements..."
 echo
 
-install_list=(
+binaries_list=(
 	leocad
 	blender
 	curl
@@ -583,46 +634,86 @@ install_list=(
 	zip
 )
 
-console.install ${install_list}
+for binary_name in ${binaries_list[@]}
+do
+	binary=$(command -v $binary_name)
 
-# initial prompt clear #
+	# if binary is not found or unspecified
+
+	if [[ ${binary} = "" ]]
+	then
+		console.warning "The '$binary_name' binary not found."
+		console.question "Specify location?"
+		console.choice
+		echo
+
+		read reply
+
+		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		then
+			# specify binary location or exit on 'cancel'
+
+			binary_path=$(dialog "Specify location") || exit 1
+
+			binary="$binary_path/$binary"
+		else
+			console.error "No '$binary_name' binary installed on system."
+			console.info "Install '$binary_name' using your system's package manager."
+			console.info "Restart this utility when '$binary_name' is installed."
+			console.fwd "Exiting."
+			echo
+
+			exit 1
+		fi
+
+	# if binary exists
+
+	elif [[ ! -z "$binary" ]]
+	then
+		console.success "'$binary' binary found on system."
+		echo
+	fi
+
+done
+
+# initial prompt clear ------------------------------------------------------- #
 
 clear
 
-# confirmation #
+# confirmation --------------------------------------------------------------- #
 
-console.inf "Utility started using the ${extension_option} extension option."
-console.inf "Utility started using the ${option} option."
+echo
+console.info "Utility started using the $extension_option extension option."
+console.info "Utility started using the $option option."
 echo
 
-if [[ "${option}" = "render" ]]
+if [[ "$option" = "render" ]]
 then
-	console.inf "Utility started using the ${render_option} camera preset."
+	console.info "Utility started using the $render_option camera preset."
+	echo
+
+elif [[ "$option" = "export" ]]
+then
+	console.info "Utility started using the $export_name export parameter."
 	echo
 fi
 
-if [[ "${option}" = "export" ]]
+if [[ "$option" = "overwrite" ]]
 then
-	console.inf "Utility started using the ${export_name} export parameter."
+	console.warning "WARNING:"
+	console.warning "Utility started using the overwrite option."
+	console.warning "Parsed model modification will be written to file directly!"
 	echo
 fi
 
-if [[ "${option}" = "overwrite" ]]
-then
-	console.wrn "WARNING:"
-	console.wrn "Utility started using the overwrite option."
-	console.wrn "Parsed model modification will be written to file directly!"
-	echo
-fi
-
-console.fwd "Proceeding."
+console.fwd "Proceeding..."
 echo
 
-# parse #
+# parse ---------------------------------------------------------------------- #
 
 for extension in ${extensions_list[@]}
 do
-	for model in $(echo $(find ${directory} -iname "*.${extension}"))
+	for model in $(echo $(find ${directory} -iname "*.$extension"))
 	do
 		# get model file name from path
 
@@ -634,9 +725,9 @@ do
 
 		model_name="${model_file_name}"
 
-# render #
+# render --------------------------------------------------------------------- #
 
-		if [[ "${option}" = "render" ]]
+		if [[ "$option" = "render" ]]
 		then
 			# define render routine
 
@@ -648,28 +739,28 @@ do
 				model=$1
 				coordinates=$2
 
-				leocad																		\
-					-h "${height}"															\
-					-w "${width}"															\
-					-i "${model_name}-${view[$coordinates]}.${extension}"					\
-					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
-					--shading ${shading}													\
-					--line-width ${line_width} "${model}" >> /dev/null
+				leocad \
+					-h "$height" \
+					-w "$width" \
+					-i "${model_name}-${view[$coordinates]}.${extension}" \
+					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]} \
+					--shading ${shading} \
+					--line-width ${line_width} "$model" >> /dev/null
 			}
 
 			# define render output directory
 
 			# use model directory as root
 
-			renders_directory="${model%/*}"/renders/
+			renders_directory="${model%/*}/renders/"
 
 			# use render directory as root
 
-			background_directory="${model%/*}"/renders/background
+			background_directory="${model%/*}/renders/background"
 
 			# use render directory as root
 
-			flat_directory="${model%/*}"/renders/flat
+			flat_directory="${model%/*}/renders/flat"
 
 			# define render parameters for all presets
 
@@ -702,35 +793,35 @@ do
 
 			# define camera position presets
 
-			if [[ "${render_preset}" == "full" ]]
+			if [[ "$render_preset" == "full" ]]
 			then
 				position=(0 1 2 3)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "fixed" ]]
+			if [[ "$render_preset" == "fixed" ]]
 			then
 				position=(0 1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "quarter-back" ]]
+			if [[ "$render_preset" == "quarter-back" ]]
 			then
 				position=(0)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "quarter-front" ]]
+			if [[ "$render_preset" == "quarter-front" ]]
 			then
 				position=(1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "back" ]]
+			if [[ "$render_preset" == "back" ]]
 			then
 				position=(2)
 				shading=full
@@ -742,38 +833,38 @@ do
 				position=(3)
 			fi
 
-			if [[ "${render_preset}" == "flat" ]]
+			if [[ "$render_preset" == "flat" ]]
 			then
 				position=(1)
 				shading=flat
 				line_width=0
 
-				renders_directory="${flat_directory}"
+				renders_directory="$flat_directory"
 			fi
 
 			# render model using options
 
-			console.inf "Rendering in..............: ${renders_directory}"
+			console.info "Rendering in..............: $renders_directory"
 			echo
 
 			for coordinates in ${position[@]}
 			do
 				# check for the renders directory existence
 
-				if [ ! -d "${renders_directory}" ]
+				if [ ! -d "$renders_directory" ]
 				then
-					mkdir -p "${renders_directory}"
+					mkdir -p "$renders_directory"
 				fi
 
-				cd "${renders_directory}" || exit 1
+				cd "$renders_directory" || exit 1
 
 				# render
 
-				console.inf "Rendering.................: ${model_name^^}"
-				console.inf "View......................: ${view[coordinates]^^}"
+				console.info "Rendering.................: ${model_name^^}"
+				console.info "View......................: ${view[coordinates]^^}"
 				echo
 
-				run_leocad "${model}" ${coordinates}
+				run_leocad "$model" $coordinates
 
 				wait
 
@@ -783,17 +874,17 @@ do
 				then
 					# Rename renders to designated splash images
 
-					mv "${model_name}-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
+					mv "$model_name-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
 				fi
 			done
 
-			console.inf "Output....................: ${renders_directory}/${model_name}-${view[$coordinates]}.${extension}"
+			console.info "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
-# export #
+# export --------------------------------------------------------------------- #
 
-		if [[ "${option}" == "export" ]]
+		if [[ "$option" == "export" ]]
 		then
 			export_file="${model_name}.${export_extension}"
 
@@ -810,65 +901,65 @@ do
 
 			# use model directory as root
 
-			exports_directory="${model%/*}"/exports/
+			exports_directory="${model%/*}/exports/"
 
 			# define export routine
 
 			run_leocad () {
 
-				console.inf "Exporting.................: ${model}"
-				console.inf "Format....................: ${export_name}"
+				console.info "Exporting.................: $model"
+				console.info "Format....................: ${export_name}"
 				echo
 
-				leocad "${model}" "-${export_option}" "${export_file}" >> /dev/null
+				leocad "$model" "-$export_option" "$export_file" >> /dev/null
 
 				wait
 			}
 
 			# check for the exports directory existence
 
-			if [[ ! -d "${exports_directory}" ]]
+			if [[ ! -d "$exports_directory" ]]
 			then
-				mkdir -p "${exports_directory}"
+				mkdir -p "$exports_directory"
 			fi
 
-			cd "${exports_directory}" || exit 1
+			cd "$exports_directory" || exit 1
 
 			# export
 
-			if [[ "${export_option}" = "3ds" ]] || \
-			   [[ "${export_option}" = "dae" ]] || \
-			   [[ "${export_option}" = "obj" ]]
+			if [[ "$export_option" = "3ds" ]] || \
+			   [[ "$export_option" = "dae" ]] || \
+			   [[ "$export_option" = "obj" ]]
 			then
 				run_leocad
 
 				wait
 
-				if [[ "${export_option}" = "obj" ]]
+				if [[ "$export_option" = "obj" ]]
 				then
 					# archive wavefront model elements
 
-					zip "${export_file_archive}" "${export_file_object}" "${export_file_material}"
+					zip "$export_file_archive" "$export_file_object" "$export_file_material"
 
 					# cleanup
 
 					rm -rf {*.obj,*.mtl}
 				fi
 
-			elif [[ "${export_option}" = "blender" ]]
+			elif [[ "$export_option" = "blender" ]]
 			then
 				run_leocad
 
-				console.inf "Converting ${model} ("$export_extension")."
+				console.info "Converting $model ("$export_extension")..."
 				echo
 
 				# import 3ds file into blender to create optimized blend file
 
-				blender --background --python "${beautify}" "${export_file_3ds}" >> /dev/null
+				blender --background --python "$beautify" "$export_file_3ds" >> /dev/null
 
 				# cleanup
 
-				rm -rf "${export_file_3ds}"
+				rm -rf "$export_file_3ds"
 			fi
 
 			# verify export file size
@@ -880,324 +971,613 @@ do
 
 			# if lesser than threshold
 
-			if [[ "${model_size_number}" -le "${model_size_threshold}" ]]
+			if [[ "$model_size_number" -le "$model_size_threshold" ]]
 			then
-				console.scs "File size threshold not exceeded - [ ${model_size} ]"
+				console.success "File size threshold not exceeded - [ $model_size ]"
 				echo
 
 			# if greater than threshold
 
 			elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
 			then
-				console.err  "File size threshold exceeded - [ ${model_size} ]"
+				console.error "File size threshold exceeded - [ $model_size ]"
 				echo
-				console.wrn "WARNING:"
-				console.inf "Model file size is above recommended threshold of ${model_size_threshold}MB"
-				console.inf "You may experience higher than average loading times."
+				console.warning "WARNING:"
+				console.info "Model file size is above recommended threshold of ${model_size_threshold}MB"
+				console.info "You may experience higher than average loading times."
 				echo
 			fi
 		fi
-
-# modify #
-
-        if [[ "${option}" == "modify" ]]
-        then
-            parse_input () {
-                while true
-                do
-                    read input
-
-                    if [[ -z $input ]]
-                    then
-                        console.wrn "WARNING:"
-                        console.wrn "Input cannot be empty."
-                        console.wrn "Try again."
-                        echo
-                    else
-                        break
-                    fi
-                done
-            }
-
-            parse_colors () {
-                parse_input
-
-                # set to lowercase for input match
-
-                color_input="${input,,}"
-
-                while IFS=$' '
-                read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
-                do
-                    # color input entries cleanup
-
-                    # color name
-
-                    # remove underscores from name
-
-                    space_name="${ldraw_color_name//_/ }"
-
-                    # set name to lowercase for input match
-
-                    name="${space_name,,}"
-
-                    # reattribute input variable to lowercase name value
-
-                    ldraw_color_name="${name}"
-
-                    # color hex value
-
-                    # remove pound from name
-
-                    hex_value="${ldraw_color_hex_value//#/}"
-
-                    # set name to lowercase for input match
-
-                    hex_value="${hex_value,,}"
-
-                    # attribute input variable to lowercase name value
-
-                    ldraw_color_hex_value="${hex_value}"
-
-                    if [[ "${color_input}" == "${ldraw_color_name}" ]]		||	\
-                    [[ "${color_input}" == "${ldraw_color_numbe}r" ]]	||	\
-                    [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
-                    then
-                        # confirmation
-
-                        console.fwd "Confirming input value..."
-                        echo
-                        console.inf "Color name................: ${ldraw_color_name}"
-                        console.inf "Color number..............: ${ldraw_color_number}"
-                        console.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
-                        echo
-
-                        return "${ldraw_color_number}"
-                    fi
-
-                done < "${colors}"
-
-                console.err  "No available color matches the input."
-                echo
-                console.fwd "Exiting..."
-                echo
-
-                exit 1
-            }
-
-            parse_parts () {
-                parse_input
-                part_input="${input}"
-
-                return "${part_input}"
-            }
-
-        # get input
-
-                if [[ "${modify_option}" = "color" ]]
-                then
-
-                    if [ -f "./author" ]
-                    then
-                        author_string=$(echo $(cat ./author))
-                    fi
-                    
-                    if [ ! -f "./author" ]
-                    then
-                        echo
-
-                        parse_input
-
-                        author_input="$input"
-
-                        echo "$author_input" > ./author
-
-                        author_string=$(echo $(cat ./author))
-                    else
-                        console.wrn "No author string/file specified."
-                        echo
-                        console.fwd "Skipping..."
-                        echo
-
-                        line=""
-                    fi
-
-                echo "${line}" >> "${temporary_file}"
-
-                if [[ "${line}" = *BACKGROUND* ]]
-                then
-                    IFS=' '
-                    read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
-
-                    : # pass
-
-                elif [[ "${line}" = *"GROUP BEGIN"* ]]
-                then
-                    IFS=' '
-                    read -r flag statement group group_begin group_name <<< "${line}"
-
-                    : # pass
-
-                elif [[ "${line}" = *"GROUP END"* ]]
-                then
-                    IFS=' '
-                    read -r flag statement group group_end <<< "${line}"
-
-                    : # pass
-
-                elif [[ "${line}" = *PIVOT* ]]
-                then
-                    IFS=' '
-                    read -r flag statement piece pivot pivot_coordinates <<< "${line}"
-
-                    : # pass
-
-                elif [[ "${line}" = *HIDDEN* ]]
-                then
-                    IFS=' '
-                    read -r flag statement piece hidden <<< "${line}"
-
-                    : # pass
-                else
-                    # if line contains '!LEOCAD' tag
-
-                    if [[ "${line}" == *!LEOCAD* ]]
-                    then
-                        # skip header and footer lines containing matching patterns
-                        # prevents model file syntax modification
-
-                        echo "${line}" >> "${temporary_file}"
-
-                        :
-                    fi
-
-                    # if line contains 'NOFILE' tag
-
-                    if [[ "${line}" == *NOFILE* ]]
-                    then
-                        # skip header and footer lines containing matching patterns
-                        # prevents model file syntax modification
-
-                        echo "${line}" >> "${temporary_file}"
-
-                        :
-                    fi
-
-                    # if line contains 'FILE' tag
-
-                    if [[ "${line}" == *FILE* ]]
-                    then
-                        IFS=' '
-                        read -r flag statement file_name <<< "${line}"
-
-                        # spaces to dashes
-
-                        clean_file_name="${clean_file_name// /-}"
-
-                        # string to lower case
-
-                        clean_file_name="${clean_file_name,,}"
-
-                        # write changes to tempporary file
-
-                        echo "${flag} ${statement} ${clean_file_name}" >> "${temporary_file}"
-                    else
-                        # parse all other lines and format submodel string
-
-                        IFS=' '
-                        read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
-
-                        # spaces to dashes
-
-                        clean_model_data="${clean_model_data// /-}"
-
-                        # string to lower case
-
-                        clean_model_data="${clean_model_data,,}"
-
-                        vect_x="${a} ${b} ${c}"
-                        vect_y="${d} ${e} ${f}"
-                        vect_z="${g} ${h} ${i}"
-
-                        # ⎡ a d g 0 ⎤	⎡ a b c x ⎤
-                        # ⎢ b e h 0 ⎥	⎢ d e f y ⎥
-                        # ⎢ c f i 0 ⎥	⎢ g h i z ⎥
-                        # ⎣ x y z 1 ⎦	⎣ 0 0 0 1 ⎦
-
-                    fi
-                fi
-            fi
-
-            # reset IFS
-
-            IFS=" "
-
-            # write changes to tempporary file
-
-            echo -e "${flag}" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${part}.${suffix}" >> "${temporary_file}"
-        fi
-
-    done < "${model}" # feed model file into loop for parsing
-
-    # Set current date stamp
-
-    stamp=$(date +"%m-%d-%Y-%H-%M-%S")
-
-# modify: overwrite #
-
-    # write changes to file?
-
-    if [[ "${overwrite_option}" = "overwrite" ]]
-    then
-        console.wrn "[ OVERWRITE ] option enabled!"
-        console.inf "Writing changes to original model file!"
-        echo
-
-        console.wrn "Writing file."
-        echo
-        console.inf "Model file................: ${model}"
-        echo
-
-        mv "${temporary_file}" "${temporary_file%.tmp}"
-    fi
-
-    if [ -z "${overwrite_option}" ]
-    then
-        console.ask  "Write changes to original model file?"
-        
-        echo
-                        echo
-
-        read reply
-
-        if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-        then
-            console.wrn "[ OVERWRITE ] option enabled!"
-            console.inf "Writing changes to original model file."
-            echo
-
-            console.wrn "Writing file."
-            echo
-            console.inf "Model file................: ${model}"
-            echo
-
-            mv "${temporary_file}" "${temporary_file%.tmp}"
-
-        else
-            console.wrn "[ OVERWRITE ] option disabled."
-            console.inf "Writing changes to model file copy."
-            echo
-            console.fwd "Writing changes to model file copy..."
-            echo
-
-            mv "${temporary_file}" "${temporary_file%.tmp}_modified_$stamp.${extension}"
-        fi
-    fi
+	done
 done
 
-# get #
+# modify --------------------------------------------------------------------- #
 
-if [[  "${option}" = "get" ]]
+if [[ "$option" == "modify" ]]
+then
+	parse_input () {
+		while true
+		do
+			read input
+
+			if [[ -z $input ]]
+			then
+				console.warning "WARNING:"
+				console.warning "Input cannot be empty."
+				console.warning "Try again."
+				echo
+			else
+				break
+			fi
+		done
+	}
+
+	parse_colors () {
+		parse_input
+
+		# set to lowercase for input match
+
+		color_input="${input,,}"
+
+		while IFS=$' '
+		read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
+		do
+			# color input entries cleanup
+
+			# color name
+
+			# remove underscores from name
+
+			space_name="${ldraw_color_name//_/ }"
+
+			# set name to lowercase for input match
+
+			name="${space_name,,}"
+
+			# reattribute input variable to lowercase name value
+
+			ldraw_color_name="${name}"
+
+			# color hex value
+
+			# remove pound from name
+
+			hex_value="${ldraw_color_hex_value//#/}"
+
+			# set name to lowercase for input match
+
+			hex_value="${hex_value,,}"
+
+			# attribute input variable to lowercase name value
+
+			ldraw_color_hex_value="${hex_value}"
+
+			if [[ "$color_input" == "$ldraw_color_name" ]] || \
+			   [[ "$color_input" == "$ldraw_color_number" ]] || \
+			   [[ "$color_input" == "$ldraw_color_hex_value" ]]
+			then
+				# confirmation
+
+				console.fwd "Confirming input value:"
+				echo
+				console.info "Color name................: ${ldraw_color_name}"
+				console.info "Color number..............: ${ldraw_color_number}"
+				console.info "Color hexadecimal value...: ${ldraw_color_hex_value}"
+				echo
+
+				return "$ldraw_color_number"
+			fi
+
+		done < "$colors"
+
+		console.error "No available color matches the input."
+		console.fwd "Exiting."
+		echo
+
+		exit 1
+	}
+
+	parse_parts () {
+		parse_input
+		part_input="$input"
+
+		return "$part_input"
+	}
+
+	# get input
+
+	if [[ "$modify_option" = "color" ]]
+	then
+		console.input "Enter the color description [ name / number / hexadecimal ] to modify."
+		parse_colors
+
+		# $? returning wrong arbitrary value
+
+		old_color="$ldraw_color_number"
+
+		console.input "Enter the color description [ name / number / hexadecimal ] to set."
+		parse_colors
+
+		# $? returning wrong arbitrary value
+
+		new_color="$ldraw_color_number"
+	fi
+
+	if [[ "$modify_option" = "part" ]]
+	then
+		console.input "Enter the part number to modify."
+		parse_parts
+
+		# $? returning wrong arbitrary value
+
+		old_part="$part_input"
+
+		console.input "Enter the part number to set as replacement."
+		parse_parts
+
+		# $? returning wrong arbitrary value
+
+		new_part="$part_input"
+	fi
+
+	if [[ "$modify_option" = "bind" ]]
+	then
+		console.input "Enter the part number to modify."
+		parse_parts
+
+		# $? returning wrong arbitrary value
+
+		part_selection="$part_input"
+
+		console.input "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
+		parse_colors
+
+		# $? returning wrong arbitrary value
+
+		old_color="$ldraw_color_number"
+
+		console.input "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
+		parse_colors
+
+		# $? returning wrong arbitrary value for $new_color
+
+		new_color="$ldraw_color_number"
+	fi
+
+	# substitution
+
+	IFS=' '
+
+	for extension in ${extensions_list[@]}
+	do
+		echo $(find ${directory} -iname "*.$extension") | while read -r model
+		do
+			model_export="${model##*/}"
+			model_export_name="${model_export%.*}"
+			model_export_name_clean="${model_export_name:5}"
+
+			temporary_file="$model.tmp"
+
+# modify: read model --------------------------------------------------------- #
+
+			# initialize line count
+
+			line_number=0
+
+			# parse
+
+			while IFS=
+			read -r line
+			do
+				line_number=$(( $line_number + 1 ))
+
+# modify: lint --------------------------------------------------------------- #
+
+				# model file linting
+
+				if [[ "$modify_option" = "lint" ]]
+				then
+					console.warning "Cleaning up model file."
+					echo
+					console.info "Model file................: $model"
+					echo
+
+						# substitute carriage return for newline
+						# substitute lines containing empty parsing string # BUG #
+						# substitute multiple whitespace characters to one
+
+						# delete lines beginning with whitespace character
+						# delete lines beginning with dot character
+						# delete lines containing BACKGROUND meta
+						# delete lines containing PIVOT meta
+						# delete lines containing HIDDEN meta
+						# strip '(' character
+						# strip ')' character
+
+					sed \
+						-e 's/\r//g' \
+						-e 's/0 STEP  *\./0 STEP/g' \
+						-e 's/  */ /g' \
+						-e '/  *\./d' \
+						-e '/^ /d' \
+						-e '/^\./d' \
+						-e '/BACKGROUND/d' \
+						-e '/PIVOT/d' \
+						-e '/HIDDEN/d' \
+						-e 's/(//g' \
+						-e 's/)//g' \
+						-e '/^$/d' "$model" > "$temporary_file"
+
+						# exit to avoid line breakdown iteration and overwrite
+
+						break
+				fi
+
+				# line breakdown for other functions
+
+
+				if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
+				then
+					# skip header and footer lines containing matching patterns
+					# prevents model file syntax modification
+
+					echo "$line" >> "$temporary_file"
+					continue
+				else
+					# read lines and parse
+					# model_data is either a part file reference or a submodel
+
+					IFS=' '
+					read -r flag color x y z a b c d e f g h i model_data <<< "$line"
+
+					vect_x="$a $b $c"
+					vect_y="$d $e $f"
+					vect_z="$g $h $i"
+
+					# â¡ a d g 0 â¤	â¡ a b c x â¤
+					# â¢ b e h 0 â¥	â¢ d e f y â¥
+					# â¢ c f i 0 â¥	â¢ g h i z â¥
+					# â£ x y z 1 â¦	â£ 0 0 0 1 â¦
+
+					# set IFS
+
+					IFS='.'
+
+					# split part argument into part number and part extension
+
+					read part suffix <<< "$model_data"
+
+					IFS=' '
+
+# modify: color -------------------------------------------------------------- #
+
+					# color substitution
+
+					if [[ "$modify_option" = "color" ]]
+					then
+						if [[ "$color" = "$old_color" ]]
+						then
+							color="$new_color"
+
+							console.info "Modifying.................: $model"
+							echo
+							console.info "Changing..................: $old_color"
+							console.info "Setting...................: $new_color "
+							echo
+						else
+							: # pass
+						fi
+					fi
+
+# modify: part --------------------------------------------------------------- #
+
+					# part substitution
+
+					if [[ "$modify_option" = "part" ]]
+					then
+						if [[ "$part" = "$old_part" ]]
+						then
+							part="$new_part"
+
+							console.info "Modifying.................: $model"
+
+							echo
+							console.info "Changing..................: $old_part"
+							console.info "Setting...................: $new_part "
+							echo
+						else
+							: # pass
+						fi
+					fi
+
+# modify: bind --------------------------------------------------------------- #
+
+					# bind [ part + color ] color substitution
+
+					if [[ "$modify_option" = "bind" ]]
+					then
+						if [[ "$part" == "$part_selection" ]]
+						then
+							if [[ "$color" = "$old_color" ]]
+							then
+								color="$new_color"
+
+								console.info "Modifying.................: $model"
+								echo
+								console.info "Part......................: $part"
+								echo
+								console.info "Changing..................: $old_color"
+								console.info "Setting...................: $new_color "
+								echo
+							else
+								: # pass
+							fi
+						fi
+					fi
+
+# modify: step --------------------------------------------------------------- #
+
+					# step submodel [ldr] separation
+
+					if [[ "$modify_option" = "step" ]]
+					then
+							if [[ "$line" == *ldr* ]]
+							then
+									if [[ "$suffix" == *ldr* ]]
+									then
+											color="0"
+											suffix="ldr\n0 STEP"
+									else
+											: # pass
+									fi
+							fi
+					fi
+
+# modify: format ------------------------------------------------------------- #
+
+					# file structure and meta substitution
+
+					if [[ "$modify_option" = "format" ]]
+					then
+						# strip lines that match the following expressions
+						# comment out to keep
+
+						if [[ "$line" = *"New Model"* ]]
+						then
+							: # pass
+
+						elif [[ "$line" = *Name* ]]
+						then
+							: # pass
+
+						elif [[ "$line" = *Unofficial* ]]
+						then
+							: # pass
+
+						elif [[ "$line" = *Untitled* ]]
+						then
+							: # pass
+
+						elif [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
+						then
+							IFS=' '
+							read -r flag statement author_model author author_string <<< "$line"
+
+							if [ ! -e "./author" ]
+							then
+								console.warning "No author file found."
+								console.question "Create author file?"
+								console.choice
+								echo
+
+								read reply
+
+								if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+								then
+									console.input "Enter author information:"
+									echo
+
+									parse_input
+
+									author_input="$input"
+
+									echo "$author_input" > ./author
+
+									author_string=$(echo $(cat ./author))
+								else
+									console.warning "No author string/file specified."
+									console.fwd "Skipping."
+									echo
+
+									line=""
+								fi
+
+							else
+								if [ -e "./author" ]
+								then
+									author_string=$(echo $(cat ./author))
+								fi
+							fi
+
+							echo "$line" >> "$temporary_file"
+
+						elif [[ "$line" = *BACKGROUND* ]]
+						then
+							IFS=' '
+							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "$line"
+
+							: # pass
+
+						elif [[ "$line" = *"GROUP BEGIN"* ]]
+						then
+							IFS=' '
+							read -r flag statement group group_begin group_name <<< "$line"
+
+							: # pass
+
+						elif [[ "$line" = *"GROUP END"* ]]
+						then
+							IFS=' '
+							read -r flag statement group group_end <<< "$line"
+
+							: # pass
+
+						elif [[ "$line" = *PIVOT* ]]
+						then
+							IFS=' '
+							read -r flag statement piece pivot pivot_coordinates <<< "$line"
+
+							: # pass
+
+						elif [[ "$line" = *HIDDEN* ]]
+						then
+							IFS=' '
+							read -r flag statement piece hidden <<< "$line"
+
+							: # pass
+						else
+							# if line contains '!LEOCAD' tag
+
+							if [[ "$line" == *!LEOCAD* ]]
+							then
+								# skip header and footer lines containing matching patterns
+								# prevents model file syntax modification
+
+								echo "$line" >> "$temporary_file"
+
+								continue
+							fi
+
+							# if line contains 'NOFILE' tag
+
+							if [[ "$line" == *NOFILE* ]]
+							then
+								# skip header and footer lines containing matching patterns
+								# prevents model file syntax modification
+
+								echo "$line" >> "$temporary_file"
+
+								continue
+							fi
+
+							# if line contains 'FILE' tag
+
+							if [[ "$line" == *FILE* ]]
+							then
+								IFS=' '
+								read -r flag statement file_name <<< "$line"
+
+								# spaces to dashes
+
+								clean_file_name="${clean_file_name// /-}"
+
+								# string to lower case
+
+								clean_file_name="${clean_file_name,,}"
+
+								# write changes to tempporary file
+
+								echo "$flag $statement $clean_file_name" >> "$temporary_file"
+							else
+								# parse all other lines and format submodel string
+
+								IFS=' '
+								read -r flag color x y z a b c d e f g h i model_data <<< "$line"
+
+								# spaces to dashes
+
+								clean_model_data="${clean_model_data// /-}"
+
+								# string to lower case
+
+								clean_model_data="${clean_model_data,,}"
+
+								vect_x="$a $b $c"
+								vect_y="$d $e $f"
+								vect_z="$g $h $i"
+
+								# â¡ a d g 0 â¤	â¡ a b c x â¤
+								# â¢ b e h 0 â¥	â¢ d e f y â¥
+								# â¢ c f i 0 â¥	â¢ g h i z â¥
+								# â£ x y z 1 â¦	â£ 0 0 0 1 â¦
+
+							fi
+						fi
+					fi
+
+					# reset IFS
+
+					IFS=" "
+
+					# write changes to tempporary file
+
+					echo -e "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part.$suffix" >> "$temporary_file"
+				fi
+
+			done < "$model" # feed model file into loop for parsing
+
+			# Set current date stamp
+
+			stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
+# modify: overwrite ---------------------------------------------------------- #
+
+			# write changes to file?
+
+			if [[ "$overwrite_option" = "overwrite" ]]
+			then
+				console.warning "[ OVERWRITE ] option enabled!"
+				console.info "Writing changes to original model file!"
+				echo
+
+				console.warning "Writing file."
+				echo
+				console.info "Model file................: $model"
+				echo
+
+				mv "$temporary_file" "${temporary_file%.tmp}"
+			fi
+
+			if [ -z "$overwrite_option" ]
+			then
+				console.question "Write changes to original model file?"
+				console.choice
+				echo
+				console.info "Model file................: $model"
+				echo
+
+				read reply
+
+				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+				then
+					console.warning "[ OVERWRITE ] option enabled!"
+					console.info "Writing changes to original model file."
+					echo
+
+					console.warning "Writing file."
+					echo
+					console.info "Model file................: $model"
+					echo
+
+					mv "$temporary_file" "${temporary_file%.tmp}"
+
+				else
+					console.warning "[ OVERWRITE ] option disabled."
+					console.info "Writing changes to model file copy."
+					echo
+					console.fwd "Writing changes to model file copy."
+					echo
+
+					mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.$extension"
+				fi
+			fi
+		done
+	done
+fi
+
+# get ------------------------------------------------------------------------ #
+
+if [[  "$option" = "get" ]]
 then
 	parts_url="https://www.ldraw.org/library/updates/complete.zip"
 
@@ -1224,11 +1604,12 @@ then
 
 	if [ -z "$directory" ]
 	then
-		console.ask  "Specify download location?"
-		
+		console.question "Specify download location?"
+		console.choice
 		echo
 
-		
+		read reply
+
 		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 		then
 			# specify directory location or exit on 'cancel'
@@ -1239,8 +1620,8 @@ then
 		else
 			directory="./"
 
-			console.wrn "No directory location specified."
-			console.wrn "Downloading into current directory."
+			console.warning "No directory location specified."
+			console.warning "Downloading into current directory."
 			echo
 		fi
 
@@ -1248,17 +1629,18 @@ then
 	fi
 fi
 
-# make list #
+# make list ------------------------------------------------------------------ #
 
-if [[  "${option}" = "make-list" ]]
+if [[  "$option" = "make-list" ]]
 then
 	if [ -z "$directory" ]
 	then
-		console.wrn "Is the LDraw parts library setup on this system?"
+		console.warning "Is the LDraw parts library setup on this system?"
+		console.choice
 		echo
 
 		read reply
-		
+
 		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 		then
 			# specify directory location or exit on 'cancel'
@@ -1266,43 +1648,43 @@ then
 			browse=$(dialog "Load LDraw library") || exit 1
 
 			cd "$browse" || exit 1
-			
+
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
-				console.scs "LDraw parts library exists."
-				console.scs "Operating within the LDraw parts directory."
-				echo
-				console.fwd "Continuing..."
+				console.success "LDraw parts library exists."
+				console.success "Operating within the LDraw parts directory."
+				console.fwd "Continuing."
 				echo
 
 				directory="$browse/parts"
 			else
-				console.err  "LDraw library directory not recognized: 'parts' directory not found."
+				console.error "LDraw library directory not recognized: 'parts' directory not found."
 			fi
 		else
-			console.wrn "LDraw parts directory not found."
-			console.ask  "Specify the LDraw parts library directory location to continue?"
+			console.warning "LDraw parts directory not found."
+			console.question "Specify the LDraw parts library directory location to continue?"
+			console.choice
 			echo
 
 			read reply
 
-            if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-            then
+			if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+			then
 				# specify directory location or exit on 'cancel'
 
 				browse=$(dialog) || exit 1
 
 				directory="$browse/parts"
 			else
-				console.ask  "Download the latest LDraw parts library?"
-				
+				console.question "Download the latest LDraw parts library?"
+				console.choice
 				echo
 
 				read reply
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					console.fwd "Specify setup location..."
+					console.fwd "Specify setup location."
 					echo
 
 					# specify directory location or exit on 'cancel'
@@ -1315,15 +1697,15 @@ then
 
 					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
 				else
-					console.err  "LDraw parts directory not setup on system."
+					console.error "LDraw parts directory not setup on system."
 					echo
-					console.wrn "The parts.lst file may be needed for some legacy editors to function."
+					console.warning "The parts.lst file may be needed for some legacy editors to function."
 					echo
-					console.inf "Visit http://www.ldraw.org to get started."
-					console.inf "You can download and extract the LDraw parts library on your system manually."
-					console.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
+					console.info "Visit http://www.ldraw.org to get started."
+					console.info "You can download and extract the LDraw parts library on your system manually."
+					console.info "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo
-					console.fwd "Exiting..."
+					console.fwd "Exiting."
 					echo
 
 					exit 1
@@ -1338,8 +1720,8 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		console.wrn "Previous instance of the parts.lst file found."
-		console.inf "Backing up."
+		console.warning "Previous instance of the parts.lst file found."
+		console.info "Backing up..."
 		echo
 
 		mv parts.lst parts.lst.bak
@@ -1349,11 +1731,11 @@ then
 
 	if [[ "$sort_mode" == "description" ]] || [[ "$sort_mode" == "number" ]]
 	then
-		console.inf "Utility startedusing the $sort_mode option flag."
+		console.info "Utility startedusing the $sort_mode option flag."
 	else
-		console.wrn "No sorting method specified."
-		console.ask  "Which sorting method should be used for parsing the parts list?"
-		console.ask  "[ [dD]escription / [nN]umber ]"
+		console.warning "No sorting method specified."
+		console.question "Which sorting method should be used for parsing the parts list?"
+		console.question "[ [dD]escription / [nN]umber ]"
 		echo
 
 		read reply
@@ -1374,7 +1756,7 @@ then
 
 		for extension in ${extensions_list[@]}
 		do
-			for part in $(echo $(find ${directory} -iname *.${extension}))
+			for part in $(echo $(find ${directory} -iname *.$extension))
 			do
 				filename="${part##*/}"
 				header="$(head -n 1 "$part")"
@@ -1396,7 +1778,7 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					console.inf "Parts count...............: $((count++))\c"
+					console.info "Parts count...............: $((count++))\c"
 					echo
 				fi
 			done
@@ -1432,7 +1814,4 @@ then
 	fi
 fi
 
-# complete #
-
-console.scs "Done."
-echo
+# complete --------------------------------
