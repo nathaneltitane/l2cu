@@ -2,7 +2,7 @@
 
 # Author: Nathanel Titane - nathanel.titane@gmail.com
 
-# LÂ²CU # l2cu # linux ldraw command line utility #
+# L²CU # l2cu # linux ldraw command line utility #
 
 # version #
 
@@ -383,11 +383,11 @@ do
 				coordinates="${2}"
 
 				leocad \
-					-h "${height}"                                                         \
-					-w "${width}"                                                          \
-					-i "${model_name}-${view[$coordinates]}.${extension}"                  \
+					-h "${height}"														 \
+					-w "${width}"														  \
+					-i "${model_name}-${view[$coordinates]}.${extension}"				  \
 					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}   \
-					--shading ${shading}                                                   \
+					--shading ${shading}												   \
 					--line-width ${line_width} "${model}" >> /dev/null
 			}
 
@@ -822,18 +822,18 @@ then
 						# strip '(' character
 						# strip ')' character
 
-					sed                                                   \
-						-e 's/\r//g'                                      \
-						-e 's/0 STEP  *\./0 STEP/g'                       \
-						-e 's/  */ /g'                                    \
-						-e '/  *\./d'                                     \
-						-e '/^ /d'                                        \
-						-e '/^\./d'                                       \
-						-e '/BACKGROUND/d'                                \
-						-e '/PIVOT/d'                                     \
-						-e '/HIDDEN/d'                                    \
-						-e 's/(//g'                                       \
-						-e 's/)//g'                                       \
+					sed												   \
+						-e 's/\r//g'									  \
+						-e 's/0 STEP  *\./0 STEP/g'					   \
+						-e 's/  */ /g'									\
+						-e '/  *\./d'									 \
+						-e '/^ /d'										\
+						-e '/^\./d'									   \
+						-e '/BACKGROUND/d'								\
+						-e '/PIVOT/d'									 \
+						-e '/HIDDEN/d'									\
+						-e 's/(//g'									   \
+						-e 's/)//g'									   \
 						-e '/^$/d' "${model}" > "${temporary_file}"
 
 						# exit to avoid line breakdown iteration and overwrite

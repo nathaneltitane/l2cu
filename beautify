@@ -13,7 +13,7 @@ context = bpy.context
 # prepare scene #
 
 for obj in context.scene.objects:
-    obj.select = True
+	obj.select = True
 
 bpy.ops.object.delete()
 
@@ -29,16 +29,16 @@ bpy.ops.object.join()
 
 # normalize transforms #
 bpy.ops.object.transform_apply(
-    location = True,
-    rotation = True,
-    scale = True
+	location = True,
+	rotation = True,
+	scale = True
 )
 
 # add smooth shade and edge split modifiers #
 
 bpy.ops.object.shade_smooth()
 bpy.ops.object.modifier_add(
-    type = "EDGE_SPLIT"
+	type = "EDGE_SPLIT"
 )
 
 # remove doubles #
@@ -52,7 +52,7 @@ bpy.ops.mesh.select_loose()
 bpy.ops.mesh.delete(type='VERT')
 
 bpy.ops.mesh.normals_make_consistent(
-    inside = False
+	inside = False
 )
 bpy.ops.object.editmode_toggle()
 
@@ -60,8 +60,8 @@ bpy.ops.object.editmode_toggle()
 
 blend_file = export_model.replace(".3ds",".blend")
 bpy.ops.wm.save_as_mainfile(
-    filepath = blend_file,
-    compress = True
+	filepath = blend_file,
+	compress = True
 )
 
 # print output #
