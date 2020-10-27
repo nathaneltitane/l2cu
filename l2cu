@@ -244,7 +244,7 @@ download () {
 if [ -z "${directory}" ]
 then
 	console.ask "Load model files from:"
-	echo""
+	echo
 
 	# specify directory location or exit on 'cancel'
 
@@ -255,11 +255,11 @@ fi
 
 get_library () {
 
-	parts_archive=$(basename "${part}s_url")
+	parts_archive=$(basename "${parts_url}")
 
 	# download
 
-	download "${part}s_url" > "${directory}"/"${parts_archive}" &
+	download "${parts_url}" > "${directory}"/"${parts_archive}" &
 
 	console.download "Downloading..."
 	echo
@@ -325,7 +325,6 @@ clear
 
 # confirmation #
 
-echo
 console.msg "Utility started using the '${extension_option}' extension option."
 console.msg "Utility started using the '${option}' option."
 echo
@@ -383,11 +382,11 @@ do
 				coordinates="${2}"
 
 				leocad \
-					-h "${height}"														 \
-					-w "${width}"														  \
-					-i "${model_name}-${view[$coordinates]}.${extension}"				  \
-					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}   \
-					--shading ${shading}												   \
+					-h "${height}"															\
+					-w "${width}"															\
+					-i "${model_name}-${view[$coordinates]}.${extension}"					\
+					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
+					--shading ${shading}													\
 					--line-width ${line_width} "${model}" >> /dev/null
 			}
 
@@ -607,7 +606,7 @@ do
 
 			# verify export file size
 
-			model_size=$(ls -s --block-size=MB "$export_file" | awk '{print $1}')
+			model_size=$(ls -s --block-size=MB "${export_file}" | awk '{print $1}')
 
 			model_size_threshold="25"
 			model_size_number="${model_size%MB}"
@@ -678,8 +677,8 @@ then
 
 			ldraw_color_hex_value="${hex_value}"
 
-			if [[ "${color_input}" == "${ldraw_color_name}" ]] || \
-			   [[ "${color_input}" == "${ldraw_color_number}" ]] || \
+			if [[ "${color_input}" == "${ldraw_color_name}" ]]		|| \
+			   [[ "${color_input}" == "${ldraw_color_number}" ]]	|| \
 			   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
 			then
 				# confirmation
@@ -822,18 +821,18 @@ then
 						# strip '(' character
 						# strip ')' character
 
-					sed												   \
-						-e 's/\r//g'									  \
-						-e 's/0 STEP  *\./0 STEP/g'					   \
+					sed													\
+						-e 's/\r//g'									\
+						-e 's/0 STEP  *\./0 STEP/g'						\
 						-e 's/  */ /g'									\
-						-e '/  *\./d'									 \
+						-e '/  *\./d'									\
 						-e '/^ /d'										\
-						-e '/^\./d'									   \
+						-e '/^\./d'										\
 						-e '/BACKGROUND/d'								\
-						-e '/PIVOT/d'									 \
+						-e '/PIVOT/d'									\
 						-e '/HIDDEN/d'									\
-						-e 's/(//g'									   \
-						-e 's/)//g'									   \
+						-e 's/(//g'										\
+						-e 's/)//g'										\
 						-e '/^$/d' "${model}" > "${temporary_file}"
 
 						# exit to avoid line breakdown iteration and overwrite
@@ -860,11 +859,6 @@ then
 					vect_x="$a $b $c"
 					vect_y="$d $e $f"
 					vect_z="$g $h $i"
-
-					# â¡ a d g 0 â¤	â¡ a b c x â¤
-					# â¢ b e h 0 â¥	â¢ d e f y â¥
-					# â¢ c f i 0 â¥	â¢ g h i z â¥
-					# â£ x y z 1 â¦	â£ 0 0 0 1 â¦
 
 					# set IFS
 
