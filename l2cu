@@ -13,10 +13,10 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 while (($#))
 do
-	case "$1" in
+	case "${1}" in
 		-directory)
 			shift
-			directory="$1"
+			directory="${1}"
 			;;
 
 # file types #
@@ -150,7 +150,7 @@ do
 		-h|--help)
 			echo -e "USAGE"
 			echo
-			echo -e "./$script [EXTENSION OPTION] [OPTION] [PARAMETER]"
+			echo -e "./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
 			echo
 			echo -e "Utility options:"
 			echo
@@ -213,14 +213,14 @@ do
 			;;
 		-v|--version)
 			echo
-			echo -e "$script $version"
+			echo -e "${script} ${version}"
 			echo
 			exit
 			;;
 		*)
 			echo
-			echo -e "$script: Unknown option $1"
-			echo -e "Type './$script --help' for help and usage information."
+			echo -e "${script}: Unknown option ${1}"
+			echo -e "Type './${script} --help' for help and usage information."
 			echo
 			exit
 			;;
@@ -241,7 +241,7 @@ download () {
 
 # if 'directory' option is not passed
 
-if [[ -z "$directory" ]]
+if [[ -z "${directory}" ]]
 then
 	console.ask "Load model files from:"
 	echo""
@@ -259,21 +259,21 @@ get_library () {
 
 	# download
 
-	download "$parts_url" > "$directory/$parts_archive" &
+	download "$parts_url" > "${directory}"/"${parts_archive}" &
 
 	console.spinner "Downloading..."
 	echo
 
 	# extract
 
-	unzip "$parts_archive" &
+	unzip "${parts_archive}" &
 
 	console.spinner "Extracting..."
 	echo
 
 	# rename
 
-	mv "$parts_archive" ldraw.zip
+	mv "${parts_archive}" ldraw.zip
 }
 
 # initial prompt clear #
@@ -282,14 +282,14 @@ clear
 
 # make temporary file: export #
 
-if [[ "$option" == "export" ]]
+if [[ "${option}" == "export" ]]
 then
 	beautify=$(mktemp /tmp/beautify.XXXXXX)
-	trap 'rm -rf "$beautify"' EXIT
+	trap 'rm -rf "${beautify}"' EXIT
 
 	# push blender conversion script to temporary file
 
-	cat > "$beautify" <<- 'PYTHON'
+	cat > "${beautify}" <<- 'PYTHON'
 	#!/usr/bin/env python3
 
 	import os
@@ -365,14 +365,14 @@ fi
 
 # make temporary file: modify #
 
-if [[  $option == "modify" ]]
+if [[  ${option} == "modify" ]]
 then
 	colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
-	trap 'rm -rf "$colors"' EXIT
+	trap 'rm -rf "${colors}"' EXIT
 
 	# push ldraw colors list to temporary file
 
-	cat > "$colors" <<- 'COLORS'
+	cat > "${colors}" <<- 'COLORS'
 	Black                                   0          #05131D
 	Blue                                    1          #0055BF
 	Green                                   2          #257A3E
@@ -543,22 +543,22 @@ clear
 # confirmation #
 
 echo
-console.inf "Utility started using the $extension_option extension option."
-console.inf "Utility started using the $option option."
+console.inf "Utility started using the ${extension}_option extension option."
+console.inf "Utility started using the ${option} option."
 echo
 
-if [[ "$option" = "render" ]]
+if [[ "${option}" = "render" ]]
 then
-	console.inf "Utility started using the $render_option camera preset."
+	console.inf "Utility started using the ${render_option} camera preset."
 	echo
 
-elif [[ "$option" = "export" ]]
+elif [[ "${option}" = "export" ]]
 then
 	console.inf "Utility started using the $export_name export parameter."
 	echo
 fi
 
-if [[ "$option" = "overwrite" ]]
+if [[ "${option}" = "overwrite" ]]
 then
 	console.wrn "WARNING:"
 	console.wrn "Utility started using the overwrite option."
@@ -573,7 +573,7 @@ echo
 
 for extension in ${extensions_list[@]}
 do
-	for model in $(echo $(find ${directory} -iname "*.$extension"))
+	for model in $(echo $(find ${directory} -iname "*.${extension}"))
 	do
 		# get model file name from path
 
@@ -587,7 +587,7 @@ do
 
 # render #
 
-		if [[ "$option" = "render" ]]
+		if [[ "${option}" = "render" ]]
 		then
 			# define render routine
 
@@ -596,31 +596,31 @@ do
 				height="4096"
 				width="4096"
 				extension="png"
-				model=$1
-				coordinates=$2
+				model="${1}"
+				coordinates="${2}"
 
 				leocad \
-					-h "$height" \
-					-w "$width" \
-					-i "${model_name}-${view[$coordinates]}.${extension}" \
-					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]} \
-					--shading ${shading} \
-					--line-width ${line_width} "$model" >> /dev/null
+					-h "${height}"                                                         \
+					-w "${width}"                                                          \
+					-i "${model_name}-${view[$coordinates]}.${extension}"                  \
+					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}   \
+					--shading ${shading}                                                   \
+					--line-width ${line_width} "${model}" >> /dev/null
 			}
 
 			# define render output directory
 
 			# use model directory as root
 
-			renders_directory="${model%/*}/renders/"
+			renders_directory="${model%/*}"/renders
 
 			# use render directory as root
 
-			background_directory="${model%/*}/renders/background"
+			background_directory="${model%/*}"/renders/background
 
 			# use render directory as root
 
-			flat_directory="${model%/*}/renders/flat"
+			flat_directory="${model%/*}"/renders/flat
 
 			# define render parameters for all presets
 
@@ -653,47 +653,47 @@ do
 
 			# define camera position presets
 
-			if [[ "$render_preset" == "full" ]]
+			if [[ "${render_preset}" == "full" ]]
 			then
 				position=(0 1 2 3)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$render_preset" == "fixed" ]]
+			if [[ "${render_preset}" == "fixed" ]]
 			then
 				position=(0 1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$render_preset" == "quarter-back" ]]
+			if [[ "${render_preset}" == "quarter-back" ]]
 			then
 				position=(0)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$render_preset" == "quarter-front" ]]
+			if [[ "${render_preset}" == "quarter-front" ]]
 			then
 				position=(1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$render_preset" == "back" ]]
+			if [[ "${render_preset}" == "back" ]]
 			then
 				position=(2)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "$render_preset" == "front" ]]
+			if [[ "${render_preset}" == "front" ]]
 			then
 				position=(3)
 			fi
 
-			if [[ "$render_preset" == "flat" ]]
+			if [[ "${render_preset}" == "flat" ]]
 			then
 				position=(1)
 				shading=flat
@@ -704,19 +704,19 @@ do
 
 			# render model using options
 
-			console.inf "Rendering in..............: $renders_directory"
+			console.inf "Rendering in..............: ${renders_directory}"
 			echo
 
 			for coordinates in ${position[@]}
 			do
 				# check for the renders directory existence
 
-				if [ ! -d "$renders_directory" ]
+				if [ ! -d "${renders_directory}" ]
 				then
-					mkdir -p "$renders_directory"
+					mkdir -p "${renders_directory}"
 				fi
 
-				cd "$renders_directory" || exit 1
+				cd "${renders_directory}" || exit 1
 
 				# render
 
@@ -724,27 +724,27 @@ do
 				console.inf "View......................: ${view[coordinates]^^}"
 				echo
 
-				run_leocad "$model" $coordinates
+				run_leocad "${model}" $coordinates
 
 				wait
 
 				# create flat splash image
 
-				if [[ "$render_option" == "flat" ]]
+				if [[ "${render_option}" == "flat" ]]
 				then
 					# Rename renders to designated splash images
 
-					mv "$model_name-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
+					mv "${model_name}-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
 				fi
 			done
 
-			console.inf "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
+			console.inf "Output....................: ${renders_directory}/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
 # export #
 
-		if [[ "$option" == "export" ]]
+		if [[ "${option}" == "export" ]]
 		then
 			export_file="${model_name}.${export_extension}"
 
@@ -767,46 +767,46 @@ do
 
 			run_leocad () {
 
-				console.inf "Exporting.................: $model"
+				console.inf "Exporting.................: ${model}"
 				console.inf "Format....................: ${export_name}"
 				echo
 
-				leocad "$model" "-$export_option" "$export_file" >> /dev/null
+				leocad "${model}" "-${export_option}" "$export_file" >> /dev/null
 
 				wait
 			}
 
 			# check for the exports directory existence
 
-			if [[ ! -d "$exports_directory" ]]
+			if [[ ! -d "${exports_directory}" ]]
 			then
-				mkdir -p "$exports_directory"
+				mkdir -p "${exports_directory}"
 			fi
 
-			cd "$exports_directory" || exit 1
+			cd "${exports_directory}" || exit 1
 
 			# export
 
-			if [[ "$export_option" = "3ds" ]] || \
-			   [[ "$export_option" = "dae" ]] || \
-			   [[ "$export_option" = "obj" ]]
+			if [[ "${export_option}" = "3ds" ]] || \
+			   [[ "${export_option}" = "dae" ]] || \
+			   [[ "${export_option}" = "obj" ]]
 			then
 				run_leocad
 
 				wait
 
-				if [[ "$export_option" = "obj" ]]
+				if [[ "${export_option}" = "obj" ]]
 				then
 					# archive wavefront model elements
 
-					zip "$export_file_archive" "$export_file_object" "$export_file_material"
+					zip "${export_file_archive}" "${export_file_object}" "${export_file_material}"
 
 					# cleanup
 
 					rm -rf {*.obj,*.mtl}
 				fi
 
-			elif [[ "$export_option" = "blender" ]]
+			elif [[ "${export_option}" = "blender" ]]
 			then
 				run_leocad
 
@@ -815,11 +815,11 @@ do
 
 				# import 3ds file into blender to create optimized blend file
 
-				blender --background --python "$beautify" "$export_file_3ds" >> /dev/null
+				blender --background --python "${beautify}" "${export_file_3ds}" >> /dev/null
 
 				# cleanup
 
-				rm -rf "$export_file_3ds"
+				rm -rf "${export_file_3ds}"
 			fi
 
 			# verify export file size
@@ -831,16 +831,16 @@ do
 
 			# if lesser than threshold
 
-			if [[ "$model_size_number" -le "$model_size_threshold" ]]
+			if [[ "${model_size_number}" -le "${model_size_threshold}" ]]
 			then
-				console.scs "File size threshold not exceeded - [ $model_size ]"
+				console.scs "File size threshold not exceeded - [ ${model_size} ]"
 				echo
 
 			# if greater than threshold
 
-			elif [[ "$model_size_number" -gt "$model_size_threshold" ]]
+			elif [[ "${model_size_number}" -gt "${model_size_threshold}" ]]
 			then
-				console.error "File size threshold exceeded - [ $model_size ]"
+				console.error "File size threshold exceeded - [ ${model_size} ]"
 				echo
 				console.wrn "WARNING:"
 				console.inf "Model file size is above recommended threshold of ${model_size_threshold}MB"
@@ -853,7 +853,7 @@ done
 
 # modify #
 
-if [[ "$option" == "modify" ]]
+if [[ "${option}" == "modify" ]]
 then
 	parse_colors () {
 		console.empty
@@ -911,7 +911,7 @@ then
 				return "$ldraw_color_number"
 			fi
 
-		done < "$colors"
+		done < "${colors}"
 
 		console.error "No available color matches the input."
 		echo
@@ -994,7 +994,7 @@ then
 
 	for extension in ${extensions_list[@]}
 	do
-		echo $(find ${directory} -iname "*.$extension") | while read -r model
+		echo $(find ${directory} -iname "*.${extension}") | while read -r model
 		do
 			model_export="${model##*/}"
 			model_export_name="${model_export%.*}"
@@ -1050,7 +1050,7 @@ then
 						-e '/HIDDEN/d' \
 						-e 's/(//g' \
 						-e 's/)//g' \
-						-e '/^$/d' "$model" > "$temporary_file"
+						-e '/^$/d' "${model}" > "$temporary_file"
 
 						# exit to avoid line breakdown iteration and overwrite
 
@@ -1359,7 +1359,7 @@ then
 					echo -e "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part.$suffix" >> "$temporary_file"
 				fi
 
-			done < "$model" # feed model file into loop for parsing
+			done < "${model}" # feed model file into loop for parsing
 
 			# Set current date stamp
 
@@ -1413,7 +1413,7 @@ then
 					console.fwd "Writing changes to model file copy."
 					echo
 
-					mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.$extension"
+					mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.${extension}"
 				fi
 			fi
 		done
@@ -1422,7 +1422,7 @@ fi
 
 # get #
 
-if [[  "$option" = "get" ]]
+if [[  "${option}" = "get" ]]
 then
 	parts_url="https://www.ldraw.org/library/updates/complete.zip"
 
@@ -1447,7 +1447,7 @@ then
 		parts_url="$unofficial_parts_url"
 	fi
 
-	if [ -z "$directory" ]
+	if [ -z "${directory}" ]
 	then
 		console.ask "Specify download location?"
 		
@@ -1476,9 +1476,9 @@ fi
 
 # make list #
 
-if [[  "$option" = "make-list" ]]
+if [[  "${option}" = "make-list" ]]
 then
-	if [ -z "$directory" ]
+	if [ -z "${directory}" ]
 	then
 		console.wrn "Is the LDraw parts library setup on this system?"
 		
@@ -1560,7 +1560,7 @@ then
 		fi
 	fi
 
-	cd "$directory" || exit 1
+	cd "${directory}" || exit 1
 
 	# parts list verification and backup
 
@@ -1602,7 +1602,7 @@ then
 
 		for extension in ${extensions_list[@]}
 		do
-			for part in $(echo $(find ${directory} -iname *.$extension))
+			for part in $(echo $(find ${directory} -iname *.${extension}))
 			do
 				filename="${part##*/}"
 				header="$(head -n 1 "$part")"
