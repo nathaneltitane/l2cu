@@ -228,18 +228,9 @@ do
 	shift
 done
 
-curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
-
 # dependencies #
 
-install_list=(
-	leocad
-	blender
-	zip
-	unzip
-)
-
-console.install ${install_list[@]}
+curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
 
 # download #
 
@@ -536,55 +527,14 @@ fi
 console.inf "Verifying utility requirements..."
 echo
 
-binaries_list=(
+install_list=(
 	leocad
 	blender
-	curl
-	unzip
 	zip
+	unzip
 )
 
-for binary_name in ${binaries_list[@]}
-do
-	binary=$(command -v $binary_name)
-
-	# if binary is not found or unspecified
-
-	if [[ ${binary} = "" ]]
-	then
-		console.wrn "The '$binary_name' binary not found."
-		console.ask "Specify location?"
-		
-		echo
-
-		read reply
-
-		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
-		then
-			# specify binary location or exit on 'cancel'
-
-			binary_path=$(dialog "Specify location") || exit 1
-
-			binary="$binary_path/$binary"
-		else
-			console.error "No '$binary_name' binary installed on system."
-			console.inf "Install '$binary_name' using your system's package manager."
-			console.inf "Restart this utility when '$binary_name' is installed."
-			console.fwd "Exiting."
-			echo
-
-			exit 1
-		fi
-
-	# if binary exists
-
-	elif [[ ! -z "$binary" ]]
-	then
-		console.scs "'$binary' binary found on system."
-		echo
-	fi
-
-done
+console.install ${install_list[@]}
 
 # initial prompt clear #
 
