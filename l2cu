@@ -855,25 +855,8 @@ done
 
 if [[ "$option" == "modify" ]]
 then
-	parse_input () {
-		while true
-		do
-			read input
-
-			if [[ -z $input ]]
-			then
-				console.wrn "WARNING:"
-				console.wrn "Input cannot be empty."
-				console.wrn "Try again."
-				echo
-			else
-				break
-			fi
-		done
-	}
-
 	parse_colors () {
-		parse_input
+		console.empty
 
 		# set to lowercase for input match
 
@@ -938,7 +921,7 @@ then
 	}
 
 	parse_parts () {
-		parse_input
+		console.empty
 		part_input="$input"
 
 		return "$part_input"
@@ -1237,7 +1220,7 @@ then
 									console.ipt "Enter author information:"
 									echo
 
-									parse_input
+									console.empty
 
 									author_input="$input"
 
