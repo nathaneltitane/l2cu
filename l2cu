@@ -249,7 +249,7 @@ download () {
 
 if [[ -z "$directory" ]]
 then
-	consol.ask "Load model files from:"
+	console.ask "Load model files from:"
 	echo""
 
 	# specify directory location or exit on 'cancel'
@@ -530,7 +530,7 @@ fi
 
 # test for utility dependencies and requirements
 
-consol.inf "Verifying utility requirements..."
+console.inf "Verifying utility requirements..."
 echo
 
 binaries_list=(
@@ -549,8 +549,8 @@ do
 
 	if [[ ${binary} = "" ]]
 	then
-		consol.wrn "The '$binary_name' binary not found."
-		consol.ask "Specify location?"
+		console.wrn "The '$binary_name' binary not found."
+		console.ask "Specify location?"
 		
 		echo
 
@@ -565,8 +565,8 @@ do
 			binary="$binary_path/$binary"
 		else
 			console.error "No '$binary_name' binary installed on system."
-			consol.inf "Install '$binary_name' using your system's package manager."
-			consol.inf "Restart this utility when '$binary_name' is installed."
+			console.inf "Install '$binary_name' using your system's package manager."
+			console.inf "Restart this utility when '$binary_name' is installed."
 			console.fwd "Exiting."
 			echo
 
@@ -577,7 +577,7 @@ do
 
 	elif [[ ! -z "$binary" ]]
 	then
-		console.success "'$binary' binary found on system."
+		console.scs "'$binary' binary found on system."
 		echo
 	fi
 
@@ -590,26 +590,26 @@ clear
 # confirmation #
 
 echo
-consol.inf "Utility started using the $extension_option extension option."
-consol.inf "Utility started using the $option option."
+console.inf "Utility started using the $extension_option extension option."
+console.inf "Utility started using the $option option."
 echo
 
 if [[ "$option" = "render" ]]
 then
-	consol.inf "Utility started using the $render_option camera preset."
+	console.inf "Utility started using the $render_option camera preset."
 	echo
 
 elif [[ "$option" = "export" ]]
 then
-	consol.inf "Utility started using the $export_name export parameter."
+	console.inf "Utility started using the $export_name export parameter."
 	echo
 fi
 
 if [[ "$option" = "overwrite" ]]
 then
-	consol.wrn "WARNING:"
-	consol.wrn "Utility started using the overwrite option."
-	consol.wrn "Parsed model modification will be written to file directly!"
+	console.wrn "WARNING:"
+	console.wrn "Utility started using the overwrite option."
+	console.wrn "Parsed model modification will be written to file directly!"
 	echo
 fi
 
@@ -751,7 +751,7 @@ do
 
 			# render model using options
 
-			consol.inf "Rendering in..............: $renders_directory"
+			console.inf "Rendering in..............: $renders_directory"
 			echo
 
 			for coordinates in ${position[@]}
@@ -767,8 +767,8 @@ do
 
 				# render
 
-				consol.inf "Rendering.................: ${model_name^^}"
-				consol.inf "View......................: ${view[coordinates]^^}"
+				console.inf "Rendering.................: ${model_name^^}"
+				console.inf "View......................: ${view[coordinates]^^}"
 				echo
 
 				run_leocad "$model" $coordinates
@@ -785,7 +785,7 @@ do
 				fi
 			done
 
-			consol.inf "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
+			console.inf "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
@@ -814,8 +814,8 @@ do
 
 			run_leocad () {
 
-				consol.inf "Exporting.................: $model"
-				consol.inf "Format....................: ${export_name}"
+				console.inf "Exporting.................: $model"
+				console.inf "Format....................: ${export_name}"
 				echo
 
 				leocad "$model" "-$export_option" "$export_file" >> /dev/null
@@ -857,7 +857,7 @@ do
 			then
 				run_leocad
 
-				consol.inf "Converting $model ("$export_extension")..."
+				console.inf "Converting $model ("$export_extension")..."
 				echo
 
 				# import 3ds file into blender to create optimized blend file
@@ -880,7 +880,7 @@ do
 
 			if [[ "$model_size_number" -le "$model_size_threshold" ]]
 			then
-				console.success "File size threshold not exceeded - [ $model_size ]"
+				console.scs "File size threshold not exceeded - [ $model_size ]"
 				echo
 
 			# if greater than threshold
@@ -889,9 +889,9 @@ do
 			then
 				console.error "File size threshold exceeded - [ $model_size ]"
 				echo
-				consol.wrn "WARNING:"
-				consol.inf "Model file size is above recommended threshold of ${model_size_threshold}MB"
-				consol.inf "You may experience higher than average loading times."
+				console.wrn "WARNING:"
+				console.inf "Model file size is above recommended threshold of ${model_size_threshold}MB"
+				console.inf "You may experience higher than average loading times."
 				echo
 			fi
 		fi
@@ -909,9 +909,9 @@ then
 
 			if [[ -z $input ]]
 			then
-				consol.wrn "WARNING:"
-				consol.wrn "Input cannot be empty."
-				consol.wrn "Try again."
+				console.wrn "WARNING:"
+				console.wrn "Input cannot be empty."
+				console.wrn "Try again."
 				echo
 			else
 				break
@@ -967,9 +967,9 @@ then
 
 				console.fwd "Confirming input value:"
 				echo
-				consol.inf "Color name................: ${ldraw_color_name}"
-				consol.inf "Color number..............: ${ldraw_color_number}"
-				consol.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
+				console.inf "Color name................: ${ldraw_color_name}"
+				console.inf "Color number..............: ${ldraw_color_number}"
+				console.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
 				echo
 
 				return "$ldraw_color_number"
@@ -1084,9 +1084,9 @@ then
 
 				if [[ "$modify_option" = "lint" ]]
 				then
-					consol.wrn "Cleaning up model file."
+					console.wrn "Cleaning up model file."
 					echo
-					consol.inf "Model file................: $model"
+					console.inf "Model file................: $model"
 					echo
 
 						# substitute carriage return for newline
@@ -1166,10 +1166,10 @@ then
 						then
 							color="$new_color"
 
-							consol.inf "Modifying.................: $model"
+							console.inf "Modifying.................: $model"
 							echo
-							consol.inf "Changing..................: $old_color"
-							consol.inf "Setting...................: $new_color "
+							console.inf "Changing..................: $old_color"
+							console.inf "Setting...................: $new_color "
 							echo
 						else
 							: # pass
@@ -1186,11 +1186,11 @@ then
 						then
 							part="$new_part"
 
-							consol.inf "Modifying.................: $model"
+							console.inf "Modifying.................: $model"
 
 							echo
-							consol.inf "Changing..................: $old_part"
-							consol.inf "Setting...................: $new_part "
+							console.inf "Changing..................: $old_part"
+							console.inf "Setting...................: $new_part "
 							echo
 						else
 							: # pass
@@ -1209,12 +1209,12 @@ then
 							then
 								color="$new_color"
 
-								consol.inf "Modifying.................: $model"
+								console.inf "Modifying.................: $model"
 								echo
-								consol.inf "Part......................: $part"
+								console.inf "Part......................: $part"
 								echo
-								consol.inf "Changing..................: $old_color"
-								consol.inf "Setting...................: $new_color "
+								console.inf "Changing..................: $old_color"
+								console.inf "Setting...................: $new_color "
 								echo
 							else
 								: # pass
@@ -1272,8 +1272,8 @@ then
 
 							if [ ! -e "./author" ]
 							then
-								consol.wrn "No author file found."
-								consol.ask "Create author file?"
+								console.wrn "No author file found."
+								console.ask "Create author file?"
 								
 								echo
 
@@ -1292,7 +1292,7 @@ then
 
 									author_string=$(echo $(cat ./author))
 								else
-									consol.wrn "No author string/file specified."
+									console.wrn "No author string/file specified."
 									console.fwd "Skipping."
 									echo
 
@@ -1433,13 +1433,13 @@ then
 
 			if [[ "$overwrite_option" = "overwrite" ]]
 			then
-				consol.wrn "[ OVERWRITE ] option enabled!"
-				consol.inf "Writing changes to original model file!"
+				console.wrn "[ OVERWRITE ] option enabled!"
+				console.inf "Writing changes to original model file!"
 				echo
 
-				consol.wrn "Writing file."
+				console.wrn "Writing file."
 				echo
-				consol.inf "Model file................: $model"
+				console.inf "Model file................: $model"
 				echo
 
 				mv "$temporary_file" "${temporary_file%.tmp}"
@@ -1447,30 +1447,30 @@ then
 
 			if [ -z "$overwrite_option" ]
 			then
-				consol.ask "Write changes to original model file?"
+				console.ask "Write changes to original model file?"
 				
 				echo
-				consol.inf "Model file................: $model"
+				console.inf "Model file................: $model"
 				echo
 
 				read reply
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					consol.wrn "[ OVERWRITE ] option enabled!"
-					consol.inf "Writing changes to original model file."
+					console.wrn "[ OVERWRITE ] option enabled!"
+					console.inf "Writing changes to original model file."
 					echo
 
-					consol.wrn "Writing file."
+					console.wrn "Writing file."
 					echo
-					consol.inf "Model file................: $model"
+					console.inf "Model file................: $model"
 					echo
 
 					mv "$temporary_file" "${temporary_file%.tmp}"
 
 				else
-					consol.wrn "[ OVERWRITE ] option disabled."
-					consol.inf "Writing changes to model file copy."
+					console.wrn "[ OVERWRITE ] option disabled."
+					console.inf "Writing changes to model file copy."
 					echo
 					console.fwd "Writing changes to model file copy."
 					echo
@@ -1511,7 +1511,7 @@ then
 
 	if [ -z "$directory" ]
 	then
-		consol.ask "Specify download location?"
+		console.ask "Specify download location?"
 		
 		echo
 
@@ -1527,8 +1527,8 @@ then
 		else
 			directory="./"
 
-			consol.wrn "No directory location specified."
-			consol.wrn "Downloading into current directory."
+			console.wrn "No directory location specified."
+			console.wrn "Downloading into current directory."
 			echo
 		fi
 
@@ -1542,7 +1542,7 @@ if [[  "$option" = "make-list" ]]
 then
 	if [ -z "$directory" ]
 	then
-		consol.wrn "Is the LDraw parts library setup on this system?"
+		console.wrn "Is the LDraw parts library setup on this system?"
 		
 		echo
 
@@ -1558,8 +1558,8 @@ then
 
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
-				console.success "LDraw parts library exists."
-				console.success "Operating within the LDraw parts directory."
+				console.scs "LDraw parts library exists."
+				console.scs "Operating within the LDraw parts directory."
 				console.fwd "Continuing."
 				echo
 
@@ -1568,8 +1568,8 @@ then
 				console.error "LDraw library directory not recognized: 'parts' directory not found."
 			fi
 		else
-			consol.wrn "LDraw parts directory not found."
-			consol.ask "Specify the LDraw parts library directory location to continue?"
+			console.wrn "LDraw parts directory not found."
+			console.ask "Specify the LDraw parts library directory location to continue?"
 			
 			echo
 
@@ -1583,7 +1583,7 @@ then
 
 				directory="$browse/parts"
 			else
-				consol.ask "Download the latest LDraw parts library?"
+				console.ask "Download the latest LDraw parts library?"
 				
 				echo
 
@@ -1606,11 +1606,11 @@ then
 				else
 					console.error "LDraw parts directory not setup on system."
 					echo
-					consol.wrn "The parts.lst file may be needed for some legacy editors to function."
+					console.wrn "The parts.lst file may be needed for some legacy editors to function."
 					echo
-					consol.inf "Visit http://www.ldraw.org to get started."
-					consol.inf "You can download and extract the LDraw parts library on your system manually."
-					consol.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
+					console.inf "Visit http://www.ldraw.org to get started."
+					console.inf "You can download and extract the LDraw parts library on your system manually."
+					console.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo
 					console.fwd "Exiting."
 					echo
@@ -1627,8 +1627,8 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		consol.wrn "Previous instance of the parts.lst file found."
-		consol.inf "Backing up..."
+		console.wrn "Previous instance of the parts.lst file found."
+		console.inf "Backing up..."
 		echo
 
 		mv parts.lst parts.lst.bak
@@ -1638,11 +1638,11 @@ then
 
 	if [[ "$sort_mode" == "description" ]] || [[ "$sort_mode" == "number" ]]
 	then
-		consol.inf "Utility startedusing the $sort_mode option flag."
+		console.inf "Utility startedusing the $sort_mode option flag."
 	else
-		consol.wrn "No sorting method specified."
-		consol.ask "Which sorting method should be used for parsing the parts list?"
-		consol.ask "[ [dD]escription / [nN]umber ]"
+		console.wrn "No sorting method specified."
+		console.ask "Which sorting method should be used for parsing the parts list?"
+		console.ask "[ [dD]escription / [nN]umber ]"
 		echo
 
 		read reply
@@ -1685,7 +1685,7 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					consol.inf "Parts count...............: $((count++))\c"
+					console.inf "Parts count...............: $((count++))\c"
 					echo
 				fi
 			done
