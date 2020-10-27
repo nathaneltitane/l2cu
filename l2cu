@@ -233,7 +233,10 @@ curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
 # dependencies #
 
 install_list=(
-	console
+	leocad
+	blender
+	zip
+	unzip
 )
 
 console.install ${install_list[@]}
@@ -254,7 +257,7 @@ then
 
 	# specify directory location or exit on 'cancel'
 
-	directory=$(dialog "Load model files") || exit 1
+	directory=$(console.dialog "Load model files") || exit 1
 fi
 
 # get library #
@@ -995,14 +998,14 @@ then
 
 	if [[ "$modify_option" = "color" ]]
 	then
-		console.input "Enter the color description [ name / number / hexadecimal ] to modify."
+		console.ipt "Enter the color description [ name / number / hexadecimal ] to modify."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
 		old_color="$ldraw_color_number"
 
-		console.input "Enter the color description [ name / number / hexadecimal ] to set."
+		console.ipt "Enter the color description [ name / number / hexadecimal ] to set."
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -1012,14 +1015,14 @@ then
 
 	if [[ "$modify_option" = "part" ]]
 	then
-		console.input "Enter the part number to modify."
+		console.ipt "Enter the part number to modify."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
 		old_part="$part_input"
 
-		console.input "Enter the part number to set as replacement."
+		console.ipt "Enter the part number to set as replacement."
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -1029,21 +1032,21 @@ then
 
 	if [[ "$modify_option" = "bind" ]]
 	then
-		console.input "Enter the part number to modify."
+		console.ipt "Enter the part number to modify."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
 		part_selection="$part_input"
 
-		console.input "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
+		console.ipt "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
 		old_color="$ldraw_color_number"
 
-		console.input "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
+		console.ipt "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
 		parse_colors
 
 		# $? returning wrong arbitrary value for $new_color
@@ -1281,7 +1284,7 @@ then
 
 								if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 								then
-									console.input "Enter author information:"
+									console.ipt "Enter author information:"
 									echo
 
 									parse_input
@@ -1596,7 +1599,7 @@ then
 
 					# specify directory location or exit on 'cancel'
 
-					setup_directory=$(dialog) || exit 1
+					setup_directory=$(console.dialog) || exit 1
 
 					cd "$setup_directory" || exit 1
 
