@@ -4,12 +4,12 @@
 
 # LÂ²CU # l2cu # linux ldraw command line utility #
 
-# version -------------------------------------------------------------------- #
+# version #
 
 version="04-01-2020"
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-# usage ---------------------------------------------------------------------- #
+# usage #
 
 while (($#))
 do
@@ -19,7 +19,7 @@ do
 			directory="$1"
 			;;
 
-# file types ----------------------------------------------------------------- #
+# file types #
 
 		-all)
 			extension_option="all"
@@ -34,7 +34,7 @@ do
 			extensions_list=(mpd)
 			;;
 
-# rendering ------------------------------------------------------------------ #
+# rendering #
 
 		-render)
 			option="render"
@@ -68,7 +68,7 @@ do
 			render_preset="front"
 			;;
 
-# exports -------------------------------------------------------------------- #
+# exports #
 
 		-export)
 			option="export"
@@ -94,7 +94,7 @@ do
 			export_name="Wavefront"
 			;;
 
-# modify --------------------------------------------------------------------- #
+# modify #
 
 		-modify)
 			option="modify"
@@ -121,7 +121,7 @@ do
 			overwrite_option="overwrite"
 			;;
 
-# get ------------------------------------------------------------------------ #
+# get #
 
 		-get)
 			option="get"
@@ -133,7 +133,7 @@ do
 			get_option=unofficial
 			;;
 
-# make list ------------------------------------------------------------------ #
+# make list #
 
 		-make-list)
 			option="make-list"
@@ -145,7 +145,7 @@ do
 			sort_mode="number"
 			;;
 
-# help ----------------------------------------------------------------------- #
+# help #
 
 		-h|--help)
 			echo -e "USAGE"
@@ -228,121 +228,28 @@ do
 	shift
 done
 
-# functions ------------------------------------------------------------------ #
+curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
 
-console.spinner () {
-	# catch PID of last command
+# dependencies #
 
-	PID=$!
-
-	# spinner string content
-
-	before="[ "
-	spinner="/â\|"
-	after="]"
-	message="$1"
-
-	i=1
-
-	echo
-
-	while [ -d /proc/$PID ]
-	do
-		echo -ne "\r${before} \b${spinner:i++%${#spinner}:1} ${after} ${message}\c "
-		sleep 0.125
-	done
-
-	echo
-}
-
-# dependencies --------------------------------------------------------------- #
-
-binaries_list=(
+install_list=(
 	console
 )
 
-if [[ "$(which $binary)" == "" ]]
-then
+console.install ${install_list[@]}
 
-	for binary in ${binaries_list[@]}
-	do
-		binary_url=bin-dex.ntttn.me/"$binary"
-
-		# get binaries from repository
-
-		curl -sL ${binary_url} > "$binary_directory/$binary" &
-
-		console.spinner "Downloading binary [ $binary ]."
-		echo
-
-		# set execution mode for binary
-
-		chmod +x "$binary_directory/$binary"
-	done
-
-	source "$binary_directory/$binary"
-fi
-
-# dialog --------------------------------------------------------------------- #
-
-dialog () {
-
-	# dialog window title
-
-	title="${script%.sh} - ${1}"
-
-	# gtk dialog - zenity
-
-	g_dialog () {
-		zenity \
-			--file-selection \
-			--multiple\
-			--directory \
-			--separator=$'\n' \
-			--title="$title" "$@"
-	}
-
-	# kde dialog - kdialog
-
-	k_dialog () {
-		kdialog \
-			--getopenfilename \
-			--multiple \
-			--separate-output \
-			--title "$title" "$@"
-	}
-
-	# define dialog usage
-
-	if [[ $(command -v zenity) = "" ]]
-	then
-		dialog=$(k_dialog)
-	elif
-	[[ $(command -v kdialog) = "" ]]
-	then
-		dialog=$(g_dialog)
-	else
-		console.error "No dialog binary present on system."
-		console.info "This utility must be run using the 'directory' option."
-		console.fwd "Exiting."
-		echo
-
-		exit 1
-	fi
-}
-
-# download ------------------------------------------------------------------- #
+# download #
 
 download () {
 
-	curl -L -S  # "$@"
+	curl -sL "$@"
 }
 
 # if 'directory' option is not passed
 
 if [[ -z "$directory" ]]
 then
-	console.question "Load model files from:"
+	consol.ask "Load model files from:"
 	echo""
 
 	# specify directory location or exit on 'cancel'
@@ -350,7 +257,7 @@ then
 	directory=$(dialog "Load model files") || exit 1
 fi
 
-# get library ---------------------------------------------------------------- #
+# get library #
 
 get_library () {
 
@@ -375,11 +282,11 @@ get_library () {
 	mv "$parts_archive" ldraw.zip
 }
 
-# initial prompt clear ------------------------------------------------------- #
+# initial prompt clear #
 
 clear
 
-# make temporary file: export ------------------------------------------------ #
+# make temporary file: export #
 
 if [[ "$option" == "export" ]]
 then
@@ -462,7 +369,7 @@ then
 	PYTHON
 fi
 
-# make temporary file: modify ------------------------------------------------ #
+# make temporary file: modify #
 
 if [[  $option == "modify" ]]
 then
@@ -623,7 +530,7 @@ fi
 
 # test for utility dependencies and requirements
 
-console.info "Verifying utility requirements..."
+consol.inf "Verifying utility requirements..."
 echo
 
 binaries_list=(
@@ -642,9 +549,9 @@ do
 
 	if [[ ${binary} = "" ]]
 	then
-		console.warning "The '$binary_name' binary not found."
-		console.question "Specify location?"
-		console.choice
+		consol.wrn "The '$binary_name' binary not found."
+		consol.ask "Specify location?"
+		
 		echo
 
 		read reply
@@ -658,8 +565,8 @@ do
 			binary="$binary_path/$binary"
 		else
 			console.error "No '$binary_name' binary installed on system."
-			console.info "Install '$binary_name' using your system's package manager."
-			console.info "Restart this utility when '$binary_name' is installed."
+			consol.inf "Install '$binary_name' using your system's package manager."
+			consol.inf "Restart this utility when '$binary_name' is installed."
 			console.fwd "Exiting."
 			echo
 
@@ -676,40 +583,40 @@ do
 
 done
 
-# initial prompt clear ------------------------------------------------------- #
+# initial prompt clear #
 
 clear
 
-# confirmation --------------------------------------------------------------- #
+# confirmation #
 
 echo
-console.info "Utility started using the $extension_option extension option."
-console.info "Utility started using the $option option."
+consol.inf "Utility started using the $extension_option extension option."
+consol.inf "Utility started using the $option option."
 echo
 
 if [[ "$option" = "render" ]]
 then
-	console.info "Utility started using the $render_option camera preset."
+	consol.inf "Utility started using the $render_option camera preset."
 	echo
 
 elif [[ "$option" = "export" ]]
 then
-	console.info "Utility started using the $export_name export parameter."
+	consol.inf "Utility started using the $export_name export parameter."
 	echo
 fi
 
 if [[ "$option" = "overwrite" ]]
 then
-	console.warning "WARNING:"
-	console.warning "Utility started using the overwrite option."
-	console.warning "Parsed model modification will be written to file directly!"
+	consol.wrn "WARNING:"
+	consol.wrn "Utility started using the overwrite option."
+	consol.wrn "Parsed model modification will be written to file directly!"
 	echo
 fi
 
 console.fwd "Proceeding..."
 echo
 
-# parse ---------------------------------------------------------------------- #
+# parse #
 
 for extension in ${extensions_list[@]}
 do
@@ -725,7 +632,7 @@ do
 
 		model_name="${model_file_name}"
 
-# render --------------------------------------------------------------------- #
+# render #
 
 		if [[ "$option" = "render" ]]
 		then
@@ -844,7 +751,7 @@ do
 
 			# render model using options
 
-			console.info "Rendering in..............: $renders_directory"
+			consol.inf "Rendering in..............: $renders_directory"
 			echo
 
 			for coordinates in ${position[@]}
@@ -860,8 +767,8 @@ do
 
 				# render
 
-				console.info "Rendering.................: ${model_name^^}"
-				console.info "View......................: ${view[coordinates]^^}"
+				consol.inf "Rendering.................: ${model_name^^}"
+				consol.inf "View......................: ${view[coordinates]^^}"
 				echo
 
 				run_leocad "$model" $coordinates
@@ -878,11 +785,11 @@ do
 				fi
 			done
 
-			console.info "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
+			consol.inf "Output....................: $renders_directory/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
-# export --------------------------------------------------------------------- #
+# export #
 
 		if [[ "$option" == "export" ]]
 		then
@@ -907,8 +814,8 @@ do
 
 			run_leocad () {
 
-				console.info "Exporting.................: $model"
-				console.info "Format....................: ${export_name}"
+				consol.inf "Exporting.................: $model"
+				consol.inf "Format....................: ${export_name}"
 				echo
 
 				leocad "$model" "-$export_option" "$export_file" >> /dev/null
@@ -950,7 +857,7 @@ do
 			then
 				run_leocad
 
-				console.info "Converting $model ("$export_extension")..."
+				consol.inf "Converting $model ("$export_extension")..."
 				echo
 
 				# import 3ds file into blender to create optimized blend file
@@ -982,16 +889,16 @@ do
 			then
 				console.error "File size threshold exceeded - [ $model_size ]"
 				echo
-				console.warning "WARNING:"
-				console.info "Model file size is above recommended threshold of ${model_size_threshold}MB"
-				console.info "You may experience higher than average loading times."
+				consol.wrn "WARNING:"
+				consol.inf "Model file size is above recommended threshold of ${model_size_threshold}MB"
+				consol.inf "You may experience higher than average loading times."
 				echo
 			fi
 		fi
 	done
 done
 
-# modify --------------------------------------------------------------------- #
+# modify #
 
 if [[ "$option" == "modify" ]]
 then
@@ -1002,9 +909,9 @@ then
 
 			if [[ -z $input ]]
 			then
-				console.warning "WARNING:"
-				console.warning "Input cannot be empty."
-				console.warning "Try again."
+				consol.wrn "WARNING:"
+				consol.wrn "Input cannot be empty."
+				consol.wrn "Try again."
 				echo
 			else
 				break
@@ -1060,9 +967,9 @@ then
 
 				console.fwd "Confirming input value:"
 				echo
-				console.info "Color name................: ${ldraw_color_name}"
-				console.info "Color number..............: ${ldraw_color_number}"
-				console.info "Color hexadecimal value...: ${ldraw_color_hex_value}"
+				consol.inf "Color name................: ${ldraw_color_name}"
+				consol.inf "Color number..............: ${ldraw_color_number}"
+				consol.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
 				echo
 
 				return "$ldraw_color_number"
@@ -1158,7 +1065,7 @@ then
 
 			temporary_file="$model.tmp"
 
-# modify: read model --------------------------------------------------------- #
+# modify: read model #
 
 			# initialize line count
 
@@ -1171,15 +1078,15 @@ then
 			do
 				line_number=$(( $line_number + 1 ))
 
-# modify: lint --------------------------------------------------------------- #
+# modify: lint #
 
 				# model file linting
 
 				if [[ "$modify_option" = "lint" ]]
 				then
-					console.warning "Cleaning up model file."
+					consol.wrn "Cleaning up model file."
 					echo
-					console.info "Model file................: $model"
+					consol.inf "Model file................: $model"
 					echo
 
 						# substitute carriage return for newline
@@ -1249,7 +1156,7 @@ then
 
 					IFS=' '
 
-# modify: color -------------------------------------------------------------- #
+# modify: color #
 
 					# color substitution
 
@@ -1259,17 +1166,17 @@ then
 						then
 							color="$new_color"
 
-							console.info "Modifying.................: $model"
+							consol.inf "Modifying.................: $model"
 							echo
-							console.info "Changing..................: $old_color"
-							console.info "Setting...................: $new_color "
+							consol.inf "Changing..................: $old_color"
+							consol.inf "Setting...................: $new_color "
 							echo
 						else
 							: # pass
 						fi
 					fi
 
-# modify: part --------------------------------------------------------------- #
+# modify: part #
 
 					# part substitution
 
@@ -1279,18 +1186,18 @@ then
 						then
 							part="$new_part"
 
-							console.info "Modifying.................: $model"
+							consol.inf "Modifying.................: $model"
 
 							echo
-							console.info "Changing..................: $old_part"
-							console.info "Setting...................: $new_part "
+							consol.inf "Changing..................: $old_part"
+							consol.inf "Setting...................: $new_part "
 							echo
 						else
 							: # pass
 						fi
 					fi
 
-# modify: bind --------------------------------------------------------------- #
+# modify: bind #
 
 					# bind [ part + color ] color substitution
 
@@ -1302,12 +1209,12 @@ then
 							then
 								color="$new_color"
 
-								console.info "Modifying.................: $model"
+								consol.inf "Modifying.................: $model"
 								echo
-								console.info "Part......................: $part"
+								consol.inf "Part......................: $part"
 								echo
-								console.info "Changing..................: $old_color"
-								console.info "Setting...................: $new_color "
+								consol.inf "Changing..................: $old_color"
+								consol.inf "Setting...................: $new_color "
 								echo
 							else
 								: # pass
@@ -1315,7 +1222,7 @@ then
 						fi
 					fi
 
-# modify: step --------------------------------------------------------------- #
+# modify: step #
 
 					# step submodel [ldr] separation
 
@@ -1333,7 +1240,7 @@ then
 							fi
 					fi
 
-# modify: format ------------------------------------------------------------- #
+# modify: format #
 
 					# file structure and meta substitution
 
@@ -1365,9 +1272,9 @@ then
 
 							if [ ! -e "./author" ]
 							then
-								console.warning "No author file found."
-								console.question "Create author file?"
-								console.choice
+								consol.wrn "No author file found."
+								consol.ask "Create author file?"
+								
 								echo
 
 								read reply
@@ -1385,7 +1292,7 @@ then
 
 									author_string=$(echo $(cat ./author))
 								else
-									console.warning "No author string/file specified."
+									consol.wrn "No author string/file specified."
 									console.fwd "Skipping."
 									echo
 
@@ -1520,19 +1427,19 @@ then
 
 			stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
-# modify: overwrite ---------------------------------------------------------- #
+# modify: overwrite #
 
 			# write changes to file?
 
 			if [[ "$overwrite_option" = "overwrite" ]]
 			then
-				console.warning "[ OVERWRITE ] option enabled!"
-				console.info "Writing changes to original model file!"
+				consol.wrn "[ OVERWRITE ] option enabled!"
+				consol.inf "Writing changes to original model file!"
 				echo
 
-				console.warning "Writing file."
+				consol.wrn "Writing file."
 				echo
-				console.info "Model file................: $model"
+				consol.inf "Model file................: $model"
 				echo
 
 				mv "$temporary_file" "${temporary_file%.tmp}"
@@ -1540,30 +1447,30 @@ then
 
 			if [ -z "$overwrite_option" ]
 			then
-				console.question "Write changes to original model file?"
-				console.choice
+				consol.ask "Write changes to original model file?"
+				
 				echo
-				console.info "Model file................: $model"
+				consol.inf "Model file................: $model"
 				echo
 
 				read reply
 
 				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
 				then
-					console.warning "[ OVERWRITE ] option enabled!"
-					console.info "Writing changes to original model file."
+					consol.wrn "[ OVERWRITE ] option enabled!"
+					consol.inf "Writing changes to original model file."
 					echo
 
-					console.warning "Writing file."
+					consol.wrn "Writing file."
 					echo
-					console.info "Model file................: $model"
+					consol.inf "Model file................: $model"
 					echo
 
 					mv "$temporary_file" "${temporary_file%.tmp}"
 
 				else
-					console.warning "[ OVERWRITE ] option disabled."
-					console.info "Writing changes to model file copy."
+					consol.wrn "[ OVERWRITE ] option disabled."
+					consol.inf "Writing changes to model file copy."
 					echo
 					console.fwd "Writing changes to model file copy."
 					echo
@@ -1575,7 +1482,7 @@ then
 	done
 fi
 
-# get ------------------------------------------------------------------------ #
+# get #
 
 if [[  "$option" = "get" ]]
 then
@@ -1604,8 +1511,8 @@ then
 
 	if [ -z "$directory" ]
 	then
-		console.question "Specify download location?"
-		console.choice
+		consol.ask "Specify download location?"
+		
 		echo
 
 		read reply
@@ -1620,8 +1527,8 @@ then
 		else
 			directory="./"
 
-			console.warning "No directory location specified."
-			console.warning "Downloading into current directory."
+			consol.wrn "No directory location specified."
+			consol.wrn "Downloading into current directory."
 			echo
 		fi
 
@@ -1629,14 +1536,14 @@ then
 	fi
 fi
 
-# make list ------------------------------------------------------------------ #
+# make list #
 
 if [[  "$option" = "make-list" ]]
 then
 	if [ -z "$directory" ]
 	then
-		console.warning "Is the LDraw parts library setup on this system?"
-		console.choice
+		consol.wrn "Is the LDraw parts library setup on this system?"
+		
 		echo
 
 		read reply
@@ -1661,9 +1568,9 @@ then
 				console.error "LDraw library directory not recognized: 'parts' directory not found."
 			fi
 		else
-			console.warning "LDraw parts directory not found."
-			console.question "Specify the LDraw parts library directory location to continue?"
-			console.choice
+			consol.wrn "LDraw parts directory not found."
+			consol.ask "Specify the LDraw parts library directory location to continue?"
+			
 			echo
 
 			read reply
@@ -1676,8 +1583,8 @@ then
 
 				directory="$browse/parts"
 			else
-				console.question "Download the latest LDraw parts library?"
-				console.choice
+				consol.ask "Download the latest LDraw parts library?"
+				
 				echo
 
 				read reply
@@ -1699,11 +1606,11 @@ then
 				else
 					console.error "LDraw parts directory not setup on system."
 					echo
-					console.warning "The parts.lst file may be needed for some legacy editors to function."
+					consol.wrn "The parts.lst file may be needed for some legacy editors to function."
 					echo
-					console.info "Visit http://www.ldraw.org to get started."
-					console.info "You can download and extract the LDraw parts library on your system manually."
-					console.info "Restart and run this utility using the 'make-list' option to generate the parts list."
+					consol.inf "Visit http://www.ldraw.org to get started."
+					consol.inf "You can download and extract the LDraw parts library on your system manually."
+					consol.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo
 					console.fwd "Exiting."
 					echo
@@ -1720,8 +1627,8 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		console.warning "Previous instance of the parts.lst file found."
-		console.info "Backing up..."
+		consol.wrn "Previous instance of the parts.lst file found."
+		consol.inf "Backing up..."
 		echo
 
 		mv parts.lst parts.lst.bak
@@ -1731,11 +1638,11 @@ then
 
 	if [[ "$sort_mode" == "description" ]] || [[ "$sort_mode" == "number" ]]
 	then
-		console.info "Utility startedusing the $sort_mode option flag."
+		consol.inf "Utility startedusing the $sort_mode option flag."
 	else
-		console.warning "No sorting method specified."
-		console.question "Which sorting method should be used for parsing the parts list?"
-		console.question "[ [dD]escription / [nN]umber ]"
+		consol.wrn "No sorting method specified."
+		consol.ask "Which sorting method should be used for parsing the parts list?"
+		consol.ask "[ [dD]escription / [nN]umber ]"
 		echo
 
 		read reply
@@ -1778,7 +1685,7 @@ then
 						printf '%-30s %-s\n' "$filename" "$description" >> parts.lst
 					fi
 
-					console.info "Parts count...............: $((count++))\c"
+					consol.inf "Parts count...............: $((count++))\c"
 					echo
 				fi
 			done
@@ -1814,4 +1721,4 @@ then
 	fi
 fi
 
-# complete --------------------------------
+# complete #
