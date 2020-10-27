@@ -901,7 +901,7 @@ then
 			then
 				# confirmation
 
-				console.fwd "Confirming input value:"
+				console.fwd "Confirming input value..."
 				echo
 				console.inf "Color name................: ${ldraw_color_name}"
 				console.inf "Color number..............: ${ldraw_color_number}"
@@ -914,7 +914,8 @@ then
 		done < "$colors"
 
 		console.error "No available color matches the input."
-		console.fwd "Exiting."
+		echo
+		console.fwd "Exiting..."
 		echo
 
 		exit 1
@@ -1229,7 +1230,8 @@ then
 									author_string=$(echo $(cat ./author))
 								else
 									console.wrn "No author string/file specified."
-									console.fwd "Skipping."
+									echo
+									console.fwd "Skipping..."
 									echo
 
 									line=""
@@ -1496,7 +1498,8 @@ then
 			then
 				console.scs "LDraw parts library exists."
 				console.scs "Operating within the LDraw parts directory."
-				console.fwd "Continuing."
+				echo
+				console.fwd "Continuing..."
 				echo
 
 				directory="$browse/parts"
@@ -1548,7 +1551,7 @@ then
 					console.inf "You can download and extract the LDraw parts library on your system manually."
 					console.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo
-					console.fwd "Exiting."
+					console.fwd "Exiting..."
 					echo
 
 					exit 1
