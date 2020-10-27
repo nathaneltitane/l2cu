@@ -261,7 +261,7 @@ get_library () {
 
 	download "${part}s_url" > "${directory}"/"${parts_archive}" &
 
-	console.spinner "Downloading..."
+	console.download "Downloading..."
 	echo
 
 	# extract
@@ -543,8 +543,8 @@ clear
 # confirmation #
 
 echo
-console.inf "Utility started using the ${extension}_option extension option."
-console.inf "Utility started using the ${option} option."
+console.msg "Utility started using the '${extension_option}' extension option."
+console.msg "Utility started using the '${option}' option."
 echo
 
 if [[ "${option}" = "render" ]]
