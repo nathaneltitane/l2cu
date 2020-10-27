@@ -255,11 +255,11 @@ fi
 
 get_library () {
 
-	parts_archive=$(basename "$parts_url")
+	parts_archive=$(basename "${part}s_url")
 
 	# download
 
-	download "$parts_url" > "${directory}"/"${parts_archive}" &
+	download "${part}s_url" > "${directory}"/"${parts_archive}" &
 
 	console.spinner "Downloading..."
 	echo
@@ -895,9 +895,9 @@ then
 
 			ldraw_color_hex_value="${hex_value}"
 
-			if [[ "$color_input" == "$ldraw_color_name" ]] || \
-			   [[ "$color_input" == "$ldraw_color_number" ]] || \
-			   [[ "$color_input" == "$ldraw_color_hex_value" ]]
+			if [[ "${color_input}" == "${ldraw_color_name}" ]] || \
+			   [[ "${color_input}" == "${ldraw_color_number}" ]] || \
+			   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
 			then
 				# confirmation
 
@@ -908,7 +908,7 @@ then
 				console.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
 				echo
 
-				return "$ldraw_color_number"
+				return "${ldraw_color_number}"
 			fi
 
 		done < "${colors}"
@@ -923,69 +923,70 @@ then
 
 	parse_parts () {
 		console.empty
+		
 		part_input="$input"
 
-		return "$part_input"
+		return "${part_input}"
 	}
 
 	# get input
 
-	if [[ "$modify_option" = "color" ]]
+	if [[ "${modify_option}" = "color" ]]
 	then
 		console.ipt "Enter the color description [ name / number / hexadecimal ] to modify."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
-		old_color="$ldraw_color_number"
+		old_color="${ldraw_color_number}"
 
 		console.ipt "Enter the color description [ name / number / hexadecimal ] to set."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
-		new_color="$ldraw_color_number"
+		new_color="${ldraw_color_number}"
 	fi
 
-	if [[ "$modify_option" = "part" ]]
+	if [[ "${modify_option}" = "part" ]]
 	then
 		console.ipt "Enter the part number to modify."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
-		old_part="$part_input"
+		old_part="${part_input}"
 
 		console.ipt "Enter the part number to set as replacement."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
-		new_part="$part_input"
+		new_part="${part_input}"
 	fi
 
-	if [[ "$modify_option" = "bind" ]]
+	if [[ "${modify_option}" = "bind" ]]
 	then
 		console.ipt "Enter the part number to modify."
 		parse_parts
 
 		# $? returning wrong arbitrary value
 
-		part_selection="$part_input"
+		part_selection="${part_input}"
 
 		console.ipt "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
 		parse_colors
 
 		# $? returning wrong arbitrary value
 
-		old_color="$ldraw_color_number"
+		old_color="${ldraw_color_number}"
 
 		console.ipt "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
 		parse_colors
 
-		# $? returning wrong arbitrary value for $new_color
+		# $? returning wrong arbitrary value for ${new_color}
 
-		new_color="$ldraw_color_number"
+		new_color="${ldraw_color_number}"
 	fi
 
 	# substitution
@@ -1013,17 +1014,17 @@ then
 			while IFS=
 			read -r line
 			do
-				line_number=$(( $line_number + 1 ))
+				line_number=$(( ${line_number} + 1 ))
 
 # modify: lint #
 
 				# model file linting
 
-				if [[ "$modify_option" = "lint" ]]
+				if [[ "${modify_option}" = "lint" ]]
 				then
 					console.wrn "Cleaning up model file."
 					echo
-					console.inf "Model file................: $model"
+					console.inf "Model file................: ${model}"
 					echo
 
 						# substitute carriage return for newline
@@ -1038,19 +1039,19 @@ then
 						# strip '(' character
 						# strip ')' character
 
-					sed \
-						-e 's/\r//g' \
-						-e 's/0 STEP  *\./0 STEP/g' \
-						-e 's/  */ /g' \
-						-e '/  *\./d' \
-						-e '/^ /d' \
-						-e '/^\./d' \
-						-e '/BACKGROUND/d' \
-						-e '/PIVOT/d' \
-						-e '/HIDDEN/d' \
-						-e 's/(//g' \
-						-e 's/)//g' \
-						-e '/^$/d' "${model}" > "$temporary_file"
+					sed                                                   \
+						-e 's/\r//g'                                      \
+						-e 's/0 STEP  *\./0 STEP/g'                       \
+						-e 's/  */ /g'                                    \
+						-e '/  *\./d'                                     \
+						-e '/^ /d'                                        \
+						-e '/^\./d'                                       \
+						-e '/BACKGROUND/d'                                \
+						-e '/PIVOT/d'                                     \
+						-e '/HIDDEN/d'                                    \
+						-e 's/(//g'                                       \
+						-e 's/)//g'                                       \
+						-e '/^$/d' "${model}" > "${temporary_file}"
 
 						# exit to avoid line breakdown iteration and overwrite
 
@@ -1059,20 +1060,19 @@ then
 
 				# line breakdown for other functions
 
-
-				if [[ "$line" == *!LEOCAD* ]] || [[ "$line" == *FILE* ]] || [[ "$line" == *NOFILE* ]]
+				if [[ "${line}" == *!LEOCAD* ]] || [[ "${line}" == *FILE* ]] || [[ "${line}" == *NOFILE* ]]
 				then
 					# skip header and footer lines containing matching patterns
 					# prevents model file syntax modification
 
-					echo "$line" >> "$temporary_file"
+					echo "${line}" >> "${temporary_file}"
 					continue
 				else
 					# read lines and parse
 					# model_data is either a part file reference or a submodel
 
 					IFS=' '
-					read -r flag color x y z a b c d e f g h i model_data <<< "$line"
+					read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
 
 					vect_x="$a $b $c"
 					vect_y="$d $e $f"
@@ -1089,7 +1089,7 @@ then
 
 					# split part argument into part number and part extension
 
-					read part suffix <<< "$model_data"
+					read part suffix <<< "${model_data}"
 
 					IFS=' '
 
@@ -1097,16 +1097,16 @@ then
 
 					# color substitution
 
-					if [[ "$modify_option" = "color" ]]
+					if [[ "${modify_option}" = "color" ]]
 					then
-						if [[ "$color" = "$old_color" ]]
+						if [[ "${color}" = "${old_color}" ]]
 						then
-							color="$new_color"
+							color="${new_color}"
 
-							console.inf "Modifying.................: $model"
+							console.inf "Modifying.................: ${model}"
 							echo
-							console.inf "Changing..................: $old_color"
-							console.inf "Setting...................: $new_color "
+							console.inf "Changing..................: ${old_color}"
+							console.inf "Setting...................: ${new_color} "
 							echo
 						else
 							: # pass
@@ -1117,17 +1117,17 @@ then
 
 					# part substitution
 
-					if [[ "$modify_option" = "part" ]]
+					if [[ "${modify_option}" = "part" ]]
 					then
-						if [[ "$part" = "$old_part" ]]
+						if [[ "${part}" = "${old_part}" ]]
 						then
-							part="$new_part"
+							part="${new_part}"
 
-							console.inf "Modifying.................: $model"
+							console.inf "Modifying.................: ${model}"
 
 							echo
-							console.inf "Changing..................: $old_part"
-							console.inf "Setting...................: $new_part "
+							console.inf "Changing..................: ${old_part}"
+							console.inf "Setting...................: ${new_part} "
 							echo
 						else
 							: # pass
@@ -1138,20 +1138,20 @@ then
 
 					# bind [ part + color ] color substitution
 
-					if [[ "$modify_option" = "bind" ]]
+					if [[ "${modify_option}" = "bind" ]]
 					then
-						if [[ "$part" == "$part_selection" ]]
+						if [[ "${part}" == "${part_selection}" ]]
 						then
-							if [[ "$color" = "$old_color" ]]
+							if [[ "${color}" = "${old_color}" ]]
 							then
-								color="$new_color"
+								color="${new_color}"
 
-								console.inf "Modifying.................: $model"
+								console.inf "Modifying.................: ${model}"
 								echo
-								console.inf "Part......................: $part"
+								console.inf "Part......................: ${part}"
 								echo
-								console.inf "Changing..................: $old_color"
-								console.inf "Setting...................: $new_color "
+								console.inf "Changing..................: ${old_color}"
+								console.inf "Setting...................: ${new_color} "
 								echo
 							else
 								: # pass
@@ -1163,9 +1163,9 @@ then
 
 					# step submodel [ldr] separation
 
-					if [[ "$modify_option" = "step" ]]
+					if [[ "${modify_option}" = "step" ]]
 					then
-							if [[ "$line" == *ldr* ]]
+							if [[ "${line}" == *ldr* ]]
 							then
 									if [[ "$suffix" == *ldr* ]]
 									then
@@ -1181,31 +1181,31 @@ then
 
 					# file structure and meta substitution
 
-					if [[ "$modify_option" = "format" ]]
+					if [[ "${modify_option}" = "format" ]]
 					then
 						# strip lines that match the following expressions
 						# comment out to keep
 
-						if [[ "$line" = *"New Model"* ]]
+						if [[ "${line}" = *"New Model"* ]]
 						then
 							: # pass
 
-						elif [[ "$line" = *Name* ]]
+						elif [[ "${line}" = *Name* ]]
 						then
 							: # pass
 
-						elif [[ "$line" = *Unofficial* ]]
+						elif [[ "${line}" = *Unofficial* ]]
 						then
 							: # pass
 
-						elif [[ "$line" = *Untitled* ]]
+						elif [[ "${line}" = *Untitled* ]]
 						then
 							: # pass
 
-						elif [[ "$line" == *[aA][uU][tT][hH][oO][rR]* ]]
+						elif [[ "${line}" == *[aA][uU][tT][hH][oO][rR]* ]]
 						then
 							IFS=' '
-							read -r flag statement author_model author author_string <<< "$line"
+							read -r flag statement author_model author author_string <<< "${line}"
 
 							if [ ! -e "./author" ]
 							then
@@ -1216,7 +1216,7 @@ then
 
 								read reply
 
-								if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+								if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 								then
 									console.ipt "Enter author information:"
 									echo
@@ -1225,7 +1225,7 @@ then
 
 									author_input="$input"
 
-									echo "$author_input" > ./author
+									echo "${author_input}" > ./author
 
 									author_string=$(echo $(cat ./author))
 								else
@@ -1244,73 +1244,73 @@ then
 								fi
 							fi
 
-							echo "$line" >> "$temporary_file"
+							echo "${line}" >> "${temporary_file}"
 
-						elif [[ "$line" = *BACKGROUND* ]]
+						elif [[ "${line}" = *BACKGROUND* ]]
 						then
 							IFS=' '
-							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "$line"
+							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
 
 							: # pass
 
-						elif [[ "$line" = *"GROUP BEGIN"* ]]
+						elif [[ "${line}" = *"GROUP BEGIN"* ]]
 						then
 							IFS=' '
-							read -r flag statement group group_begin group_name <<< "$line"
+							read -r flag statement group group_begin group_name <<< "${line}"
 
 							: # pass
 
-						elif [[ "$line" = *"GROUP END"* ]]
+						elif [[ "${line}" = *"GROUP END"* ]]
 						then
 							IFS=' '
-							read -r flag statement group group_end <<< "$line"
+							read -r flag statement group group_end <<< "${line}"
 
 							: # pass
 
-						elif [[ "$line" = *PIVOT* ]]
+						elif [[ "${line}" = *PIVOT* ]]
 						then
 							IFS=' '
-							read -r flag statement piece pivot pivot_coordinates <<< "$line"
+							read -r flag statement piece pivot pivot_coordinates <<< "${line}"
 
 							: # pass
 
-						elif [[ "$line" = *HIDDEN* ]]
+						elif [[ "${line}" = *HIDDEN* ]]
 						then
 							IFS=' '
-							read -r flag statement piece hidden <<< "$line"
+							read -r flag statement piece hidden <<< "${line}"
 
 							: # pass
 						else
 							# if line contains '!LEOCAD' tag
 
-							if [[ "$line" == *!LEOCAD* ]]
+							if [[ "${line}" == *!LEOCAD* ]]
 							then
 								# skip header and footer lines containing matching patterns
 								# prevents model file syntax modification
 
-								echo "$line" >> "$temporary_file"
+								echo "${line}" >> "${temporary_file}"
 
 								continue
 							fi
 
 							# if line contains 'NOFILE' tag
 
-							if [[ "$line" == *NOFILE* ]]
+							if [[ "${line}" == *NOFILE* ]]
 							then
 								# skip header and footer lines containing matching patterns
 								# prevents model file syntax modification
 
-								echo "$line" >> "$temporary_file"
+								echo "${line}" >> "${temporary_file}"
 
 								continue
 							fi
 
 							# if line contains 'FILE' tag
 
-							if [[ "$line" == *FILE* ]]
+							if [[ "${line}" == *FILE* ]]
 							then
 								IFS=' '
-								read -r flag statement file_name <<< "$line"
+								read -r flag statement file_name <<< "${line}"
 
 								# spaces to dashes
 
@@ -1322,12 +1322,12 @@ then
 
 								# write changes to tempporary file
 
-								echo "$flag $statement $clean_file_name" >> "$temporary_file"
+								echo "${flag} ${statement} $clean_file_name" >> "${temporary_file}"
 							else
 								# parse all other lines and format submodel string
 
 								IFS=' '
-								read -r flag color x y z a b c d e f g h i model_data <<< "$line"
+								read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
 
 								# spaces to dashes
 
@@ -1356,7 +1356,7 @@ then
 
 					# write changes to tempporary file
 
-					echo -e "$flag" "$color" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "$part.$suffix" >> "$temporary_file"
+					echo -e "${flag}" "${color}" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "${part}.$suffix" >> "${temporary_file}"
 				fi
 
 			done < "${model}" # feed model file into loop for parsing
@@ -1377,10 +1377,10 @@ then
 
 				console.wrn "Writing file."
 				echo
-				console.inf "Model file................: $model"
+				console.inf "Model file................: ${model}"
 				echo
 
-				mv "$temporary_file" "${temporary_file%.tmp}"
+				mv "${temporary_file}" "${temporary_file%.tmp}"
 			fi
 
 			if [ -z "$overwrite_option" ]
@@ -1388,12 +1388,12 @@ then
 				console.ask "Write changes to original model file?"
 				
 				echo
-				console.inf "Model file................: $model"
+				console.inf "Model file................: ${model}"
 				echo
 
 				read reply
 
-				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+				if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 				then
 					console.wrn "[ OVERWRITE ] option enabled!"
 					console.inf "Writing changes to original model file."
@@ -1401,10 +1401,10 @@ then
 
 					console.wrn "Writing file."
 					echo
-					console.inf "Model file................: $model"
+					console.inf "Model file................: ${model}"
 					echo
 
-					mv "$temporary_file" "${temporary_file%.tmp}"
+					mv "${temporary_file}" "${temporary_file%.tmp}"
 
 				else
 					console.wrn "[ OVERWRITE ] option disabled."
@@ -1413,7 +1413,7 @@ then
 					console.fwd "Writing changes to model file copy."
 					echo
 
-					mv "$temporary_file" "${temporary_file%.tmp}_modified_$stamp.${extension}"
+					mv "${temporary_file}" "${temporary_file%.tmp}_modified_$stamp.${extension}"
 				fi
 			fi
 		done
@@ -1455,7 +1455,7 @@ then
 
 		read reply
 
-		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 		then
 			# specify directory location or exit on 'cancel'
 
@@ -1486,7 +1486,7 @@ then
 
 		read reply
 
-		if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 		then
 			# specify directory location or exit on 'cancel'
 
@@ -1514,7 +1514,7 @@ then
 
 			read reply
 
-			if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+			if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 			then
 				# specify directory location or exit on 'cancel'
 
@@ -1528,7 +1528,7 @@ then
 
 				read reply
 
-				if [[ "$reply" = [yY] || "$reply" = [yY][eE][sS] ]]
+				if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 				then
 					console.fwd "Specify setup location."
 					echo
@@ -1587,7 +1587,7 @@ then
 		read reply
 	fi
 
-	if [ -z "$reply" ]
+	if [ -z "${reply}" ]
 	then
 		exit 1
 	else
@@ -1605,7 +1605,7 @@ then
 			for part in $(echo $(find ${directory} -iname *.${extension}))
 			do
 				filename="${part##*/}"
-				header="$(head -n 1 "$part")"
+				header="$(head -n 1 "${part}")"
 				description="${header:2}"
 
 				if [[ "$description" == *~Moved* ]]
@@ -1640,11 +1640,11 @@ then
 
 		for list in "._.lst" ".~.lst" parts.lst
 		do
-			if [[ "$reply" = [dD] ]] || [[ "$sort_mode" == "description" ]]
+			if [[ "${reply}" = [dD] ]] || [[ "$sort_mode" == "description" ]]
 			then
 				sort -b -d -k 2 -t "$separator" -o "$list" "$list"
 
-			elif [[ "$reply" = [nN] ]] || [[ "$sort_mode" == "number" ]]
+			elif [[ "${reply}" = [nN] ]] || [[ "$sort_mode" == "number" ]]
 			then
 				sort -b -n -k 1 -t "$separator" -o "$list" "$list"
 			fi
