@@ -241,7 +241,7 @@ download () {
 
 # if 'directory' option is not passed
 
-if [[ -z "${directory}" ]]
+if [ -z "${directory}" ]
 then
 	console.ask "Load model files from:"
 	echo""
@@ -1167,7 +1167,7 @@ then
 					then
 							if [[ "${line}" == *ldr* ]]
 							then
-									if [[ "$suffix" == *ldr* ]]
+									if [[ "${suffix}" == *ldr* ]]
 									then
 											color="0"
 											suffix="ldr\n0 STEP"
@@ -1337,9 +1337,9 @@ then
 
 								clean_model_data="${clean_model_data,,}"
 
-								vect_x="$a $b $c"
-								vect_y="$d $e $f"
-								vect_z="$g $h $i"
+								vect_x="${a} ${b} ${c}"
+								vect_y="${d} ${e} ${f}"
+								vect_z="${g} ${h} ${i}"
 
 								# â¡ a d g 0 â¤	â¡ a b c x â¤
 								# â¢ b e h 0 â¥	â¢ d e f y â¥
@@ -1356,7 +1356,7 @@ then
 
 					# write changes to tempporary file
 
-					echo -e "${flag}" "${color}" "$x" "$y" "$z" "$a" "$b" "$c" "$d" "$e" "$f" "$g" "$h" "$i" "${part}.$suffix" >> "${temporary_file}"
+					echo -e "${flag}" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${part}.${suffix}" >> "${temporary_file}"
 				fi
 
 			done < "${model}" # feed model file into loop for parsing
@@ -1432,19 +1432,19 @@ then
 
 	if [[ "$get_option" = "complete" ]]
 	then
-		parts_url="$complete_parts_url"
+		parts_url="${complete_parts_url}"
 	fi
 
 	if [[ "$get_option" = "update" ]]
 	then
 		# workaround until html parsing is complete # TODO #
 
-		parts_url="$complete_parts_url"
+		parts_url="${complete_parts_url}"
 	fi
 
 	if [[ "$get_option" = "unofficial" ]]
 	then
-		parts_url="$unofficial_parts_url"
+		parts_url="${unofficial_parts_url}"
 	fi
 
 	if [ -z "${directory}" ]
@@ -1461,7 +1461,7 @@ then
 
 			browse=$(console.dialog "Save to") || exit 1
 
-			directory="$browse"
+			directory="${browse}"
 		else
 			directory="./"
 
@@ -1492,7 +1492,7 @@ then
 
 			browse=$(console.dialog "Load LDraw library") || exit 1
 
-			cd "$browse" || exit 1
+			cd "${browse}" || exit 1
 
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
@@ -1502,7 +1502,7 @@ then
 				console.fwd "Continuing..."
 				echo
 
-				directory="$browse/parts"
+				directory="${browse}/parts"
 			else
 				console.error "LDraw library directory not recognized: 'parts' directory not found."
 			fi
@@ -1520,7 +1520,7 @@ then
 
 				browse=$(dialog) || exit 1
 
-				directory="$browse/parts"
+				directory="${browse}/parts"
 			else
 				console.ask "Download the latest LDraw parts library?"
 				
