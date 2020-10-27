@@ -1459,7 +1459,7 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(dialog "Save to") || exit 1
+			browse=$(console.dialog "Save to") || exit 1
 
 			directory="$browse"
 		else
@@ -1490,7 +1490,7 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(dialog "Load LDraw library") || exit 1
+			browse=$(console.dialog "Load LDraw library") || exit 1
 
 			cd "$browse" || exit 1
 
@@ -1661,3 +1661,5 @@ then
 fi
 
 # complete #
+
+console.scs "Done."
