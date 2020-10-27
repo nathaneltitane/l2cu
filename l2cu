@@ -996,36 +996,36 @@ then
 
 	# get input
 
-					if [[ "${modify_option}" = "color" ]]
-					then
-							echo
-
-							parse_input
-
-							author_input="$input"
-
-							echo "$author_input" > ./author
-
-							author_string=$(echo $(cat ./author))
-						else
-							console.wrn "No author string/file specified."
-							echo
-							console.fwd "Skipping..."
-							echo
-
-							line=""
-						fi
-
-						else
+                        if [[ "${modify_option}" = "color" ]]
+ 
 							if [ -f "./author" ]
 							then
 								author_string=$(echo $(cat ./author))
-							fi
-						fi
+                            fi
+                            
+                            if [ ! -f "./author" ]
+                            then
+                                echo
+
+                                parse_input
+
+                                author_input="$input"
+
+                                echo "$author_input" > ./author
+
+                                author_string=$(echo $(cat ./author))
+                            else
+                                console.wrn "No author string/file specified."
+                                echo
+                                console.fwd "Skipping..."
+                                echo
+
+                                line=""
+                            fi
 
 						echo "${line}" >> "${temporary_file}"
 
-						elif [[ "${line}" = *BACKGROUND* ]]
+						if [[ "${line}" = *BACKGROUND* ]]
 						then
 							IFS=' '
 							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
