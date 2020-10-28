@@ -266,28 +266,26 @@ get_library () {
 	mv "${parts_archive}" ldraw.zip
 }
 
-# make temporary file: export #
+# export: make temporary file #
 
 if [[ "${option}" == "export" ]]
 then
-	beautify=$(mktemp /tmp/beautify.XXXXXX)
-	trap 'rm -rf "${beautify}"' EXIT
+	console.trap beautify
 
 	# push blender conversion script to temporary file
 
-	curl -sL https://raw.githubusercontent.com/nathaneltitane/l2cu/master/beautify > "${beautify}"
+	console.get https://raw.githubusercontent.com/nathaneltitane/l2cu/master beautify "${beautify}"
 fi
 
-# make temporary file: modify #
+# modify: make temporary file #
 
-if [[  ${option} == "modify" ]]
+if [[ ${option} == "modify" ]]
 then
-	colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
-	trap 'rm -rf "${colors}"' EXIT
+	console.trap colors
 
 	# push ldraw colors list to temporary file
 
-	curl -sL https://raw.githubusercontent.com/nathaneltitane/l2cu/master/colors > "${colors}"
+	console.get https://raw.githubusercontent.com/nathaneltitane/l2cu/master colors "${colors}"
 	
 fi
 
@@ -391,12 +389,12 @@ do
 		then
 			# define render routine
 
-			run_leocad () {
+			leocad_render () {
 
 				height="4096"
 				width="4096"
 				extension="png"
-				
+
 				model="${1}"
 				coordinates="${2}"
 
@@ -525,7 +523,7 @@ do
 				console.inf "View......................: ${view[coordinates]^^}"
 				echo
 
-				run_leocad "${model}" $coordinates
+				leocad_render "${model}" $coordinates
 
 				wait
 
@@ -566,7 +564,7 @@ do
 
 			# define export routine
 
-			run_leocad () {
+			leocad_export () {
 
 				console.inf "Exporting.................: ${model}"
 				console.inf "Format....................: ${export_name}"
@@ -592,7 +590,7 @@ do
 			   [[ "${export_option}" = "dae" ]] || \
 			   [[ "${export_option}" = "obj" ]]
 			then
-				run_leocad
+				leocad_export
 
 				wait
 
@@ -609,7 +607,7 @@ do
 
 			elif [[ "${export_option}" = "blender" ]]
 			then
-				run_leocad
+				leocad_export
 
 				console.inf "Converting $model ("$export_extension")..."
 				echo
