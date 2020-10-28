@@ -4,10 +4,9 @@
 
 # L²CU # l2cu # linux ldraw command line utility #
 
-# version #
+# dependencies #
 
-version="04-01-2020"
-script=$(basename -- "${BASH_SOURCE[0]}")
+curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
 
 # usage #
 
@@ -228,9 +227,10 @@ do
 	shift
 done
 
-# dependencies #
+# variables #
 
-curl -sL dep.dxtp.app/console > /usr/bin/console && source /usr/bin/console
+script=$(basename -- "${BASH_SOURCE[0]}")
+version="04-01-2020"
 
 # download #
 
@@ -276,9 +276,6 @@ get_library () {
 	mv "${parts_archive}" ldraw.zip
 }
 
-# initial prompt clear #
-
-clear
 
 # make temporary file: export #
 
@@ -305,6 +302,10 @@ then
 	
 fi
 
+# initial prompt clear #
+
+clear
+
 # test for utility dependencies and requirements
 
 console.inf "Verifying utility requirements..."
@@ -319,7 +320,7 @@ install_list=(
 
 console.install ${install_list[@]}
 
-# initial prompt clear #
+# initialize #
 
 clear
 
@@ -343,8 +344,8 @@ fi
 if [[ "${option}" = "overwrite" ]]
 then
 	console.wrn "WARNING:"
-	console.wrn "Utility started using the overwrite option."
-	console.wrn "Parsed model modification will be written to file directly!"
+	console.wrn "Utility started using the overwrite option:"
+	console.wrn "Model modifications will be written to file directly!"
 	echo
 fi
 
@@ -625,8 +626,8 @@ do
 				console.error "File size threshold exceeded - [ ${model_size} ]"
 				echo
 				console.wrn "WARNING:"
-				console.inf "Model file size is above recommended threshold of ${model_size_threshold}MB"
-				console.inf "You may experience higher than average loading times."
+				console.wrn "Model file size is above recommended threshold of ${model_size_threshold}MB"
+				console.wrn "You may experience higher than average loading times."
 				echo
 			fi
 		fi
@@ -716,6 +717,7 @@ then
 	if [[ "${modify_option}" = "color" ]]
 	then
 		console.ipt "Enter the color description [ name / number / hexadecimal ] to modify."
+		
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -723,6 +725,7 @@ then
 		old_color="${ldraw_color_number}"
 
 		console.ipt "Enter the color description [ name / number / hexadecimal ] to set."
+		
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -733,6 +736,7 @@ then
 	if [[ "${modify_option}" = "part" ]]
 	then
 		console.ipt "Enter the part number to modify."
+		
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -740,6 +744,7 @@ then
 		old_part="${part_input}"
 
 		console.ipt "Enter the part number to set as replacement."
+		
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -750,6 +755,7 @@ then
 	if [[ "${modify_option}" = "bind" ]]
 	then
 		console.ipt "Enter the part number to modify."
+		
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -757,6 +763,7 @@ then
 		part_selection="${part_input}"
 
 		console.ipt "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
+		
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -764,6 +771,7 @@ then
 		old_color="${ldraw_color_number}"
 
 		console.ipt "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
+		
 		parse_colors
 
 		# $? returning wrong arbitrary value for ${new_color}
@@ -804,7 +812,7 @@ then
 
 				if [[ "${modify_option}" = "lint" ]]
 				then
-					console.wrn "Cleaning up model file."
+					console.inf "Linting model file."
 					echo
 					console.inf "Model file................: ${model}"
 					echo
@@ -901,7 +909,6 @@ then
 							part="${new_part}"
 
 							console.inf "Modifying.................: ${model}"
-
 							echo
 							console.inf "Changing..................: ${old_part}"
 							console.inf "Setting...................: ${new_part} "
@@ -987,8 +994,8 @@ then
 							if [ ! -e "./author" ]
 							then
 								console.wrn "No author file found."
+								echo
 								console.ask "Create author file?"
-								
 								echo
 
 								read reply
@@ -1066,8 +1073,6 @@ then
 								# prevents model file syntax modification
 
 								echo "${line}" >> "${temporary_file}"
-
-								continue
 							fi
 
 							# if line contains 'NOFILE' tag
@@ -1078,8 +1083,6 @@ then
 								# prevents model file syntax modification
 
 								echo "${line}" >> "${temporary_file}"
-
-								continue
 							fi
 
 							# if line contains 'FILE' tag
@@ -1207,19 +1210,19 @@ then
 	update_parts_url="https://ldraw.org/library/unofficial/lcad1903.zip"
 	unofficial_parts_url="https://ldraw.org/library/unofficial/ldrawunf.zip"
 
-	if [[ "$get_option" = "complete" ]]
+	if [[ "${get_option}" = "complete" ]]
 	then
 		parts_url="${complete_parts_url}"
 	fi
 
-	if [[ "$get_option" = "update" ]]
+	if [[ "${get_option}" = "update" ]]
 	then
 		# workaround until html parsing is complete # TODO #
 
 		parts_url="${complete_parts_url}"
 	fi
 
-	if [[ "$get_option" = "unofficial" ]]
+	if [[ "${get_option}" = "unofficial" ]]
 	then
 		parts_url="${unofficial_parts_url}"
 	fi
@@ -1240,7 +1243,7 @@ then
 
 			directory="${browse}"
 		else
-			directory="./"
+			directory="${PWD}"
 
 			console.wrn "No directory location specified."
 			console.wrn "Downloading into current directory."
@@ -1279,7 +1282,7 @@ then
 				console.fwd "Continuing..."
 				echo
 
-				directory="${browse}/parts"
+				directory="${browse}"/parts
 			else
 				console.error "LDraw library directory not recognized: 'parts' directory not found."
 			fi
@@ -1343,7 +1346,7 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		console.wrn "Previous instance of the parts.lst file found."
+		console.wrn "Alternate version of 'parts.lst' file found."
 		echo
 		console.fwd "Backing up..."
 		echo
