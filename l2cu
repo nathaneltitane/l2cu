@@ -233,13 +233,9 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 version="11-01-2020"
 
+stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
 # functions #
-
-# download
-
-download () {
-	curl -sL "$@"
-}
 
 # get library
 
@@ -249,11 +245,8 @@ get_library () {
 
 	# download
 
-	download "${parts_url}" > "${directory}"/"${parts_archive}" &
-
-	console.download "Downloading..."
-	echo
-
+	console.download "${parts_url}" "${directory}"/"${parts_archive}"
+	
 	# extract
 
 	unzip "${parts_archive}" &
@@ -842,6 +835,7 @@ then
 						# delete lines containing BACKGROUND meta
 						# delete lines containing PIVOT meta
 						# delete lines containing HIDDEN meta
+						
 						# strip '(' character
 						# strip ')' character
 
@@ -872,7 +866,6 @@ then
 					# prevents model file syntax modification
 
 					echo "${line}" >> "${temporary_file}"
-					continue
 				else
 					# read lines and parse
 					# model_data is either a part file reference or a submodel
@@ -1137,10 +1130,12 @@ then
 								vect_y="${d} ${e} ${f}"
 								vect_z="${g} ${h} ${i}"
 
-								# â¡ a d g 0 â¤	â¡ a b c x â¤
-								# â¢ b e h 0 â¥	â¢ d e f y â¥
-								# â¢ c f i 0 â¥	â¢ g h i z â¥
-								# â£ x y z 1 â¦	â£ 0 0 0 1 â¦
+								# # # # # #		# # # # # #
+								# a d g 0 #		# a b c x #
+								# b e h 0 #		# d e f y #
+								# c f i 0 #		# g h i z #
+								# x y z 1 #		# 0 0 0 1 #
+								# # # # # #		# # # # # 
 
 							fi
 						fi
@@ -1157,13 +1152,9 @@ then
 
 			done < "${model}" # feed model file into loop for parsing
 
-			# Set current date stamp
-
-			stamp=$(date +"%m-%d-%Y-%H-%M-%S")
-
 # modify: overwrite #
 
-			# write changes to file?
+			# write changes to file
 
 			if [[ "$overwrite_option" = "overwrite" ]]
 			then
@@ -1316,7 +1307,7 @@ then
 
 				browse=$(dialog) || exit 1
 
-				directory="${browse}/parts"
+				directory="${browse}"/parts
 			else
 				console.ask "Download the latest LDraw parts library?"
 				
