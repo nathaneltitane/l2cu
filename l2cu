@@ -230,28 +230,18 @@ done
 # variables #
 
 script=$(basename -- "${BASH_SOURCE[0]}")
-version="04-01-2020"
 
-# download #
+version="11-01-2020"
+
+# functions #
+
+# download
 
 download () {
-
 	curl -sL "$@"
 }
 
-# if 'directory' option is not passed
-
-if [ -z "${directory}" ]
-then
-	console.ask "Load model files from:"
-	echo
-
-	# specify directory location or exit on 'cancel'
-
-	directory=$(console.dialog "Load model files") || exit 1
-fi
-
-# get library #
+# get library
 
 get_library () {
 
@@ -275,7 +265,6 @@ get_library () {
 
 	mv "${parts_archive}" ldraw.zip
 }
-
 
 # make temporary file: export #
 
@@ -320,9 +309,14 @@ install_list=(
 
 console.install ${install_list[@]}
 
-# initialize #
+# clear #
 
 clear
+
+# welcome #
+
+console.msg "[ Linux on Android -  Termux // Dextop // Ubuntu [ Version ${version} ] ]"
+echo
 
 # confirmation #
 
@@ -349,8 +343,31 @@ then
 	echo
 fi
 
+# if 'directory' option is not passed
+
+if [ -z "${directory}" ]
+then
+	console.ask "Load model files from:"
+	echo
+
+	# specify directory location or exit on 'cancel'
+
+	directory=$(console.dialog "Load model files")
+else
+	console.error "No model directory specified."
+	echo
+	console.fwd "Exiting..."
+	echo
+	
+	exit 1
+fi
+
 console.fwd "Proceeding..."
 echo
+
+# clear #
+
+clear
 
 # parse #
 
@@ -379,6 +396,7 @@ do
 				height="4096"
 				width="4096"
 				extension="png"
+				
 				model="${1}"
 				coordinates="${2}"
 
