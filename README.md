@@ -1,8 +1,6 @@
 ### L²CU: LDraw Linux Command line Utility
 
-This project aims at providing any user running a Linux-based distribution with the tools to handle LDraw model file related operations, on multiple models and/or project files at the same time.
-
-L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of tags properties and attributes.
+L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of LDraw model files.
 
 Most older and even more modern editors miss that mark to provide such features and that is where L²CU tries to fill the gap in a simple, user-friendly way.
 
@@ -10,42 +8,49 @@ Most older and even more modern editors miss that mark to provide such features 
 
 L²CU supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
 
-In addition to the stream editing features, it also offers rendering and exporting your models: this is particularly interesting since it can turn your creations into image and 3D content (standard 3D formats), letting you publish and share them without compromising your build information (if you do not wish to share the actual model file).
-
-You can also tweak or rework the utility's functions to match your preferences.
-
 In short, with L²CU you can:
 - render your models
 - export your models (to various 3D standard formats)
-- modify your models(color, part or part with a specific color)
+- modify your models (color, part or part with a specific color)
 - format your models in bulk (meta tags, steps, linting, etc.)
 - download and unpack the LDraw parts library
 - create the legacy 'parts.lst' file
+- 
+You can also tweak or rework the utility's functions to match your preferences.
 
 ### How does it work?
 
-LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly.
+LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly:
 
 L²CU is a shell script (BASH) that parses and modifies the text in the model file to get the job done.
 It is optimized for portability and uses a very minimal set of dependencies to get the job done.
 
 ### What does it need?
 
-On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's request.
+On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's change request(s).
+
+You will need:
+
+Common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager:
+
+- curl
+- sed
+- zip
+- unzip
+
 For the rendering and exporting features, you may wish to install the following prior to processing:
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor
 
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
 
-- curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer.
-
 ### render
 
-The render function generates preset, high defintion renders, of the selected LDraw model files or projects (using leocad to process the renders).
+The render function generates preset, high defintion renders, of the selected LDraw model files or projects (using [LeoCAD](https://github.com/leozide/leocad) to process the renders).
 
 The user can choose from set defaults or specify the latitude and longitude parameters of the camera, as well as a file saving suffix to register the coordinates as a viewing angle string to the file name:
 
+ˋˋˋ
 Defaults (as arrays):
 
 latitude=(
@@ -68,22 +73,32 @@ view=(
 	"back"
 	"front"
 )
+ˋˋˋ
 
-Please refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences.
+You can refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences.
 
 ### export
 
-This function serves as a 3D standard file exporter. It can generate (with the use of Leocad and/or Blender) 3ds, wavefront (as obj and mtl within a zip archive) and blend compatible and optimized 3D files of the selected LDraw model(s) or project files.
+This function serves as a 3D standard file exporter.
+It can generate (with the use of Leocad and/or Blender) the following formats:
+- 3ds
+- wavefront (as obj and mtl within a zip archive)
+- blender compatible and optimized 3D files
 
-Those exports can then be used to upload the models online for showcase purposes, displaying them online in personal or commercial galleries (using WebGL: [ThreeJS](https://threejs.org/), [LegoLinux](https://legolinux.com), [Sketchfab](https://sketchfab.com)).
+The model exports can be used for showcase purposes, displaying them online in personal or commercial galleries (uses WebGL: [ThreeJS](https://threejs.org/))
+
+Examples:
+
+- [LegoLinux](https://legolinux.com)
+- [Sketchfab](https://sketchfab.com))
 
 ### modify
 
-This portion of the utility is the more interesting one: it serves as a batch editing tool to modify model files at the part level for both ldr and mpd file extensions.
+Here is where the batch editing happens:
 
-It can be extremely helpful in the case of massive model updates and color or part adjustments that would normally be done manually through an editor.
+This feature is extremely helpful when processing massive model updates and color or part adjustments that would normally be done manually through an editor.
 
-It uses stream editing to find and replace the desired elements, using the LDraw file specification syntax as reference.
+The script uses stream editing to find and replace the desired elements, using the LDraw file specification syntax as reference.
 
 The user can modify any ldr or mpd file in one of four ways:
 
