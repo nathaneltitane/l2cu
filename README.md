@@ -10,13 +10,11 @@ Most older and even more modern editors miss that mark to provide such features 
 
 L²CU supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
 
-It offers several features amongst which rendering and exporting your models: this is particularly interesting since it can turn your creations into image and 3D content (standard 3D formats), letting you publish and share them without compromising your build information (if you do not wish to share the actual model file).
+In addition to the stream editing features, it also offers rendering and exporting your models: this is particularly interesting since it can turn your creations into image and 3D content (standard 3D formats), letting you publish and share them without compromising your build information (if you do not wish to share the actual model file).
 
-You can also tweak or rework the utility's functions to match your preferences or work with certain meta tags commonly found in the model files (used by modern editors such as LeoCAD) and format them just the way you'd like.
+You can also tweak or rework the utility's functions to match your preferences.
 
-In short, L²CU is split into several functions to make the most out of your LDraw model files. 
-
-You can:
+In short, with L²CU you can:
 - render your models
 - export your models (to various 3D standard formats)
 - modify your models(color, part or part with a specific color)
@@ -24,25 +22,23 @@ You can:
 - download and unpack the LDraw parts library
 - create the legacy 'parts.lst' file
 
-For a quick preview of the most up-to-date capabilities, you can call `./l2cu.sh --help` on your terminal emulator to see what's currently supported in L²CU.
-
 ### How does it work?
 
-L²CU is a shell script, with BASH (Bourne Again Shell)  as its backbone: the now monolithic utility is optimized for portability and uses a very minimal set of dependencies to get the job done.
-
 LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly.
-L²CU parses the model file, reads each line contained in it and processes the values to modify or format the file according to your needs.
+
+L²CU is a shell script (BASH) that parses and modifies the text in the model file to get the job done.
+It is optimized for portability and uses a very minimal set of dependencies to get the job done.
 
 ### What does it need?
 
 On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's request.
-That being said, the user may wish to build or install the following requirements prior to using this utility for convenience's sake:
+For the rendering and exporting features, you may wish to install the following prior to processing:
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor
 
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
 
-- curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer (i.e.: apt, dnf, etc.)
+- curl, sed, zip, unzip - common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager/installer.
 
 ### render
 
