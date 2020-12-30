@@ -309,13 +309,17 @@ clear
 console.msg "[ L²CU // l2cu // linux ldraw command line utility [ Version ${version} ] ]"
 echo
 
-console.wait 1
+console.ms "Initializing..."
+
+console.wait 2
 
 # confirmation #
 
 console.msg "Utility started using the '${extension_option}' extension option."
 console.msg "Utility started using the '${option}' option."
 echo
+
+console.wait 2
 
 if [[ "${option}" = "render" ]]
 then
