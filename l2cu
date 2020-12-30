@@ -345,7 +345,7 @@ then
 
 	directory=$(console.dialog "Load model files")
 else
-	console.error "No model directory specified."
+	console.err "No model directory specified."
 	echo
 	console.fwd "Exiting..."
 	echo
@@ -632,7 +632,7 @@ do
 
 			elif [[ "${model_size_number}" -gt "${model_size_threshold}" ]]
 			then
-				console.error "File size threshold exceeded - [ ${model_size} ]"
+				console.err "File size threshold exceeded - [ ${model_size} ]"
 				echo
 				console.wrn "WARNING:"
 				console.wrn "Model file size is above recommended threshold of ${model_size_threshold}MB"
@@ -705,7 +705,7 @@ then
 
 		done < "${colors}"
 
-		console.error "No available color matches the input."
+		console.err "No available color matches the input."
 		echo
 		console.fwd "Exiting..."
 		echo
@@ -1291,7 +1291,7 @@ then
 
 				directory="${browse}"/parts
 			else
-				console.error "LDraw library directory not recognized: 'parts' directory not found."
+				console.err "LDraw library directory not recognized: 'parts' directory not found."
 			fi
 		else
 			console.wrn "LDraw parts directory not found."
@@ -1330,7 +1330,7 @@ then
 
 					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
 				else
-					console.error "LDraw parts directory not setup on system."
+					console.err "LDraw parts directory not setup on system."
 					echo
 					console.wrn "The parts.lst file may be needed for some legacy editors to function."
 					echo
