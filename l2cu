@@ -306,8 +306,7 @@ clear
 
 # welcome #
 
-console.msg "[ L²CU // l2cu // linux ldraw command line utility [ Version ${version} ] ]"
-echo
+console.title "L²CU" "l2cu // linux ldraw command line utility" "${version}"
 
 console.ms "Initializing..."
 
