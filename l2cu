@@ -16,133 +16,157 @@ do
 		-directory)
 			shift
 			directory="${1}"
-			;;
+		;;
 
 # file types #
 
 		-all)
 			extension_option="all"
 			extensions_list=(ldr mpd)
-			;;
+		;;
+
 		-ldr)
 			extension_option="ldr"
 			extensions_list=(ldr)
-			;;
+		;;
+
 		-mpd)
 			extension_option="mpd"
 			extensions_list=(mpd)
-			;;
+		;;
 
 # rendering #
 
 		-render)
 			option="render"
-			;;
+		;;
+
 		-full)
 			render_option="full"
 			render_preset="full"
-			;;
+		;;
+
 		-fixed)
 			render_option="fixed"
 			render_preset="fixed"
-			;;
+		;;
+
 		-flat)
 			render_option="flat"
 			render_preset="flat"
-			;;
+		;;
+
 		-quarter-back)
 			render_option="quarter-back"
 			render_preset="quarter-back"
-			;;
+		;;
+
 		-quarter-front)
 			render_option="quarter-front"
 			render_preset="quarter-front"
-			;;
+		;;
+
 		-back)
 			render_option="back"
 			render_preset="back"
-			;;
+		;;
+
 		-front)
 			render_option="front"
 			render_preset="front"
-			;;
+		;;
 
 # exports #
 
 		-export)
 			option="export"
-			;;
+		;;
+
 		-3ds)
 			export_option="3ds"
 			export_extension="3ds"
 			export_name="3DS"
-			;;
+		;;
+
 		-blender)
 			export_option="3ds"
 			export_extension="blend"
 			export_name="Blender"
-			;;
+		;;
+
 		-collada)
 			export_option="dae"
 			export_extension="dae"
 			export_name="Collada"
-			;;
+		;;
+
 		-wavefront)
 			export_option="obj"
 			export_extension="obj"
 			export_name="Wavefront"
-			;;
+		;;
 
 # modify #
 
 		-modify)
 			option="modify"
-			;;
+		;;
+
 		-color)
 			modify_option="color"
-			;;
+		;;
+
 		-part)
 			modify_option="part"
-			;;
+		;;
+
 		-bind)
 			modify_option="bind"
-			;;
+		;;
+
 		-lint)
 			modify_option="lint"
-			;;
+		;;
+
 		-step)
 			modify_option="step"
-			;;
+		;;
+
 		-format)
 			modify_option="format"
-			;;
+		;;
+
 		-overwrite)
 			overwrite_option="overwrite"
-			;;
+		;;
 
 # get #
 
 		-get)
 			option="get"
-			;;
+		;;
+
 		-update)
 			get_option=update
-			;;
+		;;
+
 		-unofficial)
 			get_option=unofficial
-			;;
+		;;
 
 # make list #
 
 		-make-list)
 			option="make-list"
-			;;
+		;;
+
 		-descritpion)
 			sort_mode="description"
-			;;
+		;;
+
 		-number)
 			sort_mode="number"
-			;;
+		;;
 
 # help #
 
@@ -209,21 +233,24 @@ do
 			echo -e "-h, --help \t Show help and usage."
 			echo -e "-v, --version \t Show ${script} version."
 			exit
-			;;
+		;;
+
 		-v|--version)
 			echo
 			echo -e "${script} ${version}"
 			echo
 			exit
-			;;
+		;;
+
 		*)
 			echo
 			echo -e "${script}: Unknown option ${1}"
 			echo -e "Type './${script} --help' for help and usage information."
 			echo
-			exit
-			;;
-		esac
+			exit 1
+		;;
+	esac
+
 	shift
 done
 
@@ -231,9 +258,9 @@ done
 
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-version="12-30-2020"
-
 stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
+version="12-30-2020"
 
 # functions #
 
