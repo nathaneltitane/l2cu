@@ -8,6 +8,14 @@
 
 curl -sL https://raw.githubusercontent.com/nathaneltitane/console/master/console > /usr/bin/console && source /usr/bin/console
 
+# script #
+
+script=$(basename -- "${BASH_SOURCE[0]}")
+
+# version #
+
+version="02-07-2020"
+
 # usage #
 
 while (($#))
@@ -17,9 +25,7 @@ do
 			shift
 			directory="${1}"
 		;;
-
 # file types #
-
 		-all)
 			extension_option="all"
 			extensions_list=(ldr mpd)
@@ -34,9 +40,7 @@ do
 			extension_option="mpd"
 			extensions_list=(mpd)
 		;;
-
 # rendering #
-
 		-render)
 			option="render"
 		;;
@@ -75,9 +79,7 @@ do
 			render_option="front"
 			render_preset="front"
 		;;
-
 # exports #
-
 		-export)
 			option="export"
 		;;
@@ -105,9 +107,7 @@ do
 			export_extension="obj"
 			export_name="Wavefront"
 		;;
-
 # modify #
-
 		-modify)
 			option="modify"
 		;;
@@ -139,9 +139,7 @@ do
 		-overwrite)
 			overwrite_option="overwrite"
 		;;
-
 # get #
-
 		-get)
 			option="get"
 		;;
@@ -153,9 +151,7 @@ do
 		-unofficial)
 			get_option=unofficial
 		;;
-
 # make list #
-
 		-make-list)
 			option="make-list"
 		;;
@@ -167,13 +163,10 @@ do
 		-number)
 			sort_mode="number"
 		;;
-
 # help #
-
 		-h|--help)
-			echo -e "USAGE"
 			echo
-			echo -e "./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
+                       	echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
 			echo
 			echo -e "Utility options:"
 			echo
@@ -228,39 +221,28 @@ do
 			echo -e "-description \t Sort list by part description."
 			echo -e "-number \t Sort list by part number."
 			echo
-			echo -e "USAGE:"
-			echo
-			echo -e "-h, --help \t Show help and usage."
-			echo -e "-v, --version \t Show ${script} version."
-			exit
-		;;
+                        echo -e "'${script}' [ Version ${version} ]"
+                        echo
 
-		-v|--version)
-			echo
-			echo -e "${script} ${version}"
-			echo
-			exit
-		;;
+                        exit
+                ;;
 
-		*)
-			echo
-			echo -e "${script}: Unknown option ${1}"
-			echo -e "Type './${script} --help' for help and usage information."
-			echo
-			exit 1
-		;;
-	esac
+                *)
+                        echo
+                       	echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
+                        echo
+                        echo -e "${script}: Unknown option '${1}'"
+                        echo -e "Type './${script} --help' for help and usage information."
+                        echo
 
-	shift
+                        exit 1
+                ;;
+        esac
+
+        shift
 done
 
 # variables #
-
-script=$(basename -- "${BASH_SOURCE[0]}")
-
-stamp=$(date +"%m-%d-%Y-%H-%M-%S")
-
-version="12-30-2020"
 
 # functions #
 
