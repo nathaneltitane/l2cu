@@ -317,7 +317,7 @@ clear
 
 console.title "L²CU" "l2cu // linux ldraw command line utility" "${version}"
 
-console.ms "Initializing..."
+console.msg "Initializing..."
 
 console.wait 2
 
