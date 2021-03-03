@@ -513,7 +513,7 @@ do
 
 			# render model using options
 
-			console.inf "Rendering in..............: ${renders_directory}"
+			console.inf "Rendering in" "${renders_directory}"
 			echo
 
 			for coordinates in ${position[@]}
@@ -529,8 +529,8 @@ do
 
 				# render
 
-				console.inf "Rendering.................: ${model_name^^}"
-				console.inf "View......................: ${view[coordinates]^^}"
+				console.inf "Rendering" "${model_name^^}"
+				console.inf "View" "${view[coordinates]^^}"
 				echo
 
 				leocad_render "${model}" $coordinates
@@ -547,7 +547,7 @@ do
 				fi
 			done
 
-			console.inf "Output....................: ${renders_directory}/${model_name}-${view[$coordinates]}.${extension}"
+			console.inf "Output" "${renders_directory}/${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
@@ -576,8 +576,8 @@ do
 
 			leocad_export () {
 
-				console.inf "Exporting.................: ${model}"
-				console.inf "Format....................: ${export_name}"
+				console.inf "Exporting" "${model}"
+				console.inf "Format" "${export_name}"
 				echo
 
 				leocad "${model}" "-${export_option}" "$export_file" >> /dev/null
@@ -642,14 +642,14 @@ do
 
 			if [[ "${model_size_number}" -le "${model_size_threshold}" ]]
 			then
-				console.scs "File size threshold not exceeded - [ ${model_size} ]"
+				console.scs "File size threshold not exceeded" "[ ${model_size} ]"
 				echo
 
 			# if greater than threshold
 
 			elif [[ "${model_size_number}" -gt "${model_size_threshold}" ]]
 			then
-				console.err "File size threshold exceeded - [ ${model_size} ]"
+				console.err "File size threshold exceeded" "[ ${model_size} ]"
 				echo
 				console.wrn "WARNING:"
 				console.wrn "Model file size is above recommended threshold of ${model_size_threshold}MB"
@@ -712,9 +712,9 @@ then
 
 				console.fwd "Confirming input value..."
 				echo
-				console.inf "Color name................: ${ldraw_color_name}"
-				console.inf "Color number..............: ${ldraw_color_number}"
-				console.inf "Color hexadecimal value...: ${ldraw_color_hex_value}"
+				console.inf "Color name" "${ldraw_color_name}"
+				console.inf "Color number" "${ldraw_color_number}"
+				console.inf "Color hexadecimal value" "${ldraw_color_hex_value}"
 				echo
 
 				return "${ldraw_color_number}"
@@ -732,7 +732,7 @@ then
 
 	parse_parts () {
 		console.empty
-		
+
 		part_input="$input"
 
 		return "${part_input}"
@@ -743,7 +743,7 @@ then
 	if [[ "${modify_option}" = "color" ]]
 	then
 		console.ipt "Enter the color description [ name / number / hexadecimal ] to modify."
-		
+
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -840,7 +840,7 @@ then
 				then
 					console.inf "Linting model file."
 					echo
-					console.inf "Model file................: ${model}"
+					console.inf "Model file" "${model}"
 					echo
 
 						# substitute carriage return for newline
@@ -852,7 +852,7 @@ then
 						# delete lines containing BACKGROUND meta
 						# delete lines containing PIVOT meta
 						# delete lines containing HIDDEN meta
-						
+
 						# strip '(' character
 						# strip ')' character
 
@@ -914,10 +914,10 @@ then
 						then
 							color="${new_color}"
 
-							console.inf "Modifying.................: ${model}"
+							console.inf "Modifying" "${model}"
 							echo
-							console.inf "Changing..................: ${old_color}"
-							console.inf "Setting...................: ${new_color} "
+							console.inf "Changing" "${old_color}"
+							console.inf "Setting" "${new_color} "
 							echo
 						else
 							: # pass
@@ -934,10 +934,10 @@ then
 						then
 							part="${new_part}"
 
-							console.inf "Modifying.................: ${model}"
+							console.inf "Modifying" "${model}"
 							echo
-							console.inf "Changing..................: ${old_part}"
-							console.inf "Setting...................: ${new_part} "
+							console.inf "Changing" "${old_part}"
+							console.inf "Setting" "${new_part} "
 							echo
 						else
 							: # pass
@@ -956,12 +956,12 @@ then
 							then
 								color="${new_color}"
 
-								console.inf "Modifying.................: ${model}"
+								console.inf "Modifying" "${model}"
 								echo
-								console.inf "Part......................: ${part}"
+								console.inf "Part" "${part}"
 								echo
-								console.inf "Changing..................: ${old_color}"
-								console.inf "Setting...................: ${new_color} "
+								console.inf "Changing" "${old_color}"
+								console.inf "Setting" "${new_color} "
 								echo
 							else
 								: # pass
