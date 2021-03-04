@@ -14,7 +14,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version #
 
-version="02-07-2020"
+version="03-03--2020"
 
 # usage #
 
@@ -73,7 +73,7 @@ do
 		-back)
 			render_option="back"
 			render_preset="back"
-		;;
+		;;-
 
 		-front)
 			render_option="front"
@@ -751,7 +751,7 @@ then
 		old_color="${ldraw_color_number}"
 
 		console.ipt "Enter the color description [ name / number / hexadecimal ] to set."
-		
+
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -762,7 +762,7 @@ then
 	if [[ "${modify_option}" = "part" ]]
 	then
 		console.ipt "Enter the part number to modify."
-		
+
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -770,7 +770,7 @@ then
 		old_part="${part_input}"
 
 		console.ipt "Enter the part number to set as replacement."
-		
+
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -781,7 +781,7 @@ then
 	if [[ "${modify_option}" = "bind" ]]
 	then
 		console.ipt "Enter the part number to modify."
-		
+
 		parse_parts
 
 		# $? returning wrong arbitrary value
@@ -789,7 +789,7 @@ then
 		part_selection="${part_input}"
 
 		console.ipt "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
-		
+
 		parse_colors
 
 		# $? returning wrong arbitrary value
@@ -797,7 +797,7 @@ then
 		old_color="${ldraw_color_number}"
 
 		console.ipt "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
-		
+
 		parse_colors
 
 		# $? returning wrong arbitrary value for ${new_color}
@@ -1181,7 +1181,7 @@ then
 
 				console.wrn "Writing file."
 				echo
-				console.inf "Model file................: ${model}"
+				console.inf "Model file" "${model}"
 				echo
 
 				mv "${temporary_file}" "${temporary_file%.tmp}"
@@ -1190,9 +1190,9 @@ then
 			if [ -z "$overwrite_option" ]
 			then
 				console.ask "Write changes to original model file?"
-				
+
 				echo
-				console.inf "Model file................: ${model}"
+				console.inf "Model file" "${model}"
 				echo
 
 				read reply
@@ -1205,7 +1205,7 @@ then
 
 					console.wrn "Writing file."
 					echo
-					console.inf "Model file................: ${model}"
+					console.inf "Model file" "${model}"
 					echo
 
 					mv "${temporary_file}" "${temporary_file%.tmp}"
@@ -1254,7 +1254,7 @@ then
 	if [ -z "${directory}" ]
 	then
 		console.ask "Specify download location?"
-		
+
 		echo
 
 		read reply
@@ -1285,7 +1285,7 @@ then
 	if [ -z "${directory}" ]
 	then
 		console.wrn "Is the LDraw parts library setup on this system?"
-		
+
 		echo
 
 		read reply
@@ -1313,7 +1313,7 @@ then
 		else
 			console.wrn "LDraw parts directory not found."
 			console.ask "Specify the LDraw parts library directory location to continue?"
-			
+
 			echo
 
 			read reply
@@ -1327,7 +1327,7 @@ then
 				directory="${browse}"/parts
 			else
 				console.ask "Download the latest LDraw parts library?"
-				
+
 				echo
 
 				read reply
@@ -1430,7 +1430,7 @@ then
 						printf '%-30s %-s\n' "${filename}" "${description}" >> parts.lst
 					fi
 
-					console.inf "Parts count...............: $((count++))\c"
+					console.inf "Parts count" "$((count++))\c"
 					echo
 				fi
 			done
