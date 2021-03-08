@@ -14,7 +14,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version #
 
-version="03-03--2020"
+version="03-07-02020"
 
 # usage #
 
@@ -513,7 +513,8 @@ do
 
 			# render model using options
 
-			console.inf "Rendering in" "${renders_directory}"
+			console.inf "Rendering in"
+			console.inf "${renders_directory%*/}"
 			echo
 
 			for coordinates in ${position[@]}
@@ -547,7 +548,7 @@ do
 				fi
 			done
 
-			console.inf "Output" "${renders_directory}/${model_name}-${view[$coordinates]}.${extension}"
+			console.inf "Output" "${model_name}-${view[$coordinates]}.${extension}"
 			echo
 		fi
 
