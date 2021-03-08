@@ -586,7 +586,8 @@ do
 				echo
 
 				console.inf "Output" "${export_file}"
-
+				echo
+				
 				leocad "${model}" "-${export_option}" "${export_file}" >> /dev/null
 
 				wait
