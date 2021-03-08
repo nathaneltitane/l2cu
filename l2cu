@@ -513,7 +513,7 @@ do
 
 			# render model using options
 
-			console.msg "Rendering in"
+			console.msg "Rendering in:"
 			console.msg "${renders_directory%*/}"
 			echo
 
@@ -577,15 +577,15 @@ do
 
 			leocad_export () {
 
-				console.msg "Exporting in"
+				console.msg "Exporting in:"
 				console.msg "${exports_directory%*/}"
 				echo
 
 				console.inf "Exporting" "${model_name^^}"
-				echo
-
 				console.inf "Format" "${export_name}"
 				echo
+
+				console.inf "Output" "${export_file}"
 
 				leocad "${model}" "-${export_option}" "${export_file}" >> /dev/null
 
