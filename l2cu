@@ -577,7 +577,10 @@ do
 
 			leocad_export () {
 
-				console.inf "Exporting" "${model}"
+				console.msg "Exporting"
+				console.msg "${model}"
+				echo
+
 				console.inf "Format" "${export_name}"
 				echo
 
