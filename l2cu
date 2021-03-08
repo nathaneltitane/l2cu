@@ -578,13 +578,13 @@ do
 			leocad_export () {
 
 				console.msg "Exporting"
-				console.msg "${model}"
+				console.msg "${model_name^^}"
 				echo
 
 				console.inf "Format" "${export_name}"
 				echo
 
-				leocad "${model}" "-${export_option}" "$export_file" >> /dev/null
+				leocad "${model}" "-${export_option}" "${export_file}" >> /dev/null
 
 				wait
 			}
@@ -637,7 +637,7 @@ do
 
 			# verify export file size
 
-			model_size=$(ls -s --block-size=MB "${export_file}" | awk '{print $1}')
+			model_size=$(ls -s --block-size=MB "${export_file}" | awk '{print $6}')
 
 			model_size_threshold="25"
 			model_size_number="${model_size%MB}"
