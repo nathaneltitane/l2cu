@@ -73,7 +73,7 @@ do
 		-back)
 			render_option="back"
 			render_preset="back"
-		;;-
+		;;
 
 		-front)
 			render_option="front"
