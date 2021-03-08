@@ -513,8 +513,8 @@ do
 
 			# render model using options
 
-			console.inf "Rendering in"
-			console.inf "${renders_directory%*/}"
+			console.msg "Rendering in"
+			console.msg "${renders_directory%*/}"
 			echo
 
 			for coordinates in ${position[@]}
