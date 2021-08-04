@@ -645,7 +645,7 @@ do
 
 			# get model size in bytes
 
-			model_size=$(find -type -f "${exports_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
+			model_size=$(find -type f "${exports_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
 
 			# set model size threshold in bytes : 25 * 1024
 
