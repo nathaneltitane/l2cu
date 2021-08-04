@@ -641,26 +641,31 @@ do
 
 			# verify export file size
 
-			model_size=$(ls -s --block-size=MB "${exports_directory}${export_file}" | cut -d ' ' -f 1)
+			block_size-1024
 
-			model_size_threshold="25"
-			model_size_number="${model_size%MB}"
+			# get model size in bytes
+
+			model_size=$(find -type -f "${exports_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
+
+			# set model size threshold in bytes : 25 * 1024
+
+			model_size_threshold="25600"
 
 			# if lesser than threshold
 
-			if [[ "${model_size_number}" -le "${model_size_threshold}" ]]
+			if [[ "${model_size}" -le "${model_size_threshold}" ]]
 			then
 				console.scs "File size threshold not exceeded" "[ ${model_size} ]"
 				echo
 
 			# if greater than threshold
 
-			elif [[ "${model_size_number}" -gt "${model_size_threshold}" ]]
+			elif [[ "${model_size}" -gt "${model_size_threshold}" ]]
 			then
 				console.err "File size threshold exceeded" "[ ${model_size} ]"
 				echo
 				console.wrn "WARNING:"
-				console.wrn "Model file size is above recommended threshold of ${model_size_threshold}MB"
+				console.wrn "Model file size is above recommended threshold of ${model_size_threshold}B"
 				console.wrn "You may experience higher than average loading times."
 				echo
 			fi
