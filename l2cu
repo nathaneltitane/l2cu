@@ -6,7 +6,7 @@
 
 # dependencies #
 
-curl -sL https://raw.githubusercontent.com/nathaneltitane/console/master/console > /usr/bin/console && source /usr/bin/console
+curl -sL get.trmnl.me/console/console > /usr/bin/console && . /usr/bin/console
 
 # script #
 
