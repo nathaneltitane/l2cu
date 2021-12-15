@@ -15,7 +15,7 @@ In short, with L²CU you can:
 - format your models in bulk (meta tags, steps, linting, etc.)
 - download and unpack the LDraw parts library
 - create the legacy 'parts.lst' file
-- 
+
 You can also tweak or rework the utility's functions to match your preferences.
 
 ### How does it work?
@@ -38,7 +38,7 @@ Common utilities either already set up on your Linux-based system or that you ca
 - zip
 - unzip
 
-For the rendering and exporting features, you may wish to install the following prior to processing:
+For the 'render' and 'export' features, you may wish to install the following prior to processing:
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor
 
@@ -50,7 +50,6 @@ The render function generates preset, high defintion renders, of the selected LD
 
 The user can choose from set defaults or specify the latitude and longitude parameters of the camera, as well as a file saving suffix to register the coordinates as a viewing angle string to the file name:
 
-ˋˋˋ
 Defaults (as arrays):
 
 latitude=(
@@ -73,7 +72,6 @@ view=(
 	"back"
 	"front"
 )
-ˋˋˋ
 
 You can refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences.
 
@@ -94,9 +92,7 @@ Examples:
 
 ### modify
 
-Here is where the batch editing happens:
-
-This feature is extremely helpful when processing massive model updates and color or part adjustments that would normally be done manually through an editor.
+Here is where the batch editing happens: this feature is extremely helpful when processing massive model updates and color or part adjustments that would normally be done manually through an editor.
 
 The script uses stream editing to find and replace the desired elements, using the LDraw file specification syntax as reference.
 
