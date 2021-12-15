@@ -14,7 +14,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version #
 
-version="08-03-2021"
+version="12-15-2021"
 
 # usage #
 
