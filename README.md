@@ -38,7 +38,7 @@ Common utilities either already set up on your Linux-based system or that you ca
 - zip
 - unzip
 
-For the 'render' and 'export' features, you may wish to install the following prior to processing:
+The 'render' and 'export' features depend on the following. Install them before processing:
 
 - [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor
 
