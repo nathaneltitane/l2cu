@@ -166,7 +166,7 @@ do
 # help #
 		-h|--help)
 			echo
-                       	echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
+			echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
 			echo
 			echo -e "Utility options:"
 			echo
@@ -221,25 +221,26 @@ do
 			echo -e "-description \t Sort list by part description."
 			echo -e "-number \t Sort list by part number."
 			echo
-                        echo -e "'${script}' [ Version ${version} ]"
-                        echo
+			echo -e "'${script}' [ Version ${version} ]"
+			echo
+			
+			exit
+		;;
 
-                        exit
-                ;;
+		*)
+			echo
+			echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
+			echo
+			echo -e "${script}: Unknown option '${1}'"
+			echo -e "Type './${script} --help' for help and usage information."
+			echo
 
-                *)
-                        echo
-                       	echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
-                        echo
-                        echo -e "${script}: Unknown option '${1}'"
-                        echo -e "Type './${script} --help' for help and usage information."
-                        echo
+			exit 1
+		;;
 
-                        exit 1
-                ;;
-        esac
+		esac
 
-        shift
+		shift
 done
 
 # variables #
