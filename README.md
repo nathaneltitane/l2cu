@@ -1,6 +1,6 @@
 ![l2cu](https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg)
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-2f343f.svg?style=for-the-badge)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QG58TMRHNSZAU)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-000000.svg?style=for-the-badge)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QG58TMRHNSZAU)
 
 [[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 01-21-2022 ]
 
