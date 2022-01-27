@@ -1,4 +1,10 @@
-### L²CU: LDraw Linux Command line Utility
+![l2cu](https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg)
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-2f343f.svg?style=for-the-badge)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QG58TMRHNSZAU)
+
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 01-21-2022 ]
+
+Welcome to L²CU - The LDraw Linux Command line Utility!
 
 L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of LDraw model files.
 
