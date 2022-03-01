@@ -1,46 +1,55 @@
 #!/bin/bash
 
-# Author: Nathanel Titane - nathanel.titane@gmail.com
+# dependencies ////////////////////////////////////////////////////////////////
 
-# L²CU # l2cu # linux ldraw command line utility #
+curl -s -L get.frbltr.app > /usr/bin/frobulator
 
-# dependencies #
+. /usr/bin/frobulator
 
-curl -sL get.trmnl.me/console/console > /usr/bin/console && . /usr/bin/console
-
-# script #
+# script //////////////////////////////////////////////////////////////////////
 
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-# version #
+# version /////////////////////////////////////////////////////////////////////
 
-version="12-15-2021"
+version="03-01-2022"
 
-# usage #
+# usage ///////////////////////////////////////////////////////////////////////
 
 while (($#))
 do
 	case "${1}" in
 		-directory)
-			shift
 			directory="${1}"
+
+			shift
 		;;
-# file types #
+
 		-all)
 			extension_option="all"
-			extensions_list=(ldr mpd)
+
+			extensions_list=(
+				ldr
+				mpd
+			)
 		;;
 
 		-ldr)
 			extension_option="ldr"
-			extensions_list=(ldr)
+
+			extensions_list=(
+				ldr
+			)
 		;;
 
 		-mpd)
 			extension_option="mpd"
-			extensions_list=(mpd)
+
+			extensions_list=(
+				mpd
+			)
 		;;
-# rendering #
+
 		-render)
 			option="render"
 		;;
@@ -79,7 +88,7 @@ do
 			render_option="front"
 			render_preset="front"
 		;;
-# exports #
+
 		-export)
 			option="export"
 		;;
@@ -107,7 +116,7 @@ do
 			export_extension="obj"
 			export_name="Wavefront"
 		;;
-# modify #
+
 		-modify)
 			option="modify"
 		;;
@@ -139,19 +148,19 @@ do
 		-overwrite)
 			overwrite_option="overwrite"
 		;;
-# get #
+
 		-get)
 			option="get"
 		;;
 
 		-update)
-			get_option=update
+			get_option="update"
 		;;
 
 		-unofficial)
-			get_option=unofficial
+			get_option="unofficial"
 		;;
-# make list #
+
 		-make-list)
 			option="make-list"
 		;;
@@ -163,10 +172,10 @@ do
 		-number)
 			sort_mode="number"
 		;;
-# help #
+
 		-h|--help)
 			echo
-			echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
+			echo -e "Usage: ./${script} [EXTENSION] | [OPTION] [PARAMETER]"
 			echo
 			echo -e "Utility options:"
 			echo
@@ -227,15 +236,23 @@ do
 			exit
 		;;
 
+		"")
+			# handle empty argument:
+			# use default values specified in script
+
+			:
+		;;
+
 		*)
 			echo
-			echo -e "Usage: ./${script} [EXTENSION OPTION] [OPTION] [PARAMETER]"
+			echo -e "Usage: ./${script} [EXTENSION] | [OPTION] [PARAMETER]"
 			echo
 			echo -e "${script}: Unknown option '${1}'"
 			echo -e "Type './${script} --help' for help and usage information."
 			echo
 
 			exit 1
+
 		;;
 
 		esac
@@ -243,11 +260,41 @@ do
 		shift
 done
 
-# variables #
+# clear ///////////////////////////////////////////////////////////////////////
 
-# functions #
+frobulator.clear
 
-# get library
+# prompt //////////////////////////////////////////////////////////////////////
+
+frobulator.script "Setting up ${script#*-}"
+echo
+
+# variables ///////////////////////////////////////////////////////////////////
+
+# defaults ////////////////////////////////////////////////////////////////////
+
+if [ -z "${directory}" ]
+then
+	frobulator.ask "Load model files from:"
+	echo
+
+	# specify directory location or exit on 'cancel'
+
+	directory=$(frobulator.dialog "Load model files")
+
+	if [ -z "${directory}" ]
+	then
+		frobulator.err "No model directory specified."
+		echo
+
+		frobulator.fwd "Exiting..."
+		echo
+
+		exit 1
+	fi
+fi
+
+# functions ////////////////////////////////////////////////////////////////////
 
 get_library () {
 
@@ -255,13 +302,13 @@ get_library () {
 
 	# download
 
-	console.download "${parts_url}" "${directory}"/"${parts_archive}"
+	frobulator.download "${parts_url}" "${directory}"/"${parts_archive}"
 
 	# extract
 
 	unzip "${parts_archive}" &
 
-	console.spinner "Extracting..."
+	frobulator.spinner "Extracting..."
 	echo
 
 	# rename
@@ -269,116 +316,624 @@ get_library () {
 	mv "${parts_archive}" ldraw.zip
 }
 
-# export: make temporary file #
+l2cu_prepare () {
+	url=https://raw.githubusercontent.com/nathaneltitane/l2cu/main
 
-if [[ "${option}" == "export" ]]
-then
-	console.trap beautify
+	if [[ "${option}" = "export" ]]
+	then
+		file=beautify
+	fi
 
-	# push blender conversion script to temporary file
+	if [[ "${option}" = "modify" ]]
+	then
+		file=colors
+	fi
 
-	console.get https://raw.githubusercontent.com/nathaneltitane/l2cu/master beautify "${beautify}"
-fi
+	trap "${file}"
 
-# modify: make temporary file #
+	frobulator.get "${url}" "${file}"
+}
 
-if [[ ${option} == "modify" ]]
-then
-	console.trap colors
+l2cu_export () {
+	frobulator.msg "Export directory" "[ '${exports_directory%*/}' ]"
+	echo
 
-	# push ldraw colors list to temporary file
+	frobulator.inf "Exporting" "[ '${model_name^^}' ]"
+	frobulator.inf "Format"    "[ '${export_name}' ]"
+	echo
 
-	console.get https://raw.githubusercontent.com/nathaneltitane/l2cu/master colors "${colors}"
+	frobulator.inf "Output" "${export_file}"
+	echo
 
-fi
+	leocad \
+		"${model}" "-${export_option}" "${export_file}" >> /dev/null
 
-# initial prompt clear #
+	wait
+}
 
-clear
+l2cu_render () {
+	frobulator.msg "Render directory" "[ '${renders_directory%*/}' ]"
+	echo
 
-# test for utility dependencies and requirements
+	frobulator.inf "Rendering" "[ '${model_name^^}' ]"
+	frobulator.inf "View"      "[ '${view[coordinates]^^}' ]"
+	echo
 
-console.inf "Verifying utility requirements..."
-echo
+	height="4096"
+	width="4096"
+	extension="png"
 
-install_list=(
+	model="${1}"
+	coordinates="${2}"
+
+	leocad \
+		-h "${height}"															\
+		-w "${width}"															\
+		-i "${model_name}-${view[$coordinates]}.${extension}"					\
+		--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
+		--shading ${shading}													\
+		--line-width ${line_width} "${model}" >> /dev/null
+}
+
+parse_colors () {
+	# set to lowercase for input match
+
+	color_input="${input,,}"
+
+	while IFS=$' '
+	read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
+	do
+		# color input entries cleanup
+
+		# color name
+
+		# remove underscores from name
+
+		space_name="${ldraw_color_name//_/ }"
+
+		# set name to lowercase for input match
+
+		name="${space_name,,}"
+
+		# reattribute input variable to lowercase name value
+
+		ldraw_color_name="${name}"
+
+		# color hex value
+
+		# remove pound from name
+
+		hex_value="${ldraw_color_hex_value//#/}"
+
+		# set name to lowercase for input match
+
+		hex_value="${hex_value,,}"
+
+		# attribute input variable to lowercase name value
+
+		ldraw_color_hex_value="${hex_value}"
+
+		if [[ "${color_input}" == "${ldraw_color_name}"      ]]	|| \
+		   [[ "${color_input}" == "${ldraw_color_number}"    ]]	|| \
+		   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
+		then
+			# confirmation
+
+			frobulator.fwd "Confirming input value..."
+			echo
+			frobulator.inf "Color name" "${ldraw_color_name}"
+			frobulator.inf "Color number" "${ldraw_color_number}"
+			frobulator.inf "Color hexadecimal value" "${ldraw_color_hex_value}"
+			echo
+
+			return "${ldraw_color_number}"
+		fi
+
+	done < "${colors}"
+
+	frobulator.err "No available color matches the input."
+	echo
+
+	frobulator.fwd "Exiting..."
+	echo
+
+	exit 1
+}
+
+parse_parts () {
+	part_input="$input"
+
+	return "${part_input}"
+}
+
+l2cu_input () {
+	# color input
+
+	if [[ "${modify_option}" = "color" ]]
+	then
+		frobulator.ipt "Enter the color description [ name / number / hexadecimal ] to modify."
+
+		parse_colors
+
+		# $? returning wrong arbitrary value
+
+		old_color="${ldraw_color_number}"
+
+		frobulator.ipt "Enter the color description [ name / number / hexadecimal ] to set."
+
+		parse_colors
+
+		# $? returning wrong arbitrary value
+
+		new_color="${ldraw_color_number}"
+	fi
+
+	# part input
+
+	if [[ "${modify_option}" = "part" ]]
+	then
+		frobulator.ipt "Enter the part number to modify."
+
+		parse_parts
+
+		# $? returning wrong arbitrary value
+
+		old_part="${part_input}"
+
+		frobulator.ipt "Enter the part number to set as replacement."
+
+		parse_parts
+
+		# $? returning wrong arbitrary value
+
+		new_part="${part_input}"
+	fi
+
+	# bind input
+
+	if [[ "${modify_option}" = "bind" ]]
+	then
+		frobulator.ipt "Enter the part number to modify."
+
+		parse_parts
+
+		# $? returning wrong arbitrary value
+
+		part_selection="${part_input}"
+
+		frobulator.ipt "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
+
+		parse_colors
+
+		# $? returning wrong arbitrary value
+
+		old_color="${ldraw_color_number}"
+
+		frobulator.ipt "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
+
+		parse_colors
+
+		# $? returning wrong arbitrary value for ${new_color}
+
+		new_color="${ldraw_color_number}"
+	fi
+}
+
+model_lint () {
+	if [[ "${modify_option}" = "lint" ]]
+	then
+		frobulator.inf "Linting" "[ '${model}']"
+		echo
+
+			# substitute carriage return for newline
+			# substitute lines containing empty parsing string # BUG #
+			# substitute multiple whitespace characters to one
+
+			# delete lines beginning with whitespace character
+			# delete lines beginning with dot character
+			# delete lines containing BACKGROUND meta
+			# delete lines containing PIVOT meta
+			# delete lines containing HIDDEN meta
+
+			# strip '(' character
+			# strip ')' character
+
+		sed													\
+			-e 's/\r//g'									\
+			-e 's/0 STEP  *\./0 STEP/g'						\
+			-e 's/  */ /g'									\
+			-e '/  *\./d'									\
+			-e '/^ /d'										\
+			-e '/^\./d'										\
+			-e '/BACKGROUND/d'								\
+			-e '/PIVOT/d'									\
+			-e '/HIDDEN/d'									\
+			-e 's/(//g'										\
+			-e 's/)//g'										\
+			-e '/^$/d' "${model}" > "${model_temporary_file}"
+
+			# exit to avoid line breakdown iteration and overwrite
+
+			break
+	fi
+}
+
+model_color () {
+	l2cu_input
+
+	if [[ "${modify_option}" = "color" ]]
+	then
+		if [[ "${color}" = "${old_color}" ]]
+		then
+			color="${new_color}"
+
+			frobulator.inf "Modifying" "${model}"
+			echo
+			frobulator.inf "Changing" "${old_color}"
+			frobulator.inf "Setting" "${new_color}"
+			echo
+		else
+			: # pass
+		fi
+	fi
+}
+
+model_part () {
+	l2cu_input
+
+	if [[ "${modify_option}" = "part" ]]
+	then
+		if [[ "${part}" = "${old_part}" ]]
+		then
+			part="${new_part}"
+
+			frobulator.inf "Modifying" "${model}"
+			echo
+			frobulator.inf "Changing" "${old_part}"
+			frobulator.inf "Setting" "${new_part} "
+			echo
+		else
+			: # pass
+		fi
+	fi
+}
+
+model_bind () {
+	l2cu_input
+
+	if [[ "${modify_option}" = "bind" ]]
+	then
+		if [[ "${part}" == "${part_selection}" ]]
+		then
+			if [[ "${color}" = "${old_color}" ]]
+			then
+				color="${new_color}"
+
+				frobulator.inf "Modifying" "${model}"
+				echo
+				frobulator.inf "Part" "${part}"
+				echo
+				frobulator.inf "Changing" "${old_color}"
+				frobulator.inf "Setting" "${new_color} "
+				echo
+			else
+				: # pass
+			fi
+		fi
+	fi
+}
+
+model_step () {
+	if [[ "${modify_option}" = "step" ]]
+	then
+		if [[ "${line}" == *ldr* ]]
+		then
+			if [[ "${suffix}" == *ldr* ]]
+			then
+				color="0"
+				suffix="ldr\n0 STEP"
+			else
+				: # pass
+			fi
+		fi
+	fi
+}
+
+model_author () {
+	if [[ "${modify_option}" = "step" ]]
+	then
+		if [[ "${line}" == *[aA][uU][tT][hH][oO][rR]* ]]
+		then
+			IFS=' '
+			read -r flag statement author_model author author_string <<< "${line}"
+
+			if [ ! -e "./author" ]
+			then
+				frobulator.wrn "No author file found."
+				echo
+
+				frobulator.ask "Create author file?"
+				echo
+
+				read reply
+
+				if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+				then
+					frobulator.ipt "Enter author information:"
+					echo
+
+					author_input="$input"
+
+					echo "${author_input}" > ./author
+
+					author_string=$(echo $(cat ./author))
+				else
+					frobulator.wrn "No author string/file specified."
+					echo
+
+					frobulator.fwd "Skipping..."
+					echo
+
+					line=""
+				fi
+
+			else
+				if [ -e "./author" ]
+				then
+					author_string=$(echo $(cat ./author))
+				fi
+			fi
+
+			echo "${line}" >> "${model_temporary_file}"
+		fi
+	fi
+}
+
+model_format () {
+	if [[ "${modify_option}" = "format" ]]
+	then
+		# strip lines that match the following expressions
+		# comment out to keep
+
+		if [[ "${line}" = *"New Model"* ]]
+		then
+			: # pass
+
+		elif [[ "${line}" = *Name* ]]
+		then
+			: # pass
+
+		elif [[ "${line}" = *Unofficial* ]]
+		then
+			: # pass
+
+		elif [[ "${line}" = *Untitled* ]]
+		then
+			: # pass
+
+		elif [[ "${line}" = *BACKGROUND* ]]
+		then
+			IFS=' '
+
+			read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
+
+			: # pass
+
+		elif [[ "${line}" = *"GROUP BEGIN"* ]]
+		then
+			IFS=' '
+
+			read -r flag statement group group_begin group_name <<< "${line}"
+
+			: # pass
+
+		elif [[ "${line}" = *"GROUP END"* ]]
+		then
+			IFS=' '
+
+			read -r flag statement group group_end <<< "${line}"
+
+			: # pass
+
+		elif [[ "${line}" = *PIVOT* ]]
+		then
+			IFS=' '
+
+			read -r flag statement piece pivot pivot_coordinates <<< "${line}"
+
+			: # pass
+
+		elif [[ "${line}" = *HIDDEN* ]]
+		then
+			IFS=' '
+
+			read -r flag statement piece hidden <<< "${line}"
+
+			: # pass
+		else
+			# if line contains '!LEOCAD' tag
+
+			if [[ "${line}" == *!LEOCAD* ]]
+			then
+				# skip header and footer lines containing matching patterns:
+				# prevents model file syntax modification
+
+				echo "${line}" >> "${model_temporary_file}"
+			fi
+
+			# if line contains 'NOFILE' tag
+
+			if [[ "${line}" == *NOFILE* ]]
+			then
+				# skip header and footer lines containing matching patterns:
+				# prevents model file syntax modification
+
+				echo "${line}" >> "${model_temporary_file}"
+			fi
+
+			# if line contains 'FILE' tag
+
+			if [[ "${line}" == *FILE* ]]
+			then
+				IFS=' '
+
+				read -r flag statement file_name <<< "${line}"
+
+				# spaces to dashes
+
+				clean_file_name="${clean_file_name// /-}"
+
+				# string to lower case
+
+				clean_file_name="${clean_file_name,,}"
+
+				# write changes to tempporary file
+
+				echo "${flag} ${statement} $clean_file_name" >> "${model_temporary_file}"
+			else
+				# parse all other lines and format submodel string
+
+				IFS=' '
+
+				read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
+
+				# spaces to dashes
+
+				clean_model_data="${clean_model_data// /-}"
+
+				# string to lower case
+
+				clean_model_data="${clean_model_data,,}"
+
+				vect_x="${a} ${b} ${c}"
+				vect_y="${d} ${e} ${f}"
+				vect_z="${g} ${h} ${i}"
+
+				# # # # # #		# # # # # #
+				# a d g 0 #		# a b c x #
+				# b e h 0 #		# d e f y #
+				# c f i 0 #		# g h i z #
+				# x y z 1 #		# 0 0 0 1 #
+				# # # # # #		# # # # # #
+
+			fi
+		fi
+	fi
+}
+
+model_write () {
+	if [[ "$overwrite_option" = "overwrite" ]]
+	then
+		frobulator.wrn "[ OVERWRITE ] option enabled!"
+		frobulator.inf "Writing changes to original model file!"
+		echo
+
+		frobulator.wrn "Writing file."
+		echo
+
+		frobulator.inf "Model file" "${model}"
+		echo
+
+		mv "${model_temporary_file}" "${model_temporary_file%.tmp}"
+	fi
+
+	if [ -z "$overwrite_option" ]
+	then
+		frobulator.ask "Write changes to original model file?"
+		echo
+
+		frobulator.inf "Model file" "${model}"
+		echo
+
+		read reply
+
+		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+		then
+			frobulator.wrn "[ OVERWRITE ] option enabled!"
+			frobulator.inf "Writing changes to original model file."
+			echo
+
+			frobulator.wrn "Writing file."
+			echo
+
+			frobulator.inf "Model file" "${model}"
+			echo
+
+			mv "${model_temporary_file}" "${model_temporary_file%.tmp}"
+
+		else
+			frobulator.wrn "[ OVERWRITE ] option disabled."
+			frobulator.inf "Writing changes to model file copy."
+			echo
+
+			frobulator.fwd "Writing..."
+			echo
+
+			mv "${model_temporary_file}" "${model_temporary_file%.tmp}_modified_$stamp.${extension}"
+		fi
+	fi
+}
+
+# requirements ////////////////////////////////////////////////////////////////
+
+list=(
 	leocad
-	blender
-	zip
-	unzip
 )
 
-console.install ${install_list[@]}
+if [ "${option}" = "3ds" ]
+then
+	list+=(
+		blender
+	)
+fi
 
-# clear #
+if [ "${option}" = "get" ]
+then
+	list+=(
+		zip
+		unzip
+		)
+fi
 
-clear
+frobulator.require ${list[@]}
 
-# welcome #
+list=()
 
-console.title "L²CU" "l2cu // linux ldraw command line utility" "${version}"
+# generate necessary process files
 
-console.msg "Initializing..."
+l2cu_prepare
 
-console.wait 2
+# confirmation ////////////////////////////////////////////////////////////////
 
-# confirmation #
-
-console.msg "Utility started using the '${extension_option}' extension option."
-console.msg "Utility started using the '${option}' option."
+frobulator.msg "Extension option" "[ '${extension_option}' ]"
+frobulator.msg "Option" "[ '${option}' ]"
 echo
 
-console.wait 2
+frobulator.wait 1
 
 if [[ "${option}" = "render" ]]
 then
-	console.inf "Utility started using the ${render_option} camera preset."
+	frobulator.inf "Render option" "[ '${render_option}' ]"
 	echo
 
 elif [[ "${option}" = "export" ]]
 then
-	console.inf "Utility started using the ${export_name} export parameter."
+	frobulator.inf "Export parameter" "[ '${export_name}' ]"
 	echo
 fi
 
 if [[ "${option}" = "overwrite" ]]
 then
-	console.wrn "WARNING:"
-	console.wrn "Utility started using the overwrite option:"
-	console.wrn "Model modifications will be written to file directly!"
+	frobulator.wrn "WARNING:"
+	frobulator.wrn "Overwrite option selected:"
+	frobulator.wrn "Model modifications will be written to file directly!"
 	echo
 fi
 
-# if 'directory' option is not passed
-
-if [ -z "${directory}" ]
-then
-	console.ask "Load model files from:"
-	echo
-
-	# specify directory location or exit on 'cancel'
-
-	directory=$(console.dialog "Load model files")
-
-	if [ -z "${directory}" ]
-	then
-		console.err "No model directory specified."
-		echo
-		console.fwd "Exiting..."
-		echo
-
-		exit 1
-	fi
-fi
-
-console.fwd "Proceeding..."
+frobulator.fwd "Proceeding..."
 echo
 
-# clear #
-
-clear
-
-# parse #
+# render //////////////////////////////////////////////////////////////////////
 
 for extension in ${extensions_list[@]}
 do
@@ -394,30 +949,8 @@ do
 
 		model_name="${model_file_name}"
 
-# render #
-
 		if [[ "${option}" = "render" ]]
 		then
-			# define render routine
-
-			leocad_render () {
-
-				height="4096"
-				width="4096"
-				extension="png"
-
-				model="${1}"
-				coordinates="${2}"
-
-				leocad \
-					-h "${height}"															\
-					-w "${width}"															\
-					-i "${model_name}-${view[$coordinates]}.${extension}"					\
-					--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
-					--shading ${shading}													\
-					--line-width ${line_width} "${model}" >> /dev/null
-			}
-
 			# define render output directory
 
 			# use model directory as root
@@ -434,7 +967,7 @@ do
 
 			# define render parameters for all presets
 
-			# default camera latitude
+			# camera latitude
 
 			latitude=(
 				30
@@ -443,7 +976,7 @@ do
 				30
 			)
 
-			# default camera longitude
+			# camera longitude
 
 			longitude=(
 				225
@@ -452,7 +985,7 @@ do
 				0
 			)
 
-			# default view labels
+			# view labels
 
 			view=(
 				"quarter-back"
@@ -463,47 +996,47 @@ do
 
 			# define camera position presets
 
-			if [[ "${render_preset}" == "full" ]]
+			if [[ "${render_preset}" = "full" ]]
 			then
 				position=(0 1 2 3)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "fixed" ]]
+			if [[ "${render_preset}" = "fixed" ]]
 			then
 				position=(0 1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "quarter-back" ]]
+			if [[ "${render_preset}" = "quarter-back" ]]
 			then
 				position=(0)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "quarter-front" ]]
+			if [[ "${render_preset}" = "quarter-front" ]]
 			then
 				position=(1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "back" ]]
+			if [[ "${render_preset}" = "back" ]]
 			then
 				position=(2)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" == "front" ]]
+			if [[ "${render_preset}" = "front" ]]
 			then
 				position=(3)
 			fi
 
-			if [[ "${render_preset}" == "flat" ]]
+			if [[ "${render_preset}" = "flat" ]]
 			then
 				position=(1)
 				shading=flat
@@ -513,10 +1046,6 @@ do
 			fi
 
 			# render model using options
-
-			console.msg "Rendering in:"
-			console.msg "${renders_directory%*/}"
-			echo
 
 			for coordinates in ${position[@]}
 			do
@@ -531,31 +1060,43 @@ do
 
 				# render
 
-				console.inf "Rendering" "${model_name^^}"
-				console.inf "View" "${view[coordinates]^^}"
-				echo
-
-				leocad_render "${model}" $coordinates
+				l2cu_render "${model}" $coordinates
 
 				wait
 
 				# create flat splash image
 
-				if [[ "${render_option}" == "flat" ]]
+				if [[ "${render_option}" = "flat" ]]
 				then
-					# Rename renders to designated splash images
+					# rename renders to designated splash images
 
 					mv "${model_name}-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
 				fi
 			done
 
-			console.inf "Output" "${model_name}-${view[$coordinates]}.${extension}"
+			frobulator.inf "Output" "[ '${model_name}-${view[$coordinates]}.${extension}' ]"
 			echo
 		fi
+	done
+done
 
-# export #
+# export //////////////////////////////////////////////////////////////////////
 
-		if [[ "${option}" == "export" ]]
+for extension in ${extensions_list[@]}
+do
+	for model in $(echo $(find ${directory} -iname "*.${extension}"))
+	do
+		# get model file name from path
+
+		model_file="${model##*/}"
+
+		# strip extension from model file name
+
+		model_file_name="${model_file%.*}"
+
+		model_name="${model_file_name}"
+
+		if [[ "${option}" = "export" ]]
 		then
 			export_file="${model_name}.${export_extension}"
 
@@ -574,26 +1115,6 @@ do
 
 			exports_directory="${model%/*}/exports/"
 
-			# define export routine
-
-			leocad_export () {
-
-				console.msg "Exporting in:"
-				console.msg "${exports_directory%*/}"
-				echo
-
-				console.inf "Exporting" "${model_name^^}"
-				console.inf "Format" "${export_name}"
-				echo
-
-				console.inf "Output" "${export_file}"
-				echo
-				
-				leocad "${model}" "-${export_option}" "${export_file}" >> /dev/null
-
-				wait
-			}
-
 			# check for the exports directory existence
 
 			if [[ ! -d "${exports_directory}" ]]
@@ -609,7 +1130,7 @@ do
 			   [[ "${export_option}" = "dae" ]] || \
 			   [[ "${export_option}" = "obj" ]]
 			then
-				leocad_export
+				l2cu_export
 
 				wait
 
@@ -626,9 +1147,9 @@ do
 
 			elif [[ "${export_option}" = "blender" ]]
 			then
-				leocad_export
+				l2cu_export
 
-				console.inf "Converting $model ("$export_extension")..."
+				frobulator.inf "Converting $model ("$export_extension")..."
 				echo
 
 				# import 3ds file into blender to create optimized blend file
@@ -656,169 +1177,28 @@ do
 
 			if [[ "${model_size}" -le "${model_size_threshold}" ]]
 			then
-				console.scs "File size threshold not exceeded" "[ ${model_size} ]"
+				frobulator.scs "File size threshold not exceeded" "[ ${model_size} ]"
 				echo
 
 			# if greater than threshold
 
 			elif [[ "${model_size}" -gt "${model_size_threshold}" ]]
 			then
-				console.err "File size threshold exceeded" "[ ${model_size} ]"
+				frobulator.err "File size threshold exceeded" "[ ${model_size} ]"
 				echo
-				console.wrn "WARNING:"
-				console.wrn "Model file size is above recommended threshold of ${model_size_threshold}B"
-				console.wrn "You may experience higher than average loading times."
+				frobulator.wrn "WARNING:"
+				frobulator.wrn "Model file size is above recommended threshold of ${model_size_threshold}B"
+				frobulator.wrn "You may experience higher than average loading times."
 				echo
 			fi
 		fi
 	done
 done
 
-# modify #
+# modify //////////////////////////////////////////////////////////////////////
 
-if [[ "${option}" == "modify" ]]
+if [[ "${option}" = "modify" ]]
 then
-	parse_colors () {
-		console.empty
-
-		# set to lowercase for input match
-
-		color_input="${input,,}"
-
-		while IFS=$' '
-		read -r ldraw_color_name ldraw_color_number ldraw_color_hex_value
-		do
-			# color input entries cleanup
-
-			# color name
-
-			# remove underscores from name
-
-			space_name="${ldraw_color_name//_/ }"
-
-			# set name to lowercase for input match
-
-			name="${space_name,,}"
-
-			# reattribute input variable to lowercase name value
-
-			ldraw_color_name="${name}"
-
-			# color hex value
-
-			# remove pound from name
-
-			hex_value="${ldraw_color_hex_value//#/}"
-
-			# set name to lowercase for input match
-
-			hex_value="${hex_value,,}"
-
-			# attribute input variable to lowercase name value
-
-			ldraw_color_hex_value="${hex_value}"
-
-			if [[ "${color_input}" == "${ldraw_color_name}" ]]		|| \
-			   [[ "${color_input}" == "${ldraw_color_number}" ]]	|| \
-			   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
-			then
-				# confirmation
-
-				console.fwd "Confirming input value..."
-				echo
-				console.inf "Color name" "${ldraw_color_name}"
-				console.inf "Color number" "${ldraw_color_number}"
-				console.inf "Color hexadecimal value" "${ldraw_color_hex_value}"
-				echo
-
-				return "${ldraw_color_number}"
-			fi
-
-		done < "${colors}"
-
-		console.err "No available color matches the input."
-		echo
-		console.fwd "Exiting..."
-		echo
-
-		exit 1
-	}
-
-	parse_parts () {
-		console.empty
-
-		part_input="$input"
-
-		return "${part_input}"
-	}
-
-	# get input
-
-	if [[ "${modify_option}" = "color" ]]
-	then
-		console.ipt "Enter the color description [ name / number / hexadecimal ] to modify."
-
-		parse_colors
-
-		# $? returning wrong arbitrary value
-
-		old_color="${ldraw_color_number}"
-
-		console.ipt "Enter the color description [ name / number / hexadecimal ] to set."
-
-		parse_colors
-
-		# $? returning wrong arbitrary value
-
-		new_color="${ldraw_color_number}"
-	fi
-
-	if [[ "${modify_option}" = "part" ]]
-	then
-		console.ipt "Enter the part number to modify."
-
-		parse_parts
-
-		# $? returning wrong arbitrary value
-
-		old_part="${part_input}"
-
-		console.ipt "Enter the part number to set as replacement."
-
-		parse_parts
-
-		# $? returning wrong arbitrary value
-
-		new_part="${part_input}"
-	fi
-
-	if [[ "${modify_option}" = "bind" ]]
-	then
-		console.ipt "Enter the part number to modify."
-
-		parse_parts
-
-		# $? returning wrong arbitrary value
-
-		part_selection="${part_input}"
-
-		console.ipt "Enter the matching color description [ name | number | hexadecimal ] modify for the selected part."
-
-		parse_colors
-
-		# $? returning wrong arbitrary value
-
-		old_color="${ldraw_color_number}"
-
-		console.ipt "Enter the new color description [ name | number | hexadecimal ] to set for the selected part."
-
-		parse_colors
-
-		# $? returning wrong arbitrary value for ${new_color}
-
-		new_color="${ldraw_color_number}"
-	fi
-
 	# substitution
 
 	IFS=' '
@@ -831,9 +1211,7 @@ then
 			model_export_name="${model_export%.*}"
 			model_export_name_clean="${model_export_name:5}"
 
-			temporary_file="$model.tmp"
-
-# modify: read model #
+			model_temporary_file="$model.tmp"
 
 			# initialize line count
 
@@ -844,64 +1222,31 @@ then
 			while IFS=
 			read -r line
 			do
+				# iterate line count
+
 				line_number=$(( ${line_number} + 1 ))
 
-# modify: lint #
+# modify: lint model //////////////////////////////////////////////////////////
 
-				# model file linting
+				model_lint
 
-				if [[ "${modify_option}" = "lint" ]]
-				then
-					console.inf "Linting model file."
-					echo
-					console.inf "Model file" "${model}"
-					echo
-
-						# substitute carriage return for newline
-						# substitute lines containing empty parsing string # BUG #
-						# substitute multiple whitespace characters to one
-
-						# delete lines beginning with whitespace character
-						# delete lines beginning with dot character
-						# delete lines containing BACKGROUND meta
-						# delete lines containing PIVOT meta
-						# delete lines containing HIDDEN meta
-
-						# strip '(' character
-						# strip ')' character
-
-					sed													\
-						-e 's/\r//g'									\
-						-e 's/0 STEP  *\./0 STEP/g'						\
-						-e 's/  */ /g'									\
-						-e '/  *\./d'									\
-						-e '/^ /d'										\
-						-e '/^\./d'										\
-						-e '/BACKGROUND/d'								\
-						-e '/PIVOT/d'									\
-						-e '/HIDDEN/d'									\
-						-e 's/(//g'										\
-						-e 's/)//g'										\
-						-e '/^$/d' "${model}" > "${temporary_file}"
-
-						# exit to avoid line breakdown iteration and overwrite
-
-						break
-				fi
-
-				# line breakdown for other functions
+				# line breakdown:
+				# prepare model read for other options
 
 				if [[ "${line}" == *!LEOCAD* ]] || [[ "${line}" == *FILE* ]] || [[ "${line}" == *NOFILE* ]]
 				then
 					# skip header and footer lines containing matching patterns
 					# prevents model file syntax modification
 
-					echo "${line}" >> "${temporary_file}"
+					echo "${line}" >> "${model_temporary_file}"
 				else
-					# read lines and parse
-					# model_data is either a part file reference or a submodel
+					# read lines and parse:
+					# model_data is either a part file (dat) or a submodel (ldr)
+
+					# set IFS
 
 					IFS=' '
+
 					read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
 
 					vect_x="$a $b $c"
@@ -916,331 +1261,69 @@ then
 
 					read part suffix <<< "${model_data}"
 
+					# set IFS
+
 					IFS=' '
 
-# modify: color #
+# modify: color ///////////////////////////////////////////////////////////////
 
 					# color substitution
 
-					if [[ "${modify_option}" = "color" ]]
-					then
-						if [[ "${color}" = "${old_color}" ]]
-						then
-							color="${new_color}"
+					model_color
 
-							console.inf "Modifying" "${model}"
-							echo
-							console.inf "Changing" "${old_color}"
-							console.inf "Setting" "${new_color} "
-							echo
-						else
-							: # pass
-						fi
-					fi
-
-# modify: part #
+# modify: part ////////////////////////////////////////////////////////////////
 
 					# part substitution
 
-					if [[ "${modify_option}" = "part" ]]
-					then
-						if [[ "${part}" = "${old_part}" ]]
-						then
-							part="${new_part}"
+					model_part
 
-							console.inf "Modifying" "${model}"
-							echo
-							console.inf "Changing" "${old_part}"
-							console.inf "Setting" "${new_part} "
-							echo
-						else
-							: # pass
-						fi
-					fi
-
-# modify: bind #
+# modify: bind ////////////////////////////////////////////////////////////////
 
 					# bind [ part + color ] color substitution
 
-					if [[ "${modify_option}" = "bind" ]]
-					then
-						if [[ "${part}" == "${part_selection}" ]]
-						then
-							if [[ "${color}" = "${old_color}" ]]
-							then
-								color="${new_color}"
+					model_bind
 
-								console.inf "Modifying" "${model}"
-								echo
-								console.inf "Part" "${part}"
-								echo
-								console.inf "Changing" "${old_color}"
-								console.inf "Setting" "${new_color} "
-								echo
-							else
-								: # pass
-							fi
-						fi
-					fi
-
-# modify: step #
+# modify: step ////////////////////////////////////////////////////////////////
 
 					# step submodel [ldr] separation
 
-					if [[ "${modify_option}" = "step" ]]
-					then
-							if [[ "${line}" == *ldr* ]]
-							then
-									if [[ "${suffix}" == *ldr* ]]
-									then
-											color="0"
-											suffix="ldr\n0 STEP"
-									else
-											: # pass
-									fi
-							fi
-					fi
+					model_step
 
-# modify: format #
+# modify: author ////////////////////////////////////////////////////////////////
 
-					# file structure and meta substitution
+					# author substitiution
 
-					if [[ "${modify_option}" = "format" ]]
-					then
-						# strip lines that match the following expressions
-						# comment out to keep
+					model_author
 
-						if [[ "${line}" = *"New Model"* ]]
-						then
-							: # pass
+# modify: format //////////////////////////////////////////////////////////////
 
-						elif [[ "${line}" = *Name* ]]
-						then
-							: # pass
+					# file structure and meta tag substitution
 
-						elif [[ "${line}" = *Unofficial* ]]
-						then
-							: # pass
-
-						elif [[ "${line}" = *Untitled* ]]
-						then
-							: # pass
-
-						elif [[ "${line}" == *[aA][uU][tT][hH][oO][rR]* ]]
-						then
-							IFS=' '
-							read -r flag statement author_model author author_string <<< "${line}"
-
-							if [ ! -e "./author" ]
-							then
-								console.wrn "No author file found."
-								echo
-								console.ask "Create author file?"
-								echo
-
-								read reply
-
-								if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-								then
-									console.ipt "Enter author information:"
-									echo
-
-									console.empty
-
-									author_input="$input"
-
-									echo "${author_input}" > ./author
-
-									author_string=$(echo $(cat ./author))
-								else
-									console.wrn "No author string/file specified."
-									echo
-									console.fwd "Skipping..."
-									echo
-
-									line=""
-								fi
-
-							else
-								if [ -e "./author" ]
-								then
-									author_string=$(echo $(cat ./author))
-								fi
-							fi
-
-							echo "${line}" >> "${temporary_file}"
-
-						elif [[ "${line}" = *BACKGROUND* ]]
-						then
-							IFS=' '
-							read -r flag statement background_model background_background background_color bg_color_1 bg_color_2 bg_color_3 <<< "${line}"
-
-							: # pass
-
-						elif [[ "${line}" = *"GROUP BEGIN"* ]]
-						then
-							IFS=' '
-							read -r flag statement group group_begin group_name <<< "${line}"
-
-							: # pass
-
-						elif [[ "${line}" = *"GROUP END"* ]]
-						then
-							IFS=' '
-							read -r flag statement group group_end <<< "${line}"
-
-							: # pass
-
-						elif [[ "${line}" = *PIVOT* ]]
-						then
-							IFS=' '
-							read -r flag statement piece pivot pivot_coordinates <<< "${line}"
-
-							: # pass
-
-						elif [[ "${line}" = *HIDDEN* ]]
-						then
-							IFS=' '
-							read -r flag statement piece hidden <<< "${line}"
-
-							: # pass
-						else
-							# if line contains '!LEOCAD' tag
-
-							if [[ "${line}" == *!LEOCAD* ]]
-							then
-								# skip header and footer lines containing matching patterns
-								# prevents model file syntax modification
-
-								echo "${line}" >> "${temporary_file}"
-							fi
-
-							# if line contains 'NOFILE' tag
-
-							if [[ "${line}" == *NOFILE* ]]
-							then
-								# skip header and footer lines containing matching patterns
-								# prevents model file syntax modification
-
-								echo "${line}" >> "${temporary_file}"
-							fi
-
-							# if line contains 'FILE' tag
-
-							if [[ "${line}" == *FILE* ]]
-							then
-								IFS=' '
-								read -r flag statement file_name <<< "${line}"
-
-								# spaces to dashes
-
-								clean_file_name="${clean_file_name// /-}"
-
-								# string to lower case
-
-								clean_file_name="${clean_file_name,,}"
-
-								# write changes to tempporary file
-
-								echo "${flag} ${statement} $clean_file_name" >> "${temporary_file}"
-							else
-								# parse all other lines and format submodel string
-
-								IFS=' '
-								read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
-
-								# spaces to dashes
-
-								clean_model_data="${clean_model_data// /-}"
-
-								# string to lower case
-
-								clean_model_data="${clean_model_data,,}"
-
-								vect_x="${a} ${b} ${c}"
-								vect_y="${d} ${e} ${f}"
-								vect_z="${g} ${h} ${i}"
-
-								# # # # # #		# # # # # #
-								# a d g 0 #		# a b c x #
-								# b e h 0 #		# d e f y #
-								# c f i 0 #		# g h i z #
-								# x y z 1 #		# 0 0 0 1 #
-								# # # # # #		# # # # # 
-
-							fi
-						fi
-					fi
+					model_format
 
 					# reset IFS
 
-					IFS=" "
+					IFS=' '
 
 					# write changes to tempporary file
 
-					echo -e "${flag}" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${part}.${suffix}" >> "${temporary_file}"
+					echo -e "${flag}" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${part}.${suffix}" >> "${model_temporary_file}"
 				fi
 
-			done < "${model}" # feed model file into loop for parsing
+			done < "${model}"
 
-# modify: overwrite #
+# modify: overwrite ///////////////////////////////////////////////////////////
 
 			# write changes to file
 
-			if [[ "$overwrite_option" = "overwrite" ]]
-			then
-				console.wrn "[ OVERWRITE ] option enabled!"
-				console.inf "Writing changes to original model file!"
-				echo
-
-				console.wrn "Writing file."
-				echo
-				console.inf "Model file" "${model}"
-				echo
-
-				mv "${temporary_file}" "${temporary_file%.tmp}"
-			fi
-
-			if [ -z "$overwrite_option" ]
-			then
-				console.ask "Write changes to original model file?"
-
-				echo
-				console.inf "Model file" "${model}"
-				echo
-
-				read reply
-
-				if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-				then
-					console.wrn "[ OVERWRITE ] option enabled!"
-					console.inf "Writing changes to original model file."
-					echo
-
-					console.wrn "Writing file."
-					echo
-					console.inf "Model file" "${model}"
-					echo
-
-					mv "${temporary_file}" "${temporary_file%.tmp}"
-
-				else
-					console.wrn "[ OVERWRITE ] option disabled."
-					console.inf "Writing changes to model file copy."
-					echo
-					console.fwd "Writing changes to model file copy."
-					echo
-
-					mv "${temporary_file}" "${temporary_file%.tmp}_modified_$stamp.${extension}"
-				fi
-			fi
+			model_write
 		done
 	done
 fi
 
-# get #
+# get /////////////////////////////////////////////////////////////////////////
 
-if [[  "${option}" = "get" ]]
+if [[ "${option}" = "get" ]]
 then
 	parts_url="https://www.ldraw.org/library/updates/complete.zip"
 
@@ -1267,7 +1350,7 @@ then
 
 	if [ -z "${directory}" ]
 	then
-		console.ask "Specify download location?"
+		frobulator.ask "Specify download location?"
 
 		echo
 
@@ -1277,14 +1360,14 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(console.dialog "Save to") || exit 1
+			browse=$(frobulator.dialog "Save to") || exit 1
 
 			directory="${browse}"
 		else
 			directory="${PWD}"
 
-			console.wrn "No directory location specified."
-			console.wrn "Downloading into current directory."
+			frobulator.wrn "No directory location specified."
+			frobulator.wrn "Downloading into current directory."
 			echo
 		fi
 
@@ -1292,13 +1375,13 @@ then
 	fi
 fi
 
-# make list #
+# make list ///////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "make-list" ]]
 then
 	if [ -z "${directory}" ]
 	then
-		console.wrn "Is the LDraw parts library setup on this system?"
+		frobulator.wrn "Is the LDraw parts library setup on this system?"
 
 		echo
 
@@ -1308,25 +1391,25 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(console.dialog "Load LDraw library") || exit 1
+			browse=$(frobulator.dialog "Load LDraw library") || exit 1
 
 			cd "${browse}" || exit 1
 
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
-				console.scs "LDraw parts library exists."
-				console.scs "Operating within the LDraw parts directory."
+				frobulator.scs "LDraw parts library exists."
+				frobulator.scs "Operating within the LDraw parts directory."
 				echo
-				console.fwd "Continuing..."
+				frobulator.fwd "Continuing..."
 				echo
 
 				directory="${browse}"/parts
 			else
-				console.err "LDraw library directory not recognized: 'parts' directory not found."
+				frobulator.err "LDraw library directory not recognized: 'parts' directory not found."
 			fi
 		else
-			console.wrn "LDraw parts directory not found."
-			console.ask "Specify the LDraw parts library directory location to continue?"
+			frobulator.wrn "LDraw parts directory not found."
+			frobulator.ask "Specify the LDraw parts library directory location to continue?"
 
 			echo
 
@@ -1340,7 +1423,7 @@ then
 
 				directory="${browse}"/parts
 			else
-				console.ask "Download the latest LDraw parts library?"
+				frobulator.ask "Download the latest LDraw parts library?"
 
 				echo
 
@@ -1348,12 +1431,12 @@ then
 
 				if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 				then
-					console.fwd "Specify setup location."
+					frobulator.fwd "Specify setup location."
 					echo
 
 					# specify directory location or exit on 'cancel'
 
-					setup_directory=$(console.dialog) || exit 1
+					setup_directory=$(frobulator.dialog) || exit 1
 
 					cd "${setup_directory}" || exit 1
 
@@ -1361,15 +1444,15 @@ then
 
 					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
 				else
-					console.err "LDraw parts directory not setup on system."
+					frobulator.err "LDraw parts directory not setup on system."
 					echo
-					console.wrn "The parts.lst file may be needed for some legacy editors to function."
+					frobulator.wrn "The parts.lst file may be needed for some legacy editors to function."
 					echo
-					console.inf "Visit http://www.ldraw.org to get started."
-					console.inf "You can download and extract the LDraw parts library on your system manually."
-					console.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
+					frobulator.inf "Visit http://www.ldraw.org to get started."
+					frobulator.inf "You can download and extract the LDraw parts library on your system manually."
+					frobulator.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo
-					console.fwd "Exiting..."
+					frobulator.fwd "Exiting..."
 					echo
 
 					exit 1
@@ -1384,9 +1467,9 @@ then
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		console.wrn "Alternate version of 'parts.lst' file found."
+		frobulator.wrn "Alternate version of 'parts.lst' file found."
 		echo
-		console.fwd "Backing up..."
+		frobulator.fwd "Backing up..."
 		echo
 
 		mv parts.lst parts.lst.bak
@@ -1396,12 +1479,12 @@ then
 
 	if [[ "$sort_mode" == "description" ]] || [[ "$sort_mode" == "number" ]]
 	then
-		console.inf "Utility startedusing the $sort_mode option flag."
+		frobulator.inf "Utility startedusing the $sort_mode option flag."
 	else
-		console.wrn "No sorting method specified."
+		frobulator.wrn "No sorting method specified."
 		echo
-		console.ask "Which sorting method should be used for parsing the parts list?"
-		console.ask "[ [dD]escription / [nN]umber ]"
+		frobulator.ask "Which sorting method should be used for parsing the parts list?"
+		frobulator.ask "[ [dD]escription / [nN]umber ]"
 		echo
 
 		read reply
@@ -1413,7 +1496,7 @@ then
 	else
 		# parse parts list
 
-		console.fwd "Processing..."
+		frobulator.fwd "Processing..."
 		echo
 
 		# initialize counter
@@ -1444,7 +1527,7 @@ then
 						printf '%-30s %-s\n' "${filename}" "${description}" >> parts.lst
 					fi
 
-					console.inf "Parts count" "$((count++))\c"
+					frobulator.inf "Parts count" "$((count++))\c"
 					echo
 				fi
 			done
@@ -1480,6 +1563,6 @@ then
 	fi
 fi
 
-# complete #
+# complete ////////////////////////////////////////////////////////////////////
 
-console.scs "Done."
+frobulator.scs "Done."
