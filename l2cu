@@ -524,7 +524,6 @@ model_lint () {
 	then
 		frobulator.inf "Linting" "[ '${model}']"
 		echo
-
 			# substitute carriage return for newline
 			# substitute lines containing empty parsing string # BUG #
 			# substitute multiple whitespace characters to one
@@ -556,6 +555,40 @@ model_lint () {
 
 			break
 	fi
+}
+
+model_read () {
+	# read lines and parse:
+	# model_data is either a part file (dat) or a submodel (ldr)
+
+	# set IFS
+
+	IFS=' '
+
+	read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
+
+	vect_x="$a $b $c"
+	vect_y="$d $e $f"
+	vect_z="$g $h $i"
+
+	# # # # # #		# # # # # #
+	# a d g 0 #		# a b c x #
+	# b e h 0 #		# d e f y #
+	# c f i 0 #		# g h i z #
+	# x y z 1 #		# 0 0 0 1 #
+	# # # # # #		# # # # # #
+
+	# set IFS
+
+	IFS='.'
+
+	# split part argument into part number and part extension
+
+	read part suffix <<< "${model_data}"
+
+	# set IFS
+
+	IFS=' '
 }
 
 model_color () {
@@ -775,6 +808,8 @@ model_format () {
 
 			if [[ "${line}" == *FILE* ]]
 			then
+				# set IFS
+
 				IFS=' '
 
 				read -r flag statement file_name <<< "${line}"
@@ -792,6 +827,8 @@ model_format () {
 				echo "${flag} ${statement} $clean_file_name" >> "${model_temporary_file}"
 			else
 				# parse all other lines and format submodel string
+
+				# set IFS
 
 				IFS=' '
 
@@ -816,6 +853,9 @@ model_format () {
 				# x y z 1 #		# 0 0 0 1 #
 				# # # # # #		# # # # # #
 
+				# reset IFS
+
+				IFS=' '
 			fi
 		fi
 	fi
@@ -871,6 +911,39 @@ model_write () {
 
 			mv "${model_temporary_file}" "${model_temporary_file%.tmp}_modified_$stamp.${extension}"
 		fi
+	fi
+}
+
+model_size () {
+	# verify export file size
+
+	block_size=1024
+
+	# get model size in bytes
+
+	model_size=$(find -type f "${exports_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
+
+	# set model size threshold in bytes : 25 * 1024
+
+	model_size_threshold="25600"
+
+	# if lesser than threshold
+
+	if [[ "${model_size}" -le "${model_size_threshold}" ]]
+	then
+		frobulator.scs "File size threshold not exceeded" "[ ${model_size} ]"
+		echo
+
+	# if greater than threshold
+
+	elif [[ "${model_size}" -gt "${model_size_threshold}" ]]
+	then
+		frobulator.err "File size threshold exceeded" "[ ${model_size} ]"
+		echo
+
+		frobulator.wrn "Model file size is above recommended threshold of ${model_size_threshold}B"
+		frobulator.wrn "You may experience higher than average loading times."
+		echo
 	fi
 }
 
@@ -935,22 +1008,28 @@ echo
 
 # render //////////////////////////////////////////////////////////////////////
 
-for extension in ${extensions_list[@]}
-do
-	for model in $(echo $(find ${directory} -iname "*.${extension}"))
+if [[ "${option}" = "render" ]]
+then
+	for extension in ${extensions_list[@]}
 	do
-		# get model file name from path
+		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
 
-		model_file="${model##*/}"
+		for model in ${models_list[@]}
+		do
+			# set IFS
 
-		# strip extension from model file name
+			IFS=' '
 
-		model_file_name="${model_file%.*}"
+			# get model file name from path
 
-		model_name="${model_file_name}"
+			model_file="${model##*/}"
 
-		if [[ "${option}" = "render" ]]
-		then
+			# strip extension from model file name
+
+			model_file_name="${model_file%.*}"
+
+			model_name="${model_file_name}"
+
 			# define render output directory
 
 			# use model directory as root
@@ -1049,14 +1128,11 @@ do
 
 			for coordinates in ${position[@]}
 			do
-				# check for the renders directory existence
+				# check renders directory existence
 
-				if [ ! -d "${renders_directory}" ]
-				then
-					mkdir -p "${renders_directory}"
-				fi
+				frobulator.directory "${renders_directory}"
 
-				cd "${renders_directory}" || exit 1
+				cd "${renders_directory}"
 
 				# render
 
@@ -1076,28 +1152,40 @@ do
 
 			frobulator.inf "Output" "[ '${model_name}-${view[$coordinates]}.${extension}' ]"
 			echo
-		fi
+
+			# unset IFS
+
+			IFS=''
+		done
 	done
-done
+fi
 
 # export //////////////////////////////////////////////////////////////////////
 
-for extension in ${extensions_list[@]}
-do
-	for model in $(echo $(find ${directory} -iname "*.${extension}"))
+if [[ "${option}" = "export" ]]
+then
+	for extension in ${extensions_list[@]}
 	do
-		# get model file name from path
+		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
 
-		model_file="${model##*/}"
+		for model in ${models_list[@]}
+		do
+			# set IFS
 
-		# strip extension from model file name
+			IFS=' '
 
-		model_file_name="${model_file%.*}"
+			# get model file name from path
 
-		model_name="${model_file_name}"
+			model_file="${model##*/}"
 
-		if [[ "${option}" = "export" ]]
-		then
+			# strip extension from model file name
+
+			model_file_name="${model_file%.*}"
+
+			model_name="${model_file_name}"
+
+			# set export file string
+
 			export_file="${model_name}.${export_extension}"
 
 			# explicit export file types for optimization
@@ -1115,20 +1203,17 @@ do
 
 			exports_directory="${model%/*}/exports/"
 
-			# check for the exports directory existence
+			# check exports directory existence
 
-			if [[ ! -d "${exports_directory}" ]]
-			then
-				mkdir -p "${exports_directory}"
-			fi
+			frobulator.directory "${exports_directory}"
 
-			cd "${exports_directory}" || exit 1
+			cd "${exports_directory}"
 
 			# export
 
 			if [[ "${export_option}" = "3ds" ]] || \
-			   [[ "${export_option}" = "dae" ]] || \
-			   [[ "${export_option}" = "obj" ]]
+			[[ "${export_option}" = "dae" ]] || \
+			[[ "${export_option}" = "obj" ]]
 			then
 				l2cu_export
 
@@ -1161,51 +1246,24 @@ do
 				rm -rf "${export_file_3ds}"
 			fi
 
-			# verify export file size
+			model_size
 
-			block_size-1024
+			# unset IFS
 
-			# get model size in bytes
-
-			model_size=$(find -type f "${exports_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
-
-			# set model size threshold in bytes : 25 * 1024
-
-			model_size_threshold="25600"
-
-			# if lesser than threshold
-
-			if [[ "${model_size}" -le "${model_size_threshold}" ]]
-			then
-				frobulator.scs "File size threshold not exceeded" "[ ${model_size} ]"
-				echo
-
-			# if greater than threshold
-
-			elif [[ "${model_size}" -gt "${model_size_threshold}" ]]
-			then
-				frobulator.err "File size threshold exceeded" "[ ${model_size} ]"
-				echo
-				frobulator.wrn "WARNING:"
-				frobulator.wrn "Model file size is above recommended threshold of ${model_size_threshold}B"
-				frobulator.wrn "You may experience higher than average loading times."
-				echo
-			fi
-		fi
+			IFS=''
+		done
 	done
-done
+fi
 
 # modify //////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "modify" ]]
 then
-	# substitution
-
-	IFS=' '
-
 	for extension in ${extensions_list[@]}
 	do
-		echo $(find ${directory} -iname "*.${extension}") | while read -r model
+		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
+
+		for model in ${models_list[@]}
 		do
 			model_export="${model##*/}"
 			model_export_name="${model_export%.*}"
@@ -1217,7 +1275,7 @@ then
 
 			line_number=0
 
-			# parse
+			# parse model file
 
 			while IFS=
 			read -r line
@@ -1226,84 +1284,49 @@ then
 
 				line_number=$(( ${line_number} + 1 ))
 
-# modify: lint model //////////////////////////////////////////////////////////
+				# modify: lint
 
 				model_lint
 
 				# line breakdown:
 				# prepare model read for other options
 
-				if [[ "${line}" == *!LEOCAD* ]] || [[ "${line}" == *FILE* ]] || [[ "${line}" == *NOFILE* ]]
-				then
-					# skip header and footer lines containing matching patterns
-					# prevents model file syntax modification
+				# skip header and footer lines containing matching patterns
+				# prevents model file syntax modification
 
+				if [[ "${line}" == *!LEOCAD* ]] || \
+				   [[ "${line}" == *FILE*    ]] || \
+				   [[ "${line}" == *NOFILE*  ]]
+				then
 					echo "${line}" >> "${model_temporary_file}"
 				else
-					# read lines and parse:
-					# model_data is either a part file (dat) or a submodel (ldr)
+					# modify: read
 
-					# set IFS
+					model_read
 
-					IFS=' '
-
-					read -r flag color x y z a b c d e f g h i model_data <<< "${line}"
-
-					vect_x="$a $b $c"
-					vect_y="$d $e $f"
-					vect_z="$g $h $i"
-
-					# set IFS
-
-					IFS='.'
-
-					# split part argument into part number and part extension
-
-					read part suffix <<< "${model_data}"
-
-					# set IFS
-
-					IFS=' '
-
-# modify: color ///////////////////////////////////////////////////////////////
-
-					# color substitution
+					# modify: color
 
 					model_color
 
-# modify: part ////////////////////////////////////////////////////////////////
-
-					# part substitution
+					# modify: part
 
 					model_part
 
-# modify: bind ////////////////////////////////////////////////////////////////
-
-					# bind [ part + color ] color substitution
+					# modify: bind
 
 					model_bind
 
-# modify: step ////////////////////////////////////////////////////////////////
-
-					# step submodel [ldr] separation
+					# modify: step
 
 					model_step
 
-# modify: author ////////////////////////////////////////////////////////////////
-
-					# author substitiution
+					# modify: author
 
 					model_author
 
-# modify: format //////////////////////////////////////////////////////////////
-
-					# file structure and meta tag substitution
+					# modify: format
 
 					model_format
-
-					# reset IFS
-
-					IFS=' '
 
 					# write changes to tempporary file
 
@@ -1312,9 +1335,7 @@ then
 
 			done < "${model}"
 
-# modify: overwrite ///////////////////////////////////////////////////////////
-
-			# write changes to file
+			# modify: write
 
 			model_write
 		done
@@ -1446,12 +1467,15 @@ then
 				else
 					frobulator.err "LDraw parts directory not setup on system."
 					echo
+
 					frobulator.wrn "The parts.lst file may be needed for some legacy editors to function."
 					echo
+
 					frobulator.inf "Visit http://www.ldraw.org to get started."
 					frobulator.inf "You can download and extract the LDraw parts library on your system manually."
 					frobulator.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
 					echo
+
 					frobulator.fwd "Exiting..."
 					echo
 
@@ -1469,6 +1493,7 @@ then
 	then
 		frobulator.wrn "Alternate version of 'parts.lst' file found."
 		echo
+
 		frobulator.fwd "Backing up..."
 		echo
 
@@ -1483,6 +1508,7 @@ then
 	else
 		frobulator.wrn "No sorting method specified."
 		echo
+
 		frobulator.ask "Which sorting method should be used for parsing the parts list?"
 		frobulator.ask "[ [dD]escription / [nN]umber ]"
 		echo
