@@ -822,6 +822,38 @@ l2cu_write () {
 	fi
 }
 
+l2cu_download () {
+	# manage library dowload
+
+	if [ -z "${directory}" ]
+	then
+		frobulator.ask "Specify download location?"
+		echo
+
+		read reply
+
+		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+		then
+			# specify directory location or exit on 'cancel'
+
+			browse=$(frobulator.dialog "Save to")
+
+			directory="${browse}"
+		else
+			frobulator.wrn "No directory location specified."
+			echo
+
+			frobulator.wrn "Using current directory." "[ ${PWD} ]"
+			echo
+
+			directory="${PWD}"
+		fi
+	fi
+
+	# download
+
+	frobulator.download "${base_url}"/"${parts_url_release}" "${directory}" "${parts_archive}"
+}
 # requirements ////////////////////////////////////////////////////////////////
 
 list=(
@@ -853,7 +885,17 @@ l2cu_prepare
 
 # confirmation ////////////////////////////////////////////////////////////////
 
-frobulator.msg "Extension option" "[ ${extension_option} ]"
+if [ "${option}" = "download" ]
+then
+	:
+
+elif [ "${option}" = "list" ]
+then
+	:
+else
+	frobulator.msg "Extension option" "[ ${extension_option} ]"
+fi
+
 frobulator.msg "Option"           "[ ${option} ]"
 echo
 
@@ -873,9 +915,11 @@ fi
 
 if [ "${option}" = "overwrite" ]
 then
-	frobulator.wrn "WARNING:"
+	frobulator.wrn "WARNING"
+	echo
+
 	frobulator.wrn "Overwrite option selected:"
-	frobulator.wrn "Model modifications will be written to file directly!"
+	frobulator.wrn "Modifications will be written to model file directly!"
 	echo
 fi
 
@@ -1356,43 +1400,19 @@ then
 
 	parts_url="${base_url}/${parts_url_release}/${parts_archive}"
 
-	if [ -z "${directory}" ]
-	then
-		frobulator.ask "Specify download location?"
-
-		echo
-
-		read reply
-
-		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-		then
-			# specify directory location or exit on 'cancel'
-
-			browse=$(frobulator.dialog "Save to")
-
-			download_directory="${browse}"
-		else
-			frobulator.wrn "No directory location specified."
-			echo
-
-			frobulator.wrn "Using current directory." "[ ${PWD} ]"
-			echo
-
-			download_directory="${PWD}"
-		fi
-	fi
-
 	# download
 
-	frobulator.download "${base_url}"/"${parts_url_release}" "${download_directory}" "${parts_archive}"
+	l2cu_download
 
-	# post download
+	# rename archive:
+	# substitiude 'complete' for 'ldraw'
+	# leocad can read and access the parts archive without extraction
 
 	if [[ "${download_option}" = "official" ]]
 	then
-		mv 												\
-			"${download_directory}"/"${parts_archive}"	\
-			"${download_directory}"/ldraw.zip
+		mv 										\
+			"${directory}"/"${parts_archive}"	\
+			"${directory}"/ldraw.zip
 	fi
 fi
 
