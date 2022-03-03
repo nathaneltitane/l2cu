@@ -568,46 +568,49 @@ l2cu_optimize () {
 }
 
 l2cu_export () {
-	frobulator.msg "Export directory" "[ '${exports_directory%*/}' ]"
+	frobulator.msg "Export directory" "[ '${export_directory%*/}' ]"
 	echo
 
-	frobulator.inf "Exporting" "[ '${model_name^^}' ]"
+	frobulator.inf "Exporting" "[ '${model_file^^}' ]"
 	frobulator.inf "Format"    "[ '${export_name}' ]"
 	echo
 
-	frobulator.inf "Output" "${export_file}"
+	frobulator.inf "Output" "[ '${export_file}' ]"
 	echo
 
 	leocad										\
 		"-${export_option}" "${export_file}" 	\
-												"${model}" > /dev/null 2>&1
+												"${model_path}" > /dev/null 2>&1
 
 	wait
 }
 
 l2cu_render () {
-	frobulator.msg "Render directory" "[ '${renders_directory%*/}' ]"
+	frobulator.msg "Render directory" "[ '${render_directory%*/}' ]"
 	echo
 
 	frobulator.inf "Rendering" "[ '${model_name^^}' ]"
 	frobulator.inf "View"      "[ '${view[coordinates]^^}' ]"
 	echo
 
+		model="${1}"
+	coordinates="${2}"
+
 	height="4096"
 	width="4096"
-	extension="png"
 
-	model="${1}"
-	coordinates="${2}"
+	extension="png"
 
 	leocad																		\
 		--height "${height}"													\
 		--width "${width}"														\
 		--image "${model_name}-${view[$coordinates]}.${extension}"				\
 		--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
-		--shading ${shading}													\
-		--line-width ${line_width} 												\
-																				"${model}" > /dev/null 2>&1
+		--shading "${shading}"													\
+		--line-width "${line_width}" 											\
+																				"${model_path}" > /dev/null 2>&1
+
+	wait
 }
 
 l2cu_export_size () {
@@ -617,7 +620,7 @@ l2cu_export_size () {
 
 	# get model size in bytes
 
-	export_size=$(find -type f "${exports_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
+	export_size=$(find -type f "${export_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
 
 	# set model size threshold in bytes : 25 * 1024
 
@@ -882,19 +885,19 @@ echo
 
 frobulator.wait 1
 
-if [[ "${option}" = "render" ]]
+if [ "${option}" = "render" ]
 then
 	frobulator.inf "Render option" "[ '${render_option}' ]"
 	echo
 fi
 
-if [[ "${option}" = "export" ]]
+if [ "${option}" = "export" ]
 then
 	frobulator.inf "Export parameter" "[ '${export_name}' ]"
 	echo
 fi
 
-if [[ "${option}" = "overwrite" ]]
+if [ "${option}" = "overwrite" ]
 then
 	frobulator.wrn "WARNING:"
 	frobulator.wrn "Overwrite option selected:"
@@ -907,13 +910,13 @@ echo
 
 # render //////////////////////////////////////////////////////////////////////
 
-if [[ "${option}" = "render" ]]
+if [ "${option}" = "render" ]
 then
 	for extension in ${extensions_list[@]}
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
 
-		for model in ${models_list[@]}
+		for model_path in ${models_list[@]}
 		do
 			# set IFS
 
@@ -921,27 +924,25 @@ then
 
 			# get model file name from path
 
-			model_file="${model##*/}"
+			model_file="${model_path##*/}"
 
 			# strip extension from model file name
 
-			model_file_name="${model_file%.*}"
-
-			model_name="${model_file_name}"
+			model_name="${model_file%.*}"
 
 			# define render output directory
 
 			# use model directory as root
 
-			renders_directory="${model%/*}"/renders
+			render_directory="${model_path%/*}"/renders
 
 			# use render directory as root
 
-			background_directory="${model%/*}"/renders/background
+			background_directory="${model_path%/*}"/renders/background
 
 			# use render directory as root
 
-			flat_directory="${model%/*}"/renders/flat
+			flat_directory="${model_path%/*}"/renders/flat
 
 			# define render parameters for all presets
 
@@ -1012,6 +1013,8 @@ then
 			if [[ "${render_preset}" = "front" ]]
 			then
 				position=(3)
+				shading=full
+				line_width=1
 			fi
 
 			if [[ "${render_preset}" = "flat" ]]
@@ -1020,34 +1023,26 @@ then
 				shading=flat
 				line_width=0
 
-				renders_directory="$flat_directory"
+				render_directory="${flat_directory}"
 			fi
 
-			# render model using options
+			# render
+
+			mkdir -p "${render_directory}"
 
 			for coordinates in ${position[@]}
 			do
-				# check renders directory existence
-
-				frobulator.directory "${renders_directory}"
-
-				cd "${renders_directory}"
-
-				# render
-
-				l2cu_render "${model}" $coordinates
-
-				wait
-
-				# create flat splash image
-
-				if [[ "${render_option}" = "flat" ]]
-				then
-					# rename renders to designated splash images
-
-					mv "${model_name}-${view[1]}.${extension}" "${flat_directory}/flat.${extension}"
-				fi
+				l2cu_render "${model_path}" ${coordinates}
 			done
+
+			# post rendering
+
+			if [[ "${render_option}" = "flat" ]]
+			then
+				# rename renders to designated splash images
+
+				mv "${model_name}-${view[1]}.${extension}" "${flat_directory}"/flat."${extension}"
+			fi
 
 			frobulator.inf "Output" "[ '${model_name}-${view[$coordinates]}.${extension}' ]"
 			echo
@@ -1061,7 +1056,7 @@ fi
 
 # export //////////////////////////////////////////////////////////////////////
 
-if [[ "${option}" = "export" ]]
+if [ "${option}" = "export" ]
 then
 	for extension in ${extensions_list[@]}
 	do
@@ -1083,7 +1078,7 @@ then
 
 			# set export file string
 
-			export_file="${model_name}.${export_extension}"
+			export_file="${model_path%.*}.${export_extension}"
 
 			# explicit export file types for optimization
 
@@ -1094,17 +1089,18 @@ then
 			export_file_material="${model_name}.mtl"
 			export_file_archive="${model_name}.zip"
 
+			# check exports directory existence:
+			# create directory if not available
+
+			frobulator.directory "${model_path%/*}" exports
+
 			# define model exports top directory
 
 			# use model directory as root
 
-			exports_directory="${model%/*}/exports/"
+			export_directory="${model_path%/*}"/exports
 
-			# check exports directory existence
-
-			frobulator.directory "${exports_directory}"
-
-			cd "${exports_directory}"
+			cd "${export_directory}"
 
 			# export
 
@@ -1114,17 +1110,13 @@ then
 			then
 				l2cu_export
 
-				wait
-
 				# wavefront
 
 				if [[ "${export_option}" = "obj" ]]
 				then
 					# archive wavefront model components
 
-					zip								\
-						"${export_file_archive}"	\
-													"${export_file_object}"	"${export_file_material}"
+					zip	"${export_file_archive}" "${export_file_object}" "${export_file_material}"
 
 					# cleanup
 
