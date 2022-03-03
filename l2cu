@@ -582,6 +582,40 @@ l2cu_export () {
 	wait
 }
 
+l2cu_export_size () {
+	# validate export file size
+
+	block_size=1024
+
+	# get model size in bytes
+
+	export_size=$(find -type f "${export_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
+
+	# set model size threshold in bytes : 25 * 1024
+
+	export_size_threshold="25600"
+
+	# if lesser than threshold
+
+	if [ "${export_size}" -le "${export_size_threshold}" ]
+	then
+		frobulator.scs "File size threshold not exceeded" "[ ${export_size} ]"
+		echo
+	fi
+
+	# if greater than threshold
+
+	if [ "${export_size}" -gt "${export_size_threshold}" ]
+	then
+		frobulator.err "File size threshold exceeded" "[ ${export_size} ]"
+		echo
+
+		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B"
+		frobulator.wrn "You may experience higher than average loading times."
+		echo
+	fi
+}
+
 l2cu_render () {
 	frobulator.inf "Rendering" "[ '${model_name}' ]"
 	frobulator.inf "View"      "[ '${view[coordinates]}' ]"
@@ -609,40 +643,6 @@ l2cu_render () {
 																				"${model_path}" > /dev/null 2>&1
 
 	wait
-}
-
-l2cu_export_size () {
-	# verify export file size
-
-	block_size=1024
-
-	# get model size in bytes
-
-	export_size=$(find -type f "${export_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
-
-	# set model size threshold in bytes : 25 * 1024
-
-	export_size_threshold="25600"
-
-	# if lesser than threshold
-
-	if [[ "${export_size}" -le "${export_size_threshold}" ]]
-	then
-		frobulator.scs "File size threshold not exceeded" "[ ${export_size} ]"
-		echo
-	fi
-
-	# if greater than threshold
-
-	if [[ "${export_size}" -gt "${export_size_threshold}" ]]
-	then
-		frobulator.err "File size threshold exceeded" "[ ${export_size} ]"
-		echo
-
-		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B"
-		frobulator.wrn "You may experience higher than average loading times."
-		echo
-	fi
 }
 
 parse_input () {
