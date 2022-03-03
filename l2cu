@@ -722,29 +722,29 @@ parse_colors () {
 
 		# remove underscores from name
 
-		space_name="${ldraw_color_name//_/ }"
+		ldraw_color_name="${ldraw_color_name//_/ }"
 
 		# set name to lowercase for input match
 
-		name="${space_name,,}"
+		ldraw_color_name="${ldraw_color_name,,}"
 
 		# reattribute input variable to lowercase name value
 
-		ldraw_color_name="${name}"
+		ldraw_color_name="${ldraw_color_name}"
 
 		# color hex value
 
-		# remove pound from name
+		# remove pound from value
 
-		hex_value="${ldraw_color_hex_value//#/}"
+		ldraw_color_hex_value="${ldraw_color_hex_value//#/}"
 
-		# set name to lowercase for input match
+		# set value to lowercase for input match
 
-		hex_value="${hex_value,,}"
+		ldraw_color_hex_value="${ldraw_color_hex_value,,}"
 
 		# attribute input variable to lowercase name value
 
-		ldraw_color_hex_value="${hex_value}"
+		ldraw_color_hex_value="${ldraw_color_hex_value}"
 
 		if [[ "${color_input}" == "${ldraw_color_name}"      ]] || \
 		   [[ "${color_input}" == "${ldraw_color_value}"     ]] || \
@@ -866,7 +866,7 @@ then
 	list+=(
 		zip
 		unzip
-		)
+	)
 fi
 
 frobulator.require ${list[@]}
