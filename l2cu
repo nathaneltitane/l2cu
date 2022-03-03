@@ -327,7 +327,7 @@ l2cu_prepare () {
 
 		# push blender conversion script to temporary file
 
-		cat <<- 'PYTHON' > "${optimize}"
+		cat <<- 'OPTIMIZE' > "${optimize}"
 		#!/usr/bin/env python3
 
 		import os
@@ -398,7 +398,7 @@ l2cu_prepare () {
 
 		print("saved as:", blend_file)
 		bpy.ops.wm.quit_blender()
-		PYTHON
+		OPTIMIZE
 	fi
 
 	if [[ "${option}" = "modify" ]]
@@ -564,7 +564,7 @@ l2cu_optimize () {
 	blender						\
 		--background			\
 		--python "${optimize}"	\
-			"${export_file_3ds}" > /dev/null 2>&1
+								"${export_file_3ds}" > /dev/null 2>&1
 }
 
 l2cu_export () {
@@ -578,8 +578,9 @@ l2cu_export () {
 	frobulator.inf "Output" "${export_file}"
 	echo
 
-	leocad \
-		"${model}" "-${export_option}" "${export_file}" > /dev/null 2>&1
+	leocad										\
+		"-${export_option}" "${export_file}" 	\
+												"${model}" > /dev/null 2>&1
 
 	wait
 }
@@ -599,13 +600,14 @@ l2cu_render () {
 	model="${1}"
 	coordinates="${2}"
 
-	leocad \
-		-h "${height}"															\
-		-w "${width}"															\
-		-i "${model_name}-${view[$coordinates]}.${extension}"					\
+	leocad																		\
+		--height "${height}"													\
+		--width "${width}"														\
+		--image "${model_name}-${view[$coordinates]}.${extension}"				\
 		--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
 		--shading ${shading}													\
-		--line-width ${line_width} "${model}" > /dev/null 2>&1
+		--line-width ${line_width} 												\
+																				"${model}" > /dev/null 2>&1
 }
 
 model_size () {
