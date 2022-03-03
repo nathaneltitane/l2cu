@@ -1338,11 +1338,7 @@ then
 								color="0"
 								descriptor="ldr\n0 STEP\n"
 
-								frobulator.inf "Model"      "[ ${model} ]"
-								echo
-
-								frobulator.inf "Modifying " "[ ${old_color} ]"
-								frobulator.inf "Setting"    "[ ${new_color} ]"
+								frobulator.inf "Stepping"      "[ ${model} ]"
 								echo
 							fi
 						fi
