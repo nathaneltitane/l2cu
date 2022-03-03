@@ -166,11 +166,11 @@ do
 		;;
 
 			descritpion)
-				sort_mode="description"
+				sort_option="description"
 			;;
 
 			number)
-				sort_mode="number"
+				sort_option="number"
 			;;
 
 		-h|--help)
@@ -294,6 +294,36 @@ then
 
 		exit 1
 	fi
+fi
+
+if [ -z "${extension_option}" ]
+then
+	extension_option="mpd"
+fi
+
+if [ -z "${render_option}" ]
+then
+	render_option="full"
+fi
+
+if [ -z "${export_option}" ]
+then
+	export_option="collada"
+fi
+
+if [ -z "${modify_option}" ]
+then
+	modify_option="color"
+fi
+
+if [ -z "${download_option}" ]
+then
+	download_option="official"
+fi
+
+if [ -z "${sort_option}" ]
+then
+	sort_option="description"
 fi
 
 # functions ////////////////////////////////////////////////////////////////////
@@ -897,21 +927,24 @@ if [ "${option}" = "export" ] || \
    [ "${option}" = "modify" ]
 then
 	frobulator.msg "Extension option" "[ ${extension_option} ]"
+	echo
 fi
 
 if [ "${option}" = "download" ]
 then
 	frobulator.msg "Download option" "[ ${download_option} ]"
+	echo
 fi
 
 if [ "${option}" = "list" ]
 then
-	frobulator.msg "Sort option" "[ ${sort_mode} ]"
+	frobulator.msg "Sort option" "[ ${sort_option} ]"
+	echo
 fi
 
 if [ "${option}" = "export" ]
 then
-	frobulator.inf "Export parameter" "[ ${export_name} ]"
+	frobulator.inf "Export option" "[ ${export_name} ]"
 	echo
 fi
 
@@ -1428,99 +1461,11 @@ fi
 
 if [[ "${option}" = "list" ]]
 then
-	if [ -z "${directory}" ]
-	then
-		frobulator.wrn "Locate the LDraw parts library?"
-		echo
-
-		read reply
-
-		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-		then
-			# specify directory location
-
-			browse=$(frobulator.dialog "Load LDraw library")
-
-			directory="${browse}"
-
-			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
-			then
-				frobulator.scs "LDraw parts library exists."
-				frobulator.scs "Operating within the LDraw parts directory."
-				echo
-
-				frobulator.fwd "Continuing..."
-				echo
-
-				directory="${browse}"/parts
-			else
-				frobulator.err "LDraw library directory not recognized: 'parts' directory not found."
-				echo
-			fi
-		else
-			frobulator.wrn "LDraw parts directory not found."
-			frobulator.ask "Specify the LDraw parts library directory location to continue?"
-
-			echo
-
-			read reply
-
-			if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-			then
-				# specify directory location or exit on 'cancel'
-
-				browse=$(dialog) || exit 1
-
-				directory="${browse}"/parts
-			else
-				frobulator.ask "Download the latest LDraw parts library?"
-
-				echo
-
-				read reply
-
-				if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-				then
-					frobulator.fwd "Specify setup location."
-					echo
-
-					# specify directory location or exit on 'cancel'
-
-					setup_directory=$(frobulator.dialog) || exit 1
-
-					cd "${setup_directory}" || exit 1
-
-					l2cu_download
-
-					directory="${setup_directory}"/[lL][dD][rR][aA][wW]/parts
-				else
-					frobulator.err "LDraw parts directory not setup on system."
-					echo
-
-					frobulator.wrn "The parts.lst file may be needed for some legacy editors to function."
-					echo
-
-					frobulator.inf "Visit http://www.ldraw.org to get started."
-					frobulator.inf "You can download and extract the LDraw parts library on your system manually."
-					frobulator.inf "Restart and run this utility using the 'make-list' option to generate the parts list."
-					echo
-
-					frobulator.fwd "Exiting..."
-					echo
-
-					exit 1
-				fi
-			fi
-		fi
-	fi
-
-	cd "${directory}"
-
 	# parts list verification and backup
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
-		frobulator.wrn "Alternate version of 'parts.lst' file found."
+		frobulator.wrn "Parts list file found."
 		echo
 
 		frobulator.fwd "Backing up..."
@@ -1529,30 +1474,10 @@ then
 		mv parts.lst parts.lst.bak
 	fi
 
-	# sorting mode verification
-
-	if [[ "${sort_mode}" = "description" ]] || [[ "${sort_mode}" = "number" ]]
-	then
-		frobulator.inf "Utility started using the ${sort_mode} option flag."
-	else
-		frobulator.wrn "No sorting method specified."
-		echo
-
-		frobulator.ask "Specify sort mode" "[ [d]escription / [n]umber ]"
-		echo
-
-		read reply
-	fi
-
 	# parse parts list
 
 	frobulator.fwd "Processing..."
 	echo
-
-	if [ -z "${sort_mode}" ]
-	then
-		sort_mode="description"
-	fi
 
 	# initialize counter
 
@@ -1602,11 +1527,11 @@ then
 
 		for list in "._.lst" ".~.lst" parts.lst
 		do
-			if [[ "${reply}" = [dD] ]] || [[ "${sort_mode}" == "description" ]]
+			if [[ "${reply}" = [dD] ]] || [[ "${sort_option}" == "description" ]]
 			then
 				sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
 
-			elif [[ "${reply}" = [nN] ]] || [[ "${sort_mode}" == "number" ]]
+			elif [[ "${reply}" = [nN] ]] || [[ "${sort_option}" == "number" ]]
 			then
 				sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
 			fi
