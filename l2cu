@@ -568,16 +568,16 @@ l2cu_optimize () {
 }
 
 l2cu_export () {
-	frobulator.inf "Exporting" "[ '${model_file}' ]"
-	frobulator.inf "Format"    "[ '${export_name}' ]"
+	frobulator.inf "Exporting" "[ ${model_file} ]"
+	frobulator.inf "Format"    "[ ${export_name} ]"
 	echo
 
-	frobulator.inf "Output" "[ '${export_file}' ]"
+	frobulator.inf "Output" "[ ${export_file} ]"
 	echo
 
-	leocad										\
-		"-${export_option}" "${export_file}" 	\
-												"${model_path}" > /dev/null 2>&1
+	leocad											\
+		-"${export_extension}" "${export_file}" 	\
+													"${model_path}" > /dev/null 2>&1
 
 	wait
 }
@@ -617,11 +617,11 @@ l2cu_export_size () {
 }
 
 l2cu_render () {
-	frobulator.inf "Rendering" "[ '${model_name}' ]"
-	frobulator.inf "View"      "[ '${view[coordinates]}' ]"
+	frobulator.inf "Rendering" "[ ${model_name} ]"
+	frobulator.inf "View"      "[ ${view[coordinates]} ]"
 	echo
 
-	frobulator.inf "Output" "[ '${render_file}' ]"
+	frobulator.inf "Output" "[ ${render_file} ]"
 	echo
 
 
@@ -719,7 +719,7 @@ parse_colors () {
 
 	done < "${colors}"
 
-	frobulator.err "No color match for input" "[ '${input}' ]"
+	frobulator.err "No color match for input" "[ ${input} ]"
 	echo
 
 	frobulator.fwd "Exiting..."
@@ -877,21 +877,21 @@ l2cu_prepare
 
 # confirmation ////////////////////////////////////////////////////////////////
 
-frobulator.msg "Extension option" "[ '${extension_option}' ]"
-frobulator.msg "Option"           "[ '${option}' ]"
+frobulator.msg "Extension option" "[ ${extension_option} ]"
+frobulator.msg "Option"           "[ ${option} ]"
 echo
 
 frobulator.wait 1
 
 if [ "${option}" = "render" ]
 then
-	frobulator.inf "Render option" "[ '${render_option}' ]"
+	frobulator.inf "Render option" "[ ${render_option} ]"
 	echo
 fi
 
 if [ "${option}" = "export" ]
 then
-	frobulator.inf "Export parameter" "[ '${export_name}' ]"
+	frobulator.inf "Export parameter" "[ ${export_name} ]"
 	echo
 fi
 
@@ -976,10 +976,11 @@ then
 			then
 				# archive wavefront model components
 
-				zip								\
-					"${export_file_archive}"	\
-					"${export_file_object}"		\
-					"${export_file_material}"
+				zip									\
+					-qq								\
+						"${export_file_archive}"	\
+						"${export_file_object}"		\
+						"${export_file_material}"
 
 				# cleanup
 
