@@ -145,20 +145,16 @@ do
 			overwrite_option="overwrite"
 		;;
 
-		-get)
-			option="get"
+		-download)
+			option="download"
 		;;
 
-			complete)
-				get_option="complete"
-			;;
-
-			update)
-				get_option="update"
+			official)
+				download_option="official"
 			;;
 
 			unofficial)
-				get_option="unofficial"
+				download_option="unofficial"
 			;;
 
 		-list)
@@ -218,10 +214,9 @@ do
 			echo -e "overwrite         Overwrite the original model file after modification."
 			echo
 			echo -e "GET:"
-			echo -e "-get              Download the LDraw parts library. [-complete | -update | -unofficlal]"
+			echo -e "-download        Download the LDraw parts library. [official | unofficlal]"
 			echo
-			echo -e "complete         Download the LDraw parts library - complete official archive."
-			echo -e "update           Download the LDraw parts library - update official archive."
+			echo -e "official         Download the LDraw parts library - complete official archive."
 			echo -e "unofficial       Download the LDraw parts library - complete unofficial archive."
 			echo
 			echo -e "LIST:"
@@ -298,25 +293,6 @@ then
 fi
 
 # functions ////////////////////////////////////////////////////////////////////
-
-get_library () {
-	parts_archive=$(basename "${parts_url}")
-
-	# download
-
-	frobulator.download "${parts_url}" "${directory}"/"${parts_archive}"
-
-	# extract
-
-	unzip "${parts_archive}" &
-
-	frobulator.spinner "Extracting..."
-	echo
-
-	# rename
-
-	mv "${parts_archive}" ldraw.zip
-}
 
 l2cu_prepare () {
 	if [[ "${option}" = "export" ]]
@@ -587,7 +563,7 @@ l2cu_export_size () {
 
 	block_size=1024
 
-	# get model size in bytes
+	# calculate model size in bytes
 
 	export_size=$(find -type f "${export_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
 
@@ -859,7 +835,7 @@ then
 	)
 fi
 
-if [ "${option}" = "get" ]
+if [ "${option}" = "download" ]
 then
 	list+=(
 		zip
@@ -1360,32 +1336,25 @@ then
 	done
 fi
 
-# get /////////////////////////////////////////////////////////////////////////
+# download ////////////////////////////////////////////////////////////////////
 
-if [[ "${option}" = "get" ]]
+if [[ "${option}" = "download" ]]
 then
-	parts_url="https://www.ldraw.org/library/updates/complete.zip"
+	base_url="https://www.ldraw.org/library"
 
-	complete_parts_url="https://www.ldraw.org/library/updates/complete.zip"
-	update_parts_url="https://ldraw.org/library/unofficial/lcad1903.zip"
-	unofficial_parts_url="https://ldraw.org/library/unofficial/ldrawunf.zip"
-
-	if [[ "${get_option}" = "complete" ]]
+	if [[ "${download_option}" = "official" ]]
 	then
-		parts_url="${complete_parts_url}"
+		parts_url_release="updates"
+		parts_archive="complete.zip"
 	fi
 
-	if [[ "${get_option}" = "update" ]]
+	if [[ "${download_option}" = "unofficial" ]]
 	then
-		# workaround until html parsing is complete # TODO #
-
-		parts_url="${complete_parts_url}"
+		parts_url_release="unofficial"
+		parts_archive="ldrawunf.zip"
 	fi
 
-	if [[ "${get_option}" = "unofficial" ]]
-	then
-		parts_url="${unofficial_parts_url}"
-	fi
+	parts_url="${base_url}/${parts_url_release}/${parts_archive}"
 
 	if [ -z "${directory}" ]
 	then
@@ -1399,18 +1368,31 @@ then
 		then
 			# specify directory location or exit on 'cancel'
 
-			browse=$(frobulator.dialog "Save to") || exit 1
+			browse=$(frobulator.dialog "Save to")
 
-			directory="${browse}"
+			download_directory="${browse}"
 		else
-			directory="${PWD}"
-
 			frobulator.wrn "No directory location specified."
-			frobulator.wrn "Downloading into current directory."
 			echo
-		fi
 
-		get_library
+			frobulator.wrn "Using current directory." "[ ${PWD} ]"
+			echo
+
+			download_directory="${PWD}"
+		fi
+	fi
+
+	# download
+
+	frobulator.download "${base_url}"/"${parts_url_release}" "${download_directory}" "${parts_archive}"
+
+	# post download
+
+	if [[ "${download_option}" = "official" ]]
+	then
+		mv 												\
+			"${download_directory}"/"${parts_archive}"	\
+			"${download_directory}"/ldraw.zip
 	fi
 fi
 
@@ -1479,7 +1461,7 @@ then
 
 					cd "${setup_directory}" || exit 1
 
-					get_library
+					l2cu_download
 
 					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
 				else
