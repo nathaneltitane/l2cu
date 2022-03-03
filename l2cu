@@ -54,92 +54,92 @@ do
 			option="render"
 		;;
 
-		full)
-			render_option="full"
-			render_preset="full"
-		;;
+			full)
+				render_option="full"
+				render_preset="full"
+			;;
 
-		fixed)
-			render_option="fixed"
-			render_preset="fixed"
-		;;
+			fixed)
+				render_option="fixed"
+				render_preset="fixed"
+			;;
 
-		flat)
-			render_option="flat"
-			render_preset="flat"
-		;;
+			flat)
+				render_option="flat"
+				render_preset="flat"
+			;;
 
-		quarter-back)
-			render_option="quarter-back"
-			render_preset="quarter-back"
-		;;
+			quarter-back)
+				render_option="quarter-back"
+				render_preset="quarter-back"
+			;;
 
-		quarter-front)
-			render_option="quarter-front"
-			render_preset="quarter-front"
-		;;
+			quarter-front)
+				render_option="quarter-front"
+				render_preset="quarter-front"
+			;;
 
-		back)
-			render_option="back"
-			render_preset="back"
-		;;
+			back)
+				render_option="back"
+				render_preset="back"
+			;;
 
-		front)
-			render_option="front"
-			render_preset="front"
-		;;
+			front)
+				render_option="front"
+				render_preset="front"
+			;;
 
 		-export)
 			option="export"
 		;;
 
-		3ds)
-			export_option="3ds"
-			export_extension="3ds"
-			export_name="3DS"
-		;;
+			3ds)
+				export_option="3ds"
+				export_extension="3ds"
+				export_name="3DS"
+			;;
 
-		blender)
-			export_option="3ds"
-			export_extension="blend"
-			export_name="Blender"
-		;;
+			blender)
+				export_option="3ds"
+				export_extension="blend"
+				export_name="Blender"
+			;;
 
-		collada)
-			export_option="dae"
-			export_extension="dae"
-			export_name="Collada"
-		;;
+			collada)
+				export_option="dae"
+				export_extension="dae"
+				export_name="Collada"
+			;;
 
-		wavefront)
-			export_option="obj"
-			export_extension="obj"
-			export_name="Wavefront"
-		;;
+			wavefront)
+				export_option="obj"
+				export_extension="obj"
+				export_name="Wavefront"
+			;;
 
 		-modify)
 			option="modify"
 		;;
 
-		color)
-			modify_option="color"
-		;;
+			color)
+				modify_option="color"
+			;;
 
-		part)
-			modify_option="part"
-		;;
+			part)
+				modify_option="part"
+			;;
 
-		bind)
-			modify_option="bind"
-		;;
+			bind)
+				modify_option="bind"
+			;;
 
-		lint)
-			modify_option="lint"
-		;;
+			lint)
+				modify_option="lint"
+			;;
 
-		step)
-			modify_option="step"
-		;;
+			step)
+				modify_option="step"
+			;;
 
 		-overwrite)
 			overwrite_option="overwrite"
@@ -149,29 +149,29 @@ do
 			option="get"
 		;;
 
-		complete)
-			get_option="complete"
-		;;
+			complete)
+				get_option="complete"
+			;;
 
-		update)
-			get_option="update"
-		;;
+			update)
+				get_option="update"
+			;;
 
-		unofficial)
-			get_option="unofficial"
-		;;
+			unofficial)
+				get_option="unofficial"
+			;;
 
 		-list)
 			option="make-list"
 		;;
 
-		descritpion)
-			sort_mode="description"
-		;;
+			descritpion)
+				sort_mode="description"
+			;;
 
-		number)
-			sort_mode="number"
-		;;
+			number)
+				sort_mode="number"
+			;;
 
 		-h|--help)
 			echo
