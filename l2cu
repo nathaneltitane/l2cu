@@ -159,6 +159,10 @@ do
 
 		-list)
 			option="make-list"
+
+			extensions_list=(
+				dat
+			)
 		;;
 
 			descritpion)
@@ -885,31 +889,35 @@ l2cu_prepare
 
 # confirmation ////////////////////////////////////////////////////////////////
 
-if [ "${option}" = "download" ]
-then
-	:
-
-elif [ "${option}" = "list" ]
-then
-	:
-else
-	frobulator.msg "Extension option" "[ ${extension_option} ]"
-fi
-
 frobulator.msg "Option"           "[ ${option} ]"
 echo
 
-frobulator.wait 1
-
-if [ "${option}" = "render" ]
+if [ "${option}" = "export" ] || \
+   [ "${option}" = "render" ] || \
+   [ "${option}" = "modify" ]
 then
-	frobulator.inf "Render option" "[ ${render_option} ]"
-	echo
+	frobulator.msg "Extension option" "[ ${extension_option} ]"
+fi
+
+if [ "${option}" = "download" ]
+then
+	frobulator.msg "Download option" "[ ${download_option} ]"
+fi
+
+if [ "${option}" = "list" ]
+then
+	frobulator.msg "Sort option" "[ ${sort_mode} ]"
 fi
 
 if [ "${option}" = "export" ]
 then
 	frobulator.inf "Export parameter" "[ ${export_name} ]"
+	echo
+fi
+
+if [ "${option}" = "render" ]
+then
+	frobulator.inf "Render option" "[ ${render_option} ]"
 	echo
 fi
 
@@ -1422,31 +1430,32 @@ if [[ "${option}" = "list" ]]
 then
 	if [ -z "${directory}" ]
 	then
-		frobulator.wrn "Is the LDraw parts library setup on this system?"
-
+		frobulator.wrn "Locate the LDraw parts library?"
 		echo
 
 		read reply
 
 		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 		then
-			# specify directory location or exit on 'cancel'
+			# specify directory location
 
-			browse=$(frobulator.dialog "Load LDraw library") || exit 1
+			browse=$(frobulator.dialog "Load LDraw library")
 
-			cd "${browse}" || exit 1
+			directory="${browse}"
 
 			if [[ "$(basename $(pwd))" == [lL][dD][rR][aA][wW] ]] && [[ -d "parts" ]]
 			then
 				frobulator.scs "LDraw parts library exists."
 				frobulator.scs "Operating within the LDraw parts directory."
 				echo
+
 				frobulator.fwd "Continuing..."
 				echo
 
 				directory="${browse}"/parts
 			else
 				frobulator.err "LDraw library directory not recognized: 'parts' directory not found."
+				echo
 			fi
 		else
 			frobulator.wrn "LDraw parts directory not found."
@@ -1483,7 +1492,7 @@ then
 
 					l2cu_download
 
-					directory="$setup_directory/[lL][dD][rR][aA][wW]/parts"
+					directory="${setup_directory}"/[lL][dD][rR][aA][wW]/parts
 				else
 					frobulator.err "LDraw parts directory not setup on system."
 					echo
@@ -1505,7 +1514,7 @@ then
 		fi
 	fi
 
-	cd "${directory}" || exit 1
+	cd "${directory}"
 
 	# parts list verification and backup
 
@@ -1522,57 +1531,57 @@ then
 
 	# sorting mode verification
 
-	if [[ "$sort_mode" == "description" ]] || [[ "$sort_mode" == "number" ]]
+	if [[ "${sort_mode}" = "description" ]] || [[ "${sort_mode}" = "number" ]]
 	then
-		frobulator.inf "Utility startedusing the $sort_mode option flag."
+		frobulator.inf "Utility started using the ${sort_mode} option flag."
 	else
 		frobulator.wrn "No sorting method specified."
 		echo
 
-		frobulator.ask "Which sorting method should be used for parsing the parts list?"
-		frobulator.ask "[ [dD]escription / [nN]umber ]"
+		frobulator.ask "Specify sort mode" "[ [d]escription / [n]umber ]"
 		echo
 
 		read reply
 	fi
 
-	if [ -z "${reply}" ]
+	# parse parts list
+
+	frobulator.fwd "Processing..."
+	echo
+
+	if [ -z "${sort_mode}" ]
 	then
-		exit 1
-	else
-		# parse parts list
+		sort_mode="description"
+	fi
 
-		frobulator.fwd "Processing..."
-		echo
+	# initialize counter
 
-		# initialize counter
-
-		count=1
+	count=1
 
 	for extension in ${extensions_list[@]}
 	do
-		partss_list=( $(find ${directory} -type f -iname "*.${extension}") )
+		parts_list=( $(find ${directory} -type f -iname "*.${extension}") )
 
-		for part in ${parts_list[@]}
+		for part_path in ${parts_list[@]}
 		do
-				filename="${part##*/}"
-				header="$(head -n 1 "${part}")"
-				description="${header:2}"
+				part_file="${part_path##*/}"
+				part_file_header="$(head -n 1 "${part_path}")"
+				part_file_description="${part_file_header:2}"
 
-				if [[ "${description}" == *~Moved* ]]
+				if [[ "${part_file_description}" == *~Moved* ]]
 				then
 					: # pass
 				else
-					if [[ "${description}" == *_* ]]
+					if [[ "${part_file_description}" == *_* ]]
 					then
-						printf '%-30s %-s\n' "${filename}" "${description}" >> "._.lst"
+						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
 
-					elif [[ "${description}" == *~* ]]
+					elif [[ "${part_file_description}" == *~* ]]
 					then
-						printf '%-30s %-s\n' "${filename}" "${description}" >> ".~.lst"
+						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
 
 					else
-						printf '%-30s %-s\n' "${filename}" "${description}" >> parts.lst
+						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
 					fi
 
 					frobulator.inf "Parts count" "$((count++))\c"
@@ -1584,6 +1593,8 @@ then
 		# keep counter visible while looping
 
 		echo
+
+		# set separator
 
 		separator=' '
 
@@ -1600,6 +1611,10 @@ then
 				sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
 			fi
 		done
+
+		# unset separator
+
+		separator=''
 
 		# merge
 
