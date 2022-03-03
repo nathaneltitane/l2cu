@@ -93,26 +93,26 @@ do
 			option="export"
 		;;
 
-			3ds)
-				export_option="3ds"
+			3dstudio)
+				export_option="3dstudio"
 				export_extension="3ds"
 				export_name="3DS"
 			;;
 
-			blender)
-				export_option="3ds"
-				export_extension="blend"
-				export_name="Blender"
-			;;
-
 			collada)
-				export_option="dae"
+				export_option="collada"
 				export_extension="dae"
 				export_name="Collada"
 			;;
 
+			blender)
+				export_option="3dstudio"
+				export_extension="blend"
+				export_name="Blender"
+			;;
+
 			wavefront)
-				export_option="obj"
+				export_option="wavefront"
 				export_extension="obj"
 				export_name="Wavefront"
 			;;
@@ -201,10 +201,10 @@ do
 			echo
 			echo -e "-export           Exports model files using the following parameters:"
 			echo
-			echo -e "3ds               Export 3ds file format only."
-			echo -e "blender           Export blender file format only."
-			echo -e "collada           Export collada file format only."
-			echo -e "wavefront         Export wavefront (obj and mtl as zip archive) file format only."
+			echo -e "3dstudio          Export 3dstudio file format.                            [ 3ds]"
+			echo -e "collada           Export collada file format.                             [ dae ]"
+			echo -e "blender           Optimize 3dstudio and export to blender file format.    [ 3ds > blend ]"
+			echo -e "wavefront         Generate wavefront files and archive.                   [ obj + mtl > zip ]"
 			echo
 			echo -e "MODIFY:"
 			echo
@@ -568,10 +568,7 @@ l2cu_optimize () {
 }
 
 l2cu_export () {
-	frobulator.msg "Export directory" "[ '${export_directory%*/}' ]"
-	echo
-
-	frobulator.inf "Exporting" "[ '${model_file^^}' ]"
+	frobulator.inf "Exporting" "[ '${model_file}' ]"
 	frobulator.inf "Format"    "[ '${export_name}' ]"
 	echo
 
@@ -586,14 +583,15 @@ l2cu_export () {
 }
 
 l2cu_render () {
-	frobulator.msg "Render directory" "[ '${render_directory%*/}' ]"
+	frobulator.inf "Rendering" "[ '${model_name}' ]"
+	frobulator.inf "View"      "[ '${view[coordinates]}' ]"
 	echo
 
-	frobulator.inf "Rendering" "[ '${model_name^^}' ]"
-	frobulator.inf "View"      "[ '${view[coordinates]^^}' ]"
+	frobulator.inf "Output" "[ '${render_file}' ]"
 	echo
 
-		model="${1}"
+
+	model_path="${1}"
 	coordinates="${2}"
 
 	height="4096"
@@ -908,6 +906,97 @@ fi
 frobulator.fwd "Proceeding..."
 echo
 
+# export //////////////////////////////////////////////////////////////////////
+
+if [ "${option}" = "export" ]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
+
+		for model_path in ${models_list[@]}
+		do
+			# set IFS
+
+			IFS=' '
+
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# define export output directory
+
+			# use model directory as root
+
+			export_directory="${model_path%/*}"/exports
+
+			# explicit export file types for optimization
+
+			export_file="${model_name}"."${export_extension}"
+
+			export_file_3ds="${model_name}.3ds"
+			export_file_blend="${model_name}.blend"
+			export_file_collada="${model_name}.dae"
+			export_file_object="${model_name}.obj"
+			export_file_material="${model_name}.mtl"
+			export_file_archive="${model_name}.zip"
+
+			# export
+
+			mkdir -p "${export_directory}"
+
+			cd "${export_directory}"
+
+			l2cu_export
+
+			# 3ds
+
+			if [[ "${export_option}" = "blender" ]]
+			then
+				# import 3ds file into blender
+				# generate optimized blend file
+
+				frobulator.fwd "Optimizing..."
+				echo
+
+				l2cu_optimize
+
+				# cleanup
+
+				rm -rf "${export_file_3ds}"
+			fi
+
+			# wavefront
+
+			if [[ "${export_option}" = "wavefront" ]]
+			then
+				# archive wavefront model components
+
+				zip								\
+					"${export_file_archive}"	\
+					"${export_file_object}"		\
+					"${export_file_material}"
+
+				# cleanup
+
+				rm -rf "${export_file_material}" "${export_file_object}"
+			fi
+
+			# verify export size threshold
+
+			l2cu_export_size
+
+			# unset IFS
+
+			IFS=''
+		done
+	done
+fi
+
 # render //////////////////////////////////////////////////////////////////////
 
 if [ "${option}" = "render" ]
@@ -938,13 +1027,9 @@ then
 
 			# use render directory as root
 
-			background_directory="${model_path%/*}"/renders/background
-
-			# use render directory as root
-
 			flat_directory="${model_path%/*}"/renders/flat
 
-			# define render parameters for all presets
+			# define coordinate values and labels
 
 			# camera latitude
 
@@ -1022,17 +1107,26 @@ then
 				position=(1)
 				shading=flat
 				line_width=0
-
-				render_directory="${flat_directory}"
 			fi
 
 			# render
 
 			mkdir -p "${render_directory}"
 
+			cd "${render_directory}"
+
+			if [[ "${render_preset}" = "flat" ]]
+			then
+				mkdir -p "${flat_directory}"
+
+				cd "${flat_directory}"
+			fi
+
 			for coordinates in ${position[@]}
 			do
-				l2cu_render "${model_path}" ${coordinates}
+				render_file="${model_name}-${view[$coordinates]}.${extension}"
+
+				l2cu_render "${model_path}" "${coordinates}"
 			done
 
 			# post rendering
@@ -1041,112 +1135,10 @@ then
 			then
 				# rename renders to designated splash images
 
-				mv "${model_name}-${view[1]}.${extension}" "${flat_directory}"/flat."${extension}"
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${flat_directory}"/flat."${extension}"
 			fi
-
-			frobulator.inf "Output" "[ '${model_name}-${view[$coordinates]}.${extension}' ]"
-			echo
-
-			# unset IFS
-
-			IFS=''
-		done
-	done
-fi
-
-# export //////////////////////////////////////////////////////////////////////
-
-if [ "${option}" = "export" ]
-then
-	for extension in ${extensions_list[@]}
-	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
-
-		for model_path in ${models_list[@]}
-		do
-			# set IFS
-
-			IFS=' '
-
-			# get model file name from path
-
-			model_file="${model_path##*/}"
-
-			# strip extension from model file name
-
-			model_name="${model_file%.*}"
-
-			# set export file string
-
-			export_file="${model_path%.*}.${export_extension}"
-
-			# explicit export file types for optimization
-
-			export_file_3ds="${model_name}.3ds"
-			export_file_blend="${model_name}.blend"
-			export_file_collada="${model_name}.dae"
-			export_file_object="${model_name}.obj"
-			export_file_material="${model_name}.mtl"
-			export_file_archive="${model_name}.zip"
-
-			# check exports directory existence:
-			# create directory if not available
-
-			frobulator.directory "${model_path%/*}" exports
-
-			# define model exports top directory
-
-			# use model directory as root
-
-			export_directory="${model_path%/*}"/exports
-
-			cd "${export_directory}"
-
-			# export
-
-			if [[ "${export_option}" = "3ds" ]] || \
-			   [[ "${export_option}" = "dae" ]] || \
-			   [[ "${export_option}" = "obj" ]]
-			then
-				l2cu_export
-
-				# wavefront
-
-				if [[ "${export_option}" = "obj" ]]
-				then
-					# archive wavefront model components
-
-					zip	"${export_file_archive}" "${export_file_object}" "${export_file_material}"
-
-					# cleanup
-
-					rm -rf {*.obj,*.mtl}
-				fi
-			fi
-
-			# 3ds
-
-			if [[ "${export_option}" = "blender" ]]
-			then
-				frobulator.inf "Converting" "[ ${model} // ${export_extension} ]"
-				echo
-
-				l2cu_export
-
-				# import 3ds file into blender
-				# generate optimized blend file
-
-				frobulator.fwd "Optimizing..."
-				echo
-
-				l2cu_optimize
-
-				# cleanup
-
-				rm -rf "${export_file_3ds}"
-			fi
-
-			l2cu_export_size
 
 			# unset IFS
 
