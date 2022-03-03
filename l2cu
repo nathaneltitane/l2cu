@@ -277,16 +277,18 @@ stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
 if [ -z "${directory}" ]
 then
-	frobulator.ask "Load model files from:"
+	frobulator.ask "Specify directory?"
 	echo
 
-	# specify directory location or exit on 'cancel'
+	read reply
 
-	directory=$(frobulator.dialog "Load model files")
-
-	if [ -z "${directory}" ]
+	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 	then
-		frobulator.err "No model directory specified."
+		# specify directory location or exit on 'cancel'
+
+		directory=$(frobulator.dialog "Directory")
+	else
+		frobulator.err "No directory specified."
 		echo
 
 		frobulator.fwd "Exiting..."
@@ -919,26 +921,23 @@ l2cu_prepare
 
 # confirmation ////////////////////////////////////////////////////////////////
 
-frobulator.msg "Option"           "[ ${option} ]"
-echo
-
 if [ "${option}" = "export" ] || \
    [ "${option}" = "render" ] || \
    [ "${option}" = "modify" ]
 then
-	frobulator.msg "Extension option" "[ ${extension_option} ]"
+	frobulator.wrn "Extension option" "[ ${extension_option} ]"
 	echo
 fi
 
 if [ "${option}" = "download" ]
 then
-	frobulator.msg "Download option" "[ ${download_option} ]"
+	frobulator.inf "Download option" "[ ${download_option} ]"
 	echo
 fi
 
 if [ "${option}" = "list" ]
 then
-	frobulator.msg "Sort option" "[ ${sort_option} ]"
+	frobulator.inf "Sort option" "[ ${sort_option} ]"
 	echo
 fi
 
@@ -954,6 +953,12 @@ then
 	echo
 fi
 
+if [ "${option}" = "modify" ]
+then
+	frobulator.inf "Modify option" "[ ${modify_option} ]"
+	echo
+fi
+
 if [ "${option}" = "overwrite" ]
 then
 	frobulator.wrn "WARNING"
@@ -963,6 +968,9 @@ then
 	frobulator.wrn "Modifications will be written to model file directly!"
 	echo
 fi
+
+frobulator.inf "Option" "[ ${option} ]"
+echo
 
 frobulator.fwd "Proceeding..."
 echo
@@ -1461,6 +1469,14 @@ fi
 
 if [[ "${option}" = "list" ]]
 then
+	# ldraw parts directory verification
+
+	if [ ! -d [lL][dD][rR][aA][wW] ]
+	then
+		frobulator.err "No LDraw directory found."
+		echo
+	fi
+
 	# parts list verification and backup
 
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
@@ -1509,7 +1525,7 @@ then
 						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
 					fi
 
-					frobulator.inf "Parts count" "$((count++))\c"
+					frobulator.inf "Part count" "$((count++))\c"
 					echo
 				fi
 			done
@@ -1527,11 +1543,12 @@ then
 
 		for list in "._.lst" ".~.lst" parts.lst
 		do
-			if [[ "${reply}" = [dD] ]] || [[ "${sort_option}" == "description" ]]
+			if [[ "${sort_option}" = "description" ]]
 			then
 				sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
+			fi
 
-			elif [[ "${reply}" = [nN] ]] || [[ "${sort_option}" == "number" ]]
+			if [[ "${sort_option}" = "number" ]]
 			then
 				sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
 			fi
