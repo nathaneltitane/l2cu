@@ -12,7 +12,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version /////////////////////////////////////////////////////////////////////
 
-version="03-01-2022"
+version="03-11-2022"
 
 # usage ///////////////////////////////////////////////////////////////////////
 
@@ -49,6 +49,34 @@ do
 				mpd
 			)
 		;;
+
+		-export)
+			option="export"
+		;;
+
+			3dstudio)
+				export_option="3dstudio"
+				export_extension="3ds"
+				export_name="3DS"
+			;;
+
+			collada)
+				export_option="collada"
+				export_extension="dae"
+				export_name="Collada"
+			;;
+
+			blender)
+				export_option="3dstudio"
+				export_extension="blend"
+				export_name="Blender"
+			;;
+
+			wavefront)
+				export_option="wavefront"
+				export_extension="obj"
+				export_name="Wavefront"
+			;;
 
 		-render)
 			option="render"
@@ -87,34 +115,6 @@ do
 			front)
 				render_option="front"
 				render_preset="front"
-			;;
-
-		-export)
-			option="export"
-		;;
-
-			3dstudio)
-				export_option="3dstudio"
-				export_extension="3ds"
-				export_name="3DS"
-			;;
-
-			collada)
-				export_option="collada"
-				export_extension="dae"
-				export_name="Collada"
-			;;
-
-			blender)
-				export_option="3dstudio"
-				export_extension="blend"
-				export_name="Blender"
-			;;
-
-			wavefront)
-				export_option="wavefront"
-				export_extension="obj"
-				export_name="Wavefront"
 			;;
 
 		-modify)
@@ -185,6 +185,15 @@ do
 			echo -e "-ldr              Selects ldr file format as target."
 			echo -e "-mpd              Selects mpd file format as target."
 			echo
+			echo -e "EXPORT:"
+			echo
+			echo -e "-export           Exports model files using the following parameters:"
+			echo
+			echo -e "3dstudio          Export 3dstudio file format.                            [ 3ds]"
+			echo -e "collada           Export collada file format.                             [ dae ]"
+			echo -e "blender           Optimize 3dstudio and export to blender file format.    [ 3ds > blend ]"
+			echo -e "wavefront         Generate wavefront files and archive.                   [ obj + mtl > zip ]"
+			echo
 			echo -e "RENDER:"
 			echo
 			echo -e "-render           Renders model files using the following parameters:"
@@ -196,15 +205,6 @@ do
 			echo -e "quarter-front     Render image using a quarter-front view preset.    [ 1 ] [ Lat.:30, Lon.: 45 ]"
 			echo -e "back              Render image using a back view preset.             [ 2 ] [ Lat.:30, Lon.: 180 ]"
 			echo -e "front             Render image using a front view preset.            [ 3 ] [ Lat.:30, Lon.: 0 ]"
-			echo
-			echo -e "EXPORT:"
-			echo
-			echo -e "-export           Exports model files using the following parameters:"
-			echo
-			echo -e "3dstudio          Export 3dstudio file format.                            [ 3ds]"
-			echo -e "collada           Export collada file format.                             [ dae ]"
-			echo -e "blender           Optimize 3dstudio and export to blender file format.    [ 3ds > blend ]"
-			echo -e "wavefront         Generate wavefront files and archive.                   [ obj + mtl > zip ]"
 			echo
 			echo -e "MODIFY:"
 			echo
@@ -1505,68 +1505,68 @@ then
 
 		for part_path in ${parts_list[@]}
 		do
-				part_file="${part_path##*/}"
-				part_file_header="$(head -n 1 "${part_path}")"
-				part_file_description="${part_file_header:2}"
+            part_file="${part_path##*/}"
+            part_file_header="$(head -n 1 "${part_path}")"
+            part_file_description="${part_file_header:2}"
 
-				if [[ "${part_file_description}" == *~Moved* ]]
-				then
-					: # pass
-				else
-					if [[ "${part_file_description}" == *_* ]]
-					then
-						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
+            if [[ "${part_file_description}" == *~Moved* ]]
+            then
+                : # pass
+            else
+                if [[ "${part_file_description}" == *_* ]]
+                then
+                    printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
 
-					elif [[ "${part_file_description}" == *~* ]]
-					then
-						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
+                elif [[ "${part_file_description}" == *~* ]]
+                then
+                    printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
 
-					else
-						printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
-					fi
+                else
+                    printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
+                fi
 
-					frobulator.inf "Part count" "$((count++))\c"
-					echo
-				fi
-			done
-		done
+                frobulator.inf "Part count" "$((count++))\c"
+                echo
+            fi
+        done
+    done
 
-		# keep counter visible while looping
+    # keep counter visible while looping
 
-		echo
+    echo
 
-		# set separator
+    # set separator
 
-		separator=' '
+    separator=' '
 
-		# apply sorting method
+    # apply sorting method
 
-		for list in "._.lst" ".~.lst" parts.lst
-		do
-			if [[ "${sort_option}" = "description" ]]
-			then
-				sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
-			fi
+    for list in "._.lst" ".~.lst" parts.lst
+    do
+        if [[ "${sort_option}" = "description" ]]
+        then
+            sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
+        fi
 
-			if [[ "${sort_option}" = "number" ]]
-			then
-				sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
-			fi
-		done
+        if [[ "${sort_option}" = "number" ]]
+        then
+            sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
+        fi
+    done
 
-		# unset separator
+    # unset separator
 
-		separator=''
+    separator=''
 
-		# merge
+    # merge
 
-		cat "._.lst" ".~.lst" >> parts.lst
+    cat "._.lst" ".~.lst" >> parts.lst
 
-		# cleanup
+    # cleanup
 
-		rm -rf "._.lst" ".~.lst"
-	fi
+    rm -rf "._.lst" ".~.lst"
 fi
+
 
 # complete ////////////////////////////////////////////////////////////////////
 
