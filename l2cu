@@ -643,15 +643,18 @@ l2cu_render () {
 	height="4096"
 	width="4096"
 
+	antialias_samples="8"
+
 	extension="png"
 
 	leocad																		\
 		--height "${height}"													\
 		--width "${width}"														\
-		--image "${model_name}-${view[$coordinates]}.${extension}"				\
 		--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
 		--shading "${shading}"													\
 		--line-width "${line_width}" 											\
+		--aa-samples "${antialias_samples}" 									\
+		--image "${model_name}-${view[$coordinates]}.${extension}"				\
 																				"${model_path}" > /dev/null 2>&1
 
 	wait
