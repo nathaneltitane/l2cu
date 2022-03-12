@@ -232,7 +232,7 @@ do
 			echo
 			echo -e "'${script}'       [ Version ${version} ]"
 			echo
-			
+
 			exit
 		;;
 
@@ -584,7 +584,7 @@ l2cu_export () {
 	frobulator.inf "Format"    "[ ${export_name} ]"
 	echo
 
-	frobulator.inf "Output" "[ ${export_file} ]"
+	frobulator.fwd "Output" "[ ${export_file} ]"
 	echo
 
 	leocad											\
@@ -601,7 +601,7 @@ l2cu_export_size () {
 
 	# calculate model size in bytes
 
-	export_size=$(find -type f "${export_directory}${export_file}" | du -B "${block_size}" | cut -f 1)
+	export_size=$(find "${export_directory}/${export_file}" -type f | du -B "${block_size}" | cut -f 1)
 
 	# set model size threshold in bytes : 25 * 1024
 
@@ -611,7 +611,7 @@ l2cu_export_size () {
 
 	if [ "${export_size}" -le "${export_size_threshold}" ]
 	then
-		frobulator.scs "File size threshold not exceeded" "[ ${export_size} ]"
+		frobulator.scs "File size" "[ ${export_size} ]"
 		echo
 	fi
 
@@ -619,11 +619,11 @@ l2cu_export_size () {
 
 	if [ "${export_size}" -gt "${export_size_threshold}" ]
 	then
-		frobulator.err "File size threshold exceeded" "[ ${export_size} ]"
+		frobulator.wrn "File size" "[ ${export_size} ]"
 		echo
 
 		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B"
-		frobulator.wrn "You may experience higher than average loading times."
+		frobulator.msg "You may experience higher than average loading times."
 		echo
 	fi
 }
@@ -633,7 +633,7 @@ l2cu_render () {
 	frobulator.inf "View"      "[ ${view[coordinates]} ]"
 	echo
 
-	frobulator.inf "Output" "[ ${render_file} ]"
+	frobulator.fwd "Output" "[ ${render_file} ]"
 	echo
 
 
