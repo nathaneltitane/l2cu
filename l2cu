@@ -921,7 +921,7 @@ do
 		frobulator.err "Missing" "[ '${requirement}' ]"
 		echo
 
-		frobulator.wrn "Start ${script} as 'root' to install missing application requirements."
+		frobulator.wrn "Start ${script} as 'root' to install requirements."
 		echo
 
 		exit 1
