@@ -914,20 +914,6 @@ then
 	)
 fi
 
-for requirement in ${list[@]}
-do
-	if [[ -z $(command -v "${requirement}") ]]
-	then
-		frobulator.err "Missing" "[ '${requirement}' ]"
-		echo
-
-		frobulator.wrn "Start ${script} as 'root' to install requirements."
-		echo
-
-		exit 1
-	fi
-done
-
 if [[ $(id -u -n) = "root" ]]
 then
 	frobulator.require ${list[@]}
@@ -940,7 +926,19 @@ then
 
 	exit
 else
-	:
+	for requirement in ${list[@]}
+	do
+		if [[ -z $(command -v "${requirement}") ]]
+		then
+			frobulator.err "Missing" "[ '${requirement}' ]"
+			echo
+
+			frobulator.wrn "Start ${script} as 'root' to install requirements."
+			echo
+
+			exit 1
+		fi
+	done
 fi
 
 list=()
