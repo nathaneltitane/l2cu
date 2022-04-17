@@ -916,7 +916,7 @@ fi
 
 for requirement in ${list[@]}
 do
-	if [[ -z $(command -v "${requirement} ]]
+	if [[ -z $(command -v "${requirement}") ]]
 	then
 		frobulator.err "Missing" "[ '${requirement}' ]"
 		echo
@@ -935,7 +935,7 @@ then
 	frobulator.msg "${script} requirements installed."
 	echo
 
-	frobulator.inf "Run ${script} as 'user'" to proceed."
+	frobulator.inf "Run ${script} as 'user' to proceed."
 	echo
 
 	exit
