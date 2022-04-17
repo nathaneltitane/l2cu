@@ -1119,66 +1119,99 @@ then
 				30
 				30
 				30
+				30
+				30
+				30
+				30
 			)
 
 			# camera longitude
 
 			longitude=(
-				225
-				45
-				180
 				0
+				45
+				90
+				135
+				180
+				225
+				270
+				315
 			)
 
 			# view labels
 
 			view=(
-				"quarter-back"
-				"quarter-front"
-				"back"
-				"front"
+				"00"
+				"01"
+				"02"
+				"03"
+				"04"
+				"05"
+				"06"
+				"07"
 			)
 
 			# define camera position presets
 
-			if [[ "${render_preset}" = "full" ]]
-			then
-				position=(0 1 2 3)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "fixed" ]]
-			then
-				position=(0 1)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "quarter-back" ]]
+			if [[ "${render_preset}" = "0" ]]
 			then
 				position=(0)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" = "quarter-front" ]]
+			if [[ "${render_preset}" = "1" ]]
 			then
 				position=(1)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" = "back" ]]
+			if [[ "${render_preset}" = "2" ]]
 			then
 				position=(2)
 				shading=full
 				line_width=1
 			fi
 
-			if [[ "${render_preset}" = "front" ]]
+			if [[ "${render_preset}" = "3" ]]
 			then
 				position=(3)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "4" ]]
+			then
+				position=(4)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "5" ]]
+			then
+				position=(5)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "6" ]]
+			then
+				position=(6)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "7" ]]
+			then
+				position=(7)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "full" ]]
+			then
+				position=(0 1 2 3 4 5 6 7)
 				shading=full
 				line_width=1
 			fi
