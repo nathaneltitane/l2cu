@@ -87,34 +87,44 @@ do
 				render_preset="full"
 			;;
 
-			fixed)
-				render_option="fixed"
-				render_preset="fixed"
-			;;
-
 			flat)
 				render_option="flat"
 				render_preset="flat"
 			;;
 
-			quarter-back)
-				render_option="quarter-back"
-				render_preset="quarter-back"
+			1)
+				render_option="1"
+				render_preset="1"
 			;;
 
-			quarter-front)
-				render_option="quarter-front"
-				render_preset="quarter-front"
+			2)
+				render_option="2"
+				render_preset="2"
 			;;
 
-			back)
-				render_option="back"
-				render_preset="back"
+			3)
+				render_option="3"
+				render_preset="3"
 			;;
 
-			front)
-				render_option="front"
-				render_preset="front"
+			4)
+				render_option="4"
+				render_preset="4"
+			;;
+
+			5)
+				render_option="5"
+				render_preset="5"
+			;;
+
+			6)
+				render_option="6"
+				render_preset="6"
+			;;
+
+			7)
+				render_option="7"
+				render_preset="7"
 			;;
 
 		-modify)
