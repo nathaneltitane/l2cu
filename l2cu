@@ -1067,23 +1067,6 @@ then
 				rm -rf "${export_file_3ds}"
 			fi
 
-			# wavefront
-
-			if [[ "${export_option}" = "wavefront" ]]
-			then
-				# archive wavefront model components
-
-				zip									\
-					-qq								\
-						"${export_file_archive}"	\
-						"${export_file_object}"		\
-						"${export_file_material}"
-
-				# cleanup
-
-				rm -rf "${export_file_material}" "${export_file_object}"
-			fi
-
 			# verify export size threshold
 
 			l2cu_export_size
