@@ -232,17 +232,17 @@ do
 			echo -e "overwrite         Overwrite the original model file after modification."
 			echo
 			echo -e "GET:"
-			echo -e "-download        Download the LDraw parts library. [official | unofficlal]"
+			echo -e "-download         Download the LDraw parts library. [official | unofficlal]"
 			echo
-			echo -e "official         Download the LDraw parts library - complete official archive."
-			echo -e "unofficial       Download the LDraw parts library - complete unofficial archive."
+			echo -e "official          Download the LDraw parts library - complete official archive."
+			echo -e "unofficial        Download the LDraw parts library - complete unofficial archive."
 			echo
 			echo -e "LIST:"
 			echo
-			echo -e "-list              Generate the LDraw parts list for use with legacy editors."
+			echo -e "-list             Generate the LDraw parts list for use with legacy editors."
 			echo
-			echo -e "description      Sort list by part description."
-			echo -e "number           Sort list by part number."
+			echo -e "description       Sort list by part description."
+			echo -e "number            Sort list by part number."
 			echo
 			echo -e "'${script}'       [ Version ${version} ]"
 			echo
