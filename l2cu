@@ -594,8 +594,7 @@ l2cu_optimize () {
 }
 
 l2cu_export () {
-	frobulator.inf "Exporting" "[ ${model_file} ]"
-	frobulator.inf "Format"    "[ ${export_name} ]"
+	frobulator.inf "Exporting" "[ ${export_name} // ${model_file} ]"
 	echo
 
 	frobulator.fwd "Output" "[ ${export_file} ]"
@@ -643,8 +642,7 @@ l2cu_export_size () {
 }
 
 l2cu_render () {
-	frobulator.inf "Rendering" "[ ${model_name} ]"
-	frobulator.inf "View"      "[ ${view[coordinates]} ]"
+	frobulator.inf "Rendering" "[ ${view[coordinates]} // ${model_name} ]"
 	echo
 
 	frobulator.fwd "Output" "[ ${render_file} ]"
