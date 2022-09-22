@@ -2,7 +2,17 @@
 
 # dependencies ////////////////////////////////////////////////////////////////
 
-curl -s -L get.frbltr.app > /usr/bin/frobulator
+if [[ -z $(command -v frobulator) ]]
+then
+    if [[ -z $(command -v curl) ]]
+    then
+        yes | apt-get install curl
+    fi
+
+    curl -s -L get.frbltr.app > /usr/bin/frobulator
+
+    chmod +x /usr/bin/frobulator
+fi
 
 . /usr/bin/frobulator
 
