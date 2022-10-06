@@ -98,7 +98,7 @@ The model exports can be used for showcase purposes, displaying them online in p
 Examples:
 
 - [LegoLinux](https://legolinux.com)
-- [Sketchfab](https://sketchfab.com))
+- [Sketchfab](https://sketchfab.com)
 
 ### modify
 
