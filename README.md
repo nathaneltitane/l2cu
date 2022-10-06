@@ -141,8 +141,6 @@ Modern editors now generate a cached dynamic index or database on application la
 
 To find examples that make use of L²CU, or to simply browse my models, you can visit my [Blog](https://legolinux.com) which is hosted at [GitHub](https://github.com/nathaneltitane/legolinux.github.io) as well.
 
-***
-
 ### Links
 
 - [LDraw](https://www.LDraw.org) - The open standard for LEGO CAD
