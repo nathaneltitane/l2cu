@@ -154,7 +154,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 - [MLCAD](http://mlcad.lm-software.com/) - Mike's Lego CAD
 - [Wine](https://www.winehq.org/) - Windows compatibility layer for POSIX-compliant operating systems
 
-***
+### Reports:
 
 [Submit bug report or feature request](https://github.com/nathaneltitane/l2cu/issues)
 
