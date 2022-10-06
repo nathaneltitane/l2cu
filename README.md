@@ -6,9 +6,9 @@
 
 ---
 
-Welcome to L²CU - The LDraw Linux Command line Utility!
+### Welcome to L²CU!
 
-L²CU uses [Frobulator](https://github.com/nathaneltitane/frobulator) to streamline the scripts and make redundant code a thing of the past.
+L²CU (The LDraw Linux Command line Utility) uses [Frobulator](https://github.com/nathaneltitane/frobulator) to streamline the scripts and make redundant code a thing of the past.
 
 L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of LDraw model files.
 
