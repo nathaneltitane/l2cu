@@ -4,7 +4,11 @@
 
 [[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 01-21-2022 ]
 
+---
+
 Welcome to L²CU - The LDraw Linux Command line Utility!
+
+L²CU uses [Frobulator](https://github.com/nathaneltitane/frobulator) to streamline the scripts and make redundant code a thing of the past.
 
 L²CU stems from a set of independant scripts that were written over the last few years to respond to an obvious need for an efficient management of LDraw model files in several ways: bulk editing of LDraw model files.
 
@@ -153,3 +157,11 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 ***
 
 [Submit bug report or feature request](https://github.com/nathaneltitane/l2cu/issues)
+
+---
+
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 01-21-2022 ]
+
+### Enjoying L²CU? Buy me a coffee to show your appreciation!
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-000000.svg?style=for-the-badge)](https://www.paypal.com/donate/?hosted_button_id=QG58TMRHNSZAU)
