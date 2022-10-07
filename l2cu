@@ -1,28 +1,51 @@
 #!/bin/bash
 
-# dependencies ////////////////////////////////////////////////////////////////
+# dependencies /////////////////////////////////////////////////////////////////
 
 if [[ -z $(command -v frobulator) ]]
 then
-    if [[ -z $(command -v curl) ]]
-    then
-        yes | apt-get install curl
-    fi
+	if [[ $(id -u -n) = "root" ]]
+	then
+		if [ -z "${SUDO:-$HOME}" ]
+		then
+			SUDO_HOME=/root
+		else
+			SUDO_HOME="${SUDO:-$HOME}"
+		fi
 
-    curl -s -L get.frbltr.app > /usr/bin/frobulator
+		USER="${SUDO_USER}"
+		USER_HOME=/home/"${USER}"
+	else
+		USER_HOME="${HOME}"
+	fi
 
-    chmod +x /usr/bin/frobulator
+	if [[ -z $(command -v curl) ]]
+	then
+		yes | apt-get install curl
+	fi
+
+	if [ ! -d "${USER_HOME}"/.local/bin ]
+	then
+		mkdir -p "${USER_HOME}"/.local/bin/frobulator
+	fi
+
+	curl -s -L get.frbltr.app > "${USER_HOME}"/.local/bin/frobulator
+
+	chmod +x "${USER_HOME}"/.local/bin/frobulator
 fi
 
-. /usr/bin/frobulator
+. "${USER_HOME}"/.local/bin/frobulator
 
-# script //////////////////////////////////////////////////////////////////////
+# superuser ////////////////////////////////////////////////////////////////////
+
+# script ///////////////////////////////////////////////////////////////////////
 
 script=$(basename -- "${BASH_SOURCE[0]}")
 
-# version /////////////////////////////////////////////////////////////////////
+# version //////////////////////////////////////////////////////////////////////
 
-version="04-29-2022"
+version="10-07-2022"
+
 
 # usage ///////////////////////////////////////////////////////////////////////
 
