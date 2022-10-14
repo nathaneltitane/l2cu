@@ -121,7 +121,7 @@ The 'get' function lets you download and extract the LDraw parts library. This i
 
 You can:
 
-- download the LDraw parts library using the -complete | -update | -unofficlal parameters.
+- download the LDraw parts library using the -complete, -update, or -unofficlal parameters.
 - download the 'complete' official LDraw parts library archive
 - download the 'update' officialLDraw parts library archive
 - download the complete 'unofficial' LDraw parts library archive
