@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-000000.svg?style=for-the-badge)](https://www.paypal.com/donate/?hosted_button_id=QG58TMRHNSZAU)
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 10-05-2022 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 10-14-2022 ]
 
 ---
 
@@ -158,7 +158,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ---
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 10-05-2022 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 10-14-2022 ]
 
 ### Enjoying L²CU? Buy me a coffee to show your appreciation!
 
