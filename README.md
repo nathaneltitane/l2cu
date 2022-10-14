@@ -16,7 +16,7 @@ Most older and even more modern editors miss that mark to provide such features 
 
 ### What can it do?
 
-L²CU supports the standard 'single-part' model file extension (ldr) and the multipart data, or model assembly file extension (mpd).
+L²CU supports the standard LDraw model file extension ([ldr](https://www.ldraw.org/article/218.html)) and the multi-part document (model assembly) file extension ([mpd](https://www.ldraw.org/article/47.html)).
 
 In short, with L²CU you can:
 - render your models
