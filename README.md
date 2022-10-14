@@ -93,7 +93,7 @@ It can generate (with the use of Leocad and/or Blender) the following formats:
 - wavefront (as obj and mtl within a zip archive)
 - blender compatible and optimized 3D files
 
-The model exports can be used for showcase purposes, displaying them online in personal or commercial galleries (uses WebGL: [ThreeJS](https://threejs.org/))
+The model exports can be used for showcase purposes, displaying them online in personal or commercial galleries (uses WebGL: [Three.JS](https://threejs.org/))
 
 Examples:
 
