@@ -143,14 +143,20 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ### Links
 
-- [LDraw](https://www.LDraw.org) - The open standard for LEGO CAD
-- [LeoCAD](https://github.com/leozide/leocad) - A CAD program for creating virtual LEGO models
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
-- [Three.JS](https://threejs.org) - JavaScript 3D library
+- [LDraw](https://www.LDraw.org) - The open standard for LEGO CAD
 - [LegoLinux](https://legolinux.com) - Where Lego meets Linux
-- [Sketchfab](https://sketchfab.com) - Publish & find 3D models online
+- [LeoCAD](https://leocad.org) - A CAD program for creating virtual LEGO models
 - [MLCAD](http://mlcad.lm-software.com/) - Mike's Lego CAD
+- [Three.JS](https://threejs.org) - JavaScript 3D library
+- [Sketchfab](https://sketchfab.com) - Publish & find 3D models online
 - [Wine](https://www.winehq.org/) - Windows compatibility layer for POSIX-compliant operating systems
+
+### Repositories
+
+- [Frobulator](https://github.com/nathaneltitane/frobulator) to streamline the scripts and make redundant code a thing of the past.
+- [LeoCAD](https://github.com/leozide/leocad) to export LDraw models into an exploitable 3D format via L²CU.
+- [Three.JS](https://github.com/mrdoob/three.js) to create the viewer used to render and display my models on your web browser.
 
 ### Reports:
 
