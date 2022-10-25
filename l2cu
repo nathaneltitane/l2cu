@@ -713,6 +713,32 @@ l2cu_render () {
 	wait
 }
 
+l2cu_instructions () {
+	# generate model instructions
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	frobulator.fwd "Output" "[ ${instructions_file} ]"
+	echo
+
+	export_option="pdf"
+
+	renderer="native"
+	projection="perspective"
+
+	lpub3d24										\
+		--preferred-renderer "${renderer}"			\
+		--projection "${projection}"				\
+		--process-export							\
+		--clear-cache								\
+		--export-option "${export_option}"			\
+		--pdf-output-file "${instructions_file}"	\
+													"${instructions_model_path}" > /dev/null 2>&1
+
+	wait
+}
+
 parse_input () {
 	# read and parse user input
 
@@ -1346,32 +1372,6 @@ fi
 
 # instructions /////////////////////////////////////////////////////////////////
 
-l2cu_instructions () {
-	# generate model instructions
-
-	frobulator.inf "Generating instructions" "[ ${model_name} ]"
-	echo
-
-	frobulator.fwd "Output" "[ ${instructions_file} ]"
-	echo
-
-	export_option="pdf"
-
-	renderer="native"
-	projection="perspective"
-
-	lpub3d24										\
-		--preferred-renderer "${renderer}"			\
-		--projection "${projection}"				\
-		--process-export							\
-		--clear-cache								\
-		--export-option "${export_option}"			\
-		--pdf-output-file "${instructions_file}"	\
-													"${instructions_model_path}" > /dev/null 2>&1
-
-	wait
-}
-
 if [[ "${option}" = "instructions" ]]
 then
 	for extension in ${extensions_list[@]}
@@ -1441,6 +1441,7 @@ then
 		done
 	done
 fi
+
 # modify //////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "modify" ]]
