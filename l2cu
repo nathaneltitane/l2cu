@@ -1275,6 +1275,11 @@ then
 
 			if [[ "${render_preset}" = "flat" ]]
 			then
+				[[ if -d "${flat_directory}" ]]
+				then
+					rm -rf "${flat_directory}"
+				fi
+
 				mkdir -p "${flat_directory}"
 
 				cd "${flat_directory}"
