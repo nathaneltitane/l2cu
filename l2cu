@@ -44,7 +44,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="10-07-2022"
+version="10-24-2022"
 
 # usage ///////////////////////////////////////////////////////////////////////
 
@@ -1088,6 +1088,11 @@ then
 
 			# export
 
+			if [[ -d "${export_directory}" ]]
+			then
+				rm -rf "${export_directory}"
+			fi
+
 			mkdir -p "${export_directory}"
 
 			cd "${export_directory}"
@@ -1269,13 +1274,18 @@ then
 
 			# render
 
+			if [[ -d "${render_directory}" ]]
+			then
+				rm -rf "${render_directory}"
+			fi
+
 			mkdir -p "${render_directory}"
 
 			cd "${render_directory}"
 
 			if [[ "${render_preset}" = "flat" ]]
 			then
-				[[ if -d "${flat_directory}" ]]
+				if [[ -d "${flat_directory}" ]]
 				then
 					rm -rf "${flat_directory}"
 				fi
