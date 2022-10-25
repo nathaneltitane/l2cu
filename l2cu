@@ -159,6 +159,10 @@ do
 				render_preset="7"
 			;;
 
+		-instructions)
+			option="instructions"
+		;;
+
 		-modify)
 			option="modify"
 		;;
@@ -251,6 +255,10 @@ do
 			echo
 			echo -e "full              Render series of images using options 0 to 7."
 			echo -e "flat              Render image using option 0 without edges or shading."
+			echo
+			echo -e "INSTRUCTIONS:"
+			echo
+			echo -e "-instructions     Generate model instruction file.                        [ pdf ]"
 			echo
 			echo -e "MODIFY:"
 			echo
@@ -674,12 +682,13 @@ l2cu_export_size () {
 }
 
 l2cu_render () {
+	# render model
+
 	frobulator.inf "Rendering" "[ ${view[coordinates]} // ${model_name} ]"
 	echo
 
 	frobulator.fwd "Output" "[ ${render_file} ]"
 	echo
-
 
 	model_path="${1}"
 	coordinates="${2}"
@@ -705,6 +714,8 @@ l2cu_render () {
 }
 
 parse_input () {
+	# read and parse user input
+
 	while true
 	do
 		read input
@@ -788,6 +799,8 @@ parse_colors () {
 }
 
 parse_parts () {
+	# read and parse part selection
+
 	parse_input
 
 	part_input="${input}"
@@ -796,6 +809,8 @@ parse_parts () {
 }
 
 parse_modification () {
+	# read and parse modification input request
+
 	if [ "${modify_option}" = "color" ]
 	then
 		frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
@@ -937,6 +952,7 @@ l2cu_download () {
 
 	frobulator.download "${base_url}"/"${parts_url_release}" "${directory}" "${parts_archive}"
 }
+
 # requirements ////////////////////////////////////////////////////////////////
 
 list=(
@@ -947,6 +963,13 @@ if [ "${option}" = "3ds" ]
 then
 	list+=(
 		blender
+	)
+fi
+
+if [ "${option}" = "instructions" ]
+then
+	list+=(
+		lpub3d24
 	)
 fi
 
@@ -993,8 +1016,9 @@ l2cu_prepare
 
 # confirmation ////////////////////////////////////////////////////////////////
 
-if [ "${option}" = "export" ] || \
-   [ "${option}" = "render" ] || \
+if [ "${option}" = "export" ]       || \
+   [ "${option}" = "render" ]       || \
+   [ "${option}" = "instructions" ] || \
    [ "${option}" = "modify" ]
 then
 	frobulator.wrn "Extension option" "[ ${extension_option} ]"
@@ -1320,6 +1344,103 @@ then
 	done
 fi
 
+# instructions /////////////////////////////////////////////////////////////////
+
+l2cu_instructions () {
+	# generate model instructions
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	frobulator.fwd "Output" "[ ${instructions_file} ]"
+	echo
+
+	export_option="pdf"
+
+	renderer="native"
+	projection="perspective"
+
+	lpub3d24										\
+		--preferred-renderer "${renderer}"			\
+		--projection "${projection}"				\
+		--process-export							\
+		--clear-cache								\
+		--export-option "${export_option}"			\
+		--pdf-output-file "${instructions_file}"	\
+													"${instructions_model_path}" > /dev/null 2>&1
+
+	wait
+}
+
+if [[ "${option}" = "instructions" ]]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
+
+		for model_path in ${models_list[@]}
+		do
+			# set IFS
+
+			IFS=' '
+
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# define render output directory
+
+			# use model directory as root
+
+			instructions_directory="${model_path%/*}"/instructions
+
+			instructions_model_path="${instructions_directory}"/instructions."${extension}"
+
+			instructions_file="${instructions_directory}"/instructions.pdf
+
+			instructions_configuration_file=/media/internal/Lego/lpub3d/configuration
+
+			if [[ ! -f "${instructions_configuration_file}" ]]
+			then
+				frobulator.err "Missing instructions configuration file"
+				echo
+
+				frobulator.inf "Instructions configuration file required to proceed"
+				echo
+
+				exit 1
+			fi
+
+			# instructions
+
+			if [[ -d "${instructions_directory}" ]]
+			then
+				rm -rf "${instructions_directory}"
+			fi
+
+			mkdir -p "${instructions_directory}"
+
+			# concatenate instructions header and model file
+
+			cat /media/internal/Lego/lpub3d/configuration "${model_path}" > "${instructions_model_path}"
+
+			# prepare ldraw model header for parsing
+
+			sed -i 												\
+				-e '/instructions/! s/00-.*.ldr/00-model.ldr/g'	\
+																"${instructions_model_path}"
+
+			# generate instructions
+
+			l2cu_instructions
+
+		done
+	done
+fi
 # modify //////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "modify" ]]
