@@ -1471,10 +1471,6 @@ then
 
 			# clean up
 
-			rm -rf "${instructions_directory}"/configuration
-
-			rm -rf "${instructions_directory}"/instructions.mpd
-
 			if [[ -d "${instructions_directory}"/[lL][pP][uU][bB][3][dD] ]]
 			then
 				rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
