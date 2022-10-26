@@ -1447,7 +1447,7 @@ then
 				then
 					configuration_url_category=$(cat "${model_path%/*/*}"/title)
 
-					line=${line/'${configuration_url_category}'/${configuration_url_string}}
+					line=${line/'${configuration_url_category}'/${configuration_url_category}}
 				fi
 
 				if [[ $line =~ configuration_url_NAME ]]
