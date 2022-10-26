@@ -1378,8 +1378,6 @@ then
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
 
-		for model_path in ${models_list[@]}
-		do
 			# set IFS
 
 			IFS=' '
@@ -1392,7 +1390,7 @@ then
 
 			model_name="${model_file%.*}"
 
-			# define render output directory
+			# define export output directory
 
 			# use model directory as root
 
