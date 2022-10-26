@@ -1428,15 +1428,13 @@ then
 
 			cat /media/internal/Lego/lpub3d/configuration "${model_path}" > "${instructions_model_path}"
 
-			# prepare ldraw model header for parsing
-
-			sed -i 												\
-				-e '/instructions/! s/00-.*.ldr/00-model.ldr/g'	\
-																"${instructions_model_path}"
-
 			# generate instructions
 
 			l2cu_instructions
+
+			# clean up
+
+			rm -rf "${instructions_directory}"/LPub3D
 
 		done
 	done
