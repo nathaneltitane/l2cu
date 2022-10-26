@@ -1382,8 +1382,6 @@ then
 		do
 			# set IFS
 
-			# set IFS
-
 			IFS=' '
 
 			# get model file name from path
@@ -1407,6 +1405,12 @@ then
 			instructions_file_path="${instructions_directory}"/"${instructions_file}"
 
 			instructions_configuration_file=/media/internal/Lego/lpub3d/configuration
+
+			# reset IFS
+
+			IFS=''
+
+			# configuration check
 
 			if [[ ! -f "${instructions_configuration_file}" ]]
 			then
