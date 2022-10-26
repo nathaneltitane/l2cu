@@ -1417,6 +1417,13 @@ then
 
 			# instructions
 
+			if [[ -d "${instructions_directory}" ]]
+			then
+				rm -rf "${instructions_directory}"
+			fi
+
+			mkdir -p "${instructions_directory}"
+
 			while read -r line
 			do
 				#substitute variables
@@ -1464,8 +1471,6 @@ then
 			then
 				rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 			fi
-
-		done
 	done
 fi
 
