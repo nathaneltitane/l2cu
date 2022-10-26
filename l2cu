@@ -1462,7 +1462,10 @@ then
 
 			# clean up
 
-			rm -rf "${instructions_directory}"/LPub3D
+			if [[ -d "${instructions_directory}"/[lL][pP][uU][bB][3][dD] ]]
+			then
+				rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+			fi
 
 		done
 	done
