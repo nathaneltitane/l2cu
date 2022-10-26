@@ -1400,7 +1400,9 @@ then
 
 			instructions_model_path="${instructions_directory}"/instructions."${extension}"
 
-			instructions_file="${instructions_directory}"/instructions.pdf
+			instructions_file="${model_name}".pdf
+
+			instructions_file_path="${instructions_directory}"/"${instructions_file}"
 
 			instructions_configuration_file=/media/internal/Lego/lpub3d/configuration
 
