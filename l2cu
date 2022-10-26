@@ -1426,9 +1426,27 @@ then
 
 			mkdir -p "${instructions_directory}"
 
+			# set configuration variables
+
+			configuration_title=$(cat "${model_path%/*}"/title)
+
+			configuration_title_string=${configuration_title//$'\n'/ }
+
+			configuration_title_string=${model_title_string//\<\/\br\>/}
+
+			configuration_url_category=$(cat "${model_path%/*/*}"/title)
+
+			configuration_url_name="${model_name^^}"
+
 			# concatenate instructions header and model file
 
-			cat /media/internal/Lego/lpub3d/configuration "${model_path}" > "${instructions_model_path}"
+			while read line
+			do
+				eval echo "${line}"
+
+			done < /media/internal/Lego/lpub3d/configuration > "${instructions_directory}"/configuration
+
+			cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
 
 			# generate instructions
 
