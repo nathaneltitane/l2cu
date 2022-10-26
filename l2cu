@@ -1450,9 +1450,9 @@ then
 					line=${line/'${configuration_url_category}'/${configuration_url_category}}
 				fi
 
-				if [[ $line =~ configuration_url_NAME ]]
+				if [[ $line =~ configuration_url_name ]]
 				then
-					configuration_url_name="${model_name}"
+					configuration_url_name="${model_name^^}"
 
 					line=${line/'${configuration_url_name}'/${configuration_url_name}}
 				fi
