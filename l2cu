@@ -1419,30 +1419,38 @@ then
 
 			# instructions
 
-			if [[ -d "${instructions_directory}" ]]
-			then
-				rm -rf "${instructions_directory}"
-			fi
-
-			mkdir -p "${instructions_directory}"
-
-			# set configuration variables
-
-			configuration_title=$(cat "${model_path%/*}"/title)
-
-			configuration_title_string=${configuration_title//$'\n'/ }
-
-			configuration_title_string=${model_title_string//\<\/\br\>/}
-
-			configuration_url_category=$(cat "${model_path%/*/*}"/title)
-
-			configuration_url_name="${model_name^^}"
-
-			# concatenate instructions header and model file
-
-			while read line
+			while read -r line
 			do
-				eval echo "${line}"
+				#substitute variables
+
+			    if [[ $line =~ configuration_title_string ]]
+				then
+					configuration_title=$(cat "${model_path%/*}"/title)
+
+					configuration_title_string=${configuration_title//$'\n'/ }
+
+					configuration_title_string=${configuration_title_string//\<\/\br\>/}
+
+					line=${line/'${configuration_title_string}'/${configuration_title_string}}
+				fi
+
+				if [[ $line =~ configuration_url_category ]]
+				then
+					configuration_url_category=$(cat "${model_path%/*/*}"/title)
+
+					line=${line/'${configuration_url_category}'/${configuration_url_string}}
+				fi
+
+				if [[ $line =~ configuration_url_NAME ]]
+				then
+					configuration_url_name="${model_name^^}"
+
+					line=${line/'${configuration_url_name}'/${configuration_url_name}}
+				fi
+
+				# write line
+
+				echo "${line}"
 
 			done < /media/internal/Lego/lpub3d/configuration > "${instructions_directory}"/configuration
 
