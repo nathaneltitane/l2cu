@@ -1376,7 +1376,7 @@ if [[ "${option}" = "instructions" ]]
 then
 	for extension in ${extensions_list[@]}
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}"))
 
 		for model_path in ${models_list[@]}
 		do
