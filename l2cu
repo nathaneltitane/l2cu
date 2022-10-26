@@ -1378,6 +1378,10 @@ then
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}") )
 
+		for model_path in ${models_list[@]}
+		do
+			# set IFS
+
 			# set IFS
 
 			IFS=' '
@@ -1471,6 +1475,9 @@ then
 			then
 				rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 			fi
+
+		done
+
 	done
 fi
 
