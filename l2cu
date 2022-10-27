@@ -1473,7 +1473,10 @@ then
 
 			# generate instructions
 
-			l2cu_instructions
+			frobulator.silence "l2cu_instructions"
+
+			frobulator.fwd "Processing"
+			echo
 
 			# clean up
 
