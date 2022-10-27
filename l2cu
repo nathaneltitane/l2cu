@@ -345,10 +345,10 @@ then
 		frobulator.err "No directory specified."
 		echo
 
-		frobulator.fwd "Exiting..."
+		frobulator.fwd "Assuming defaults..."
 		echo
 
-		exit 1
+		directory="${PWD}"
 	fi
 fi
 
