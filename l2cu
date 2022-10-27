@@ -1473,9 +1473,9 @@ then
 
 			# generate instructions
 
-			frobulator.silence "l2cu_instructions"
+			l2cu_instructions
 
-			frobulator.fwd "Processing"
+			frobulator.fwd "Processing..."
 			echo
 
 			# clean up
