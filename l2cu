@@ -1388,6 +1388,10 @@ then
 
 			IFS=' '
 
+			# get model base directory from path
+
+			model_directory="${model_path%/*}"
+
 			# get model file name from path
 
 			model_file="${model_path##*/}"
@@ -1427,13 +1431,15 @@ then
 				exit 1
 			fi
 
-			# legacy content cleanup
+			# enter model directory
 
-			cd "${model_path%/*}" || exit 1
+			cd "${model_directory}" || exit 1
+
+			# legacy content cleanup
 
 			rm -rf "${model_path%/*}"/[lL][pP][uU][bB][3][dD]
 
-			rm -rf instructions*
+			rm -rf "${model_path%/*}"/instructions*
 
 			# generate instructions directory
 
@@ -1464,6 +1470,8 @@ then
 				if [[ $line =~ configuration_url_category ]]
 				then
 					configuration_url_category=$(cat "${model_path%/*/*}"/title)
+
+					configuration_url_category="${configuration_url_category// /-}"
 
 					line=${line/'${configuration_url_category}'/${configuration_url_category}}
 				fi
