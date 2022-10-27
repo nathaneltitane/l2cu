@@ -722,9 +722,6 @@ l2cu_instructions () {
 	frobulator.fwd "Output" "[ ${instructions_file} ]"
 	echo
 
-	frobulator.fwd "Processing..."
-	echo
-
 	export_option="pdf"
 
 	renderer="native"
@@ -738,8 +735,12 @@ l2cu_instructions () {
 		--export-option "${export_option}"			\
 		--pdf-output-file "${instructions_file}"	\
 													"${instructions_model_path}" > /dev/null 2>&1
-
 	wait
+
+	# remove cache directory:
+	# prevents rendered files reuse and clutter
+
+	rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 }
 
 parse_input () {
@@ -1484,14 +1485,10 @@ then
 
 			# generate instructions
 
-			l2cu_instructions
+			l2cu_instructions &
 
-			# clean up
-
-			if [[ -d "${instructions_directory}"/[lL][pP][uU][bB][3][dD] ]]
-			then
-				rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-			fi
+			frobulator.progress "Processing..."
+			echo
 
 		done
 
