@@ -736,6 +736,9 @@ l2cu_instructions () {
 		--pdf-output-file "${instructions_file}"	\
 													"${instructions_model_path}" > /dev/null 2>&1
 
+	frobulator.fwd "Processing..."
+	echo
+
 	wait
 }
 
@@ -1474,9 +1477,6 @@ then
 			# generate instructions
 
 			l2cu_instructions
-
-			frobulator.fwd "Processing..."
-			echo
 
 			# clean up
 
