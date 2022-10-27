@@ -1493,10 +1493,7 @@ then
 
 			# generate instructions
 
-			l2cu_instructions &
-
-			frobulator.progress "Processing..."
-			echo
+			l2cu_instructions
 
 		done
 
