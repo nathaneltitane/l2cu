@@ -722,6 +722,9 @@ l2cu_instructions () {
 	frobulator.fwd "Output" "[ ${instructions_file} ]"
 	echo
 
+	frobulator.fwd "Processing..."
+	echo
+
 	export_option="pdf"
 
 	renderer="native"
@@ -735,9 +738,6 @@ l2cu_instructions () {
 		--export-option "${export_option}"			\
 		--pdf-output-file "${instructions_file}"	\
 													"${instructions_model_path}" > /dev/null 2>&1
-
-	frobulator.fwd "Processing..."
-	echo
 
 	wait
 }
@@ -1426,7 +1426,13 @@ then
 				exit 1
 			fi
 
-			# instructions
+			# legacy content cleanup
+
+			cd "${model_path%/*}" || exit 1
+
+			rm -rf "${model_path%/*}"/[lL][pP][uU][bB][3][dD]
+
+			rm -rf instructions
 
 			# generate instructions directory
 
@@ -1436,6 +1442,8 @@ then
 			fi
 
 			mkdir -p "${instructions_directory}"
+
+			# prepare instructions model file
 
 			while read -r line
 			do
