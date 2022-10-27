@@ -1433,7 +1433,7 @@ then
 
 			rm -rf "${model_path%/*}"/[lL][pP][uU][bB][3][dD]
 
-			rm -rf instructions
+			rm -rf instructions*
 
 			# generate instructions directory
 
