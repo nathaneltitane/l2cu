@@ -86,6 +86,12 @@ do
 			option="export"
 		;;
 
+			csv)
+				export_option="csv"
+				export_extension="csv"
+				export_name="Comma Separated Values"
+			;;
+
 			3dstudio)
 				export_option="3dstudio"
 				export_extension="3ds"
@@ -743,6 +749,62 @@ l2cu_instructions () {
 	rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 }
 
+l2cu_count_parts () {
+	# generate total piece count
+
+	part_count_file="${model_path%/*}"/parts.csv
+	pieces_file="${model_path%/*}"/pieces
+
+	if [[ -f "${part_count_file}" ]]
+	then
+		rm -rf "${part_count_file}"
+	fi
+
+	if [[ -f "${pieces_file}" ]]
+	then
+		rm -rf "${pieces_file}"
+	fi
+
+	leocad									\
+		--export-csv "${part_count_file}"	\
+											"${model_path}" > /dev/null 2>&1
+
+	wait
+
+	# generate piece count per part file
+
+	while IFS=''
+	read -r line
+	do
+		# set IFS
+
+		IFS=','
+
+		read -r _ _ part_count _ _ <<< "${line}"
+
+		echo "${part_count}" >> "${pieces_file}"
+
+		# reset IFS
+
+		IFS=''
+
+	done < "${part_count_file}"
+
+	IFS=''
+
+	# calculate total piece count
+
+	total_pieces=0
+
+	while read piece_coount
+	do
+		total_pieces=$(( total_pieces + piece_coount ))
+	done < "${pieces_file}"
+
+	return "${total_pieces}"
+
+}
+
 parse_input () {
 	# read and parse user input
 
@@ -1135,6 +1197,7 @@ then
 
 			export_file_3ds="${model_name}.3ds"
 			export_file_blend="${model_name}.blend"
+			export_file_csv="${model_name}.csv"
 			export_file_collada="${model_name}.dae"
 			export_file_object="${model_name}.obj"
 			export_file_material="${model_name}.mtl"
@@ -1416,6 +1479,10 @@ then
 
 			# reset IFS
 
+			l2cu_count_parts
+
+			exit
+
 			IFS=''
 
 			# configuration check
@@ -1516,8 +1583,19 @@ then
 	do
 		echo $(find ${directory} -type f -iname "*.${extension}") | while read -r model_path
 		do
+			# get model base directory from path
+
+			model_directory="${model_path%/*}"
+
+			# get model file name from path
+
 			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
 			model_name="${model_file%.*}"
+
+			# set model buffer file
 
 			model_buffer="${model_path}.tmp"
 
