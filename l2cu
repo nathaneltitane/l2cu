@@ -1499,8 +1499,6 @@ then
 
 			l2cu_instruction_pieces
 
-			exit
-
 			# enter model directory
 
 			cd "${model_directory}" || exit 1
