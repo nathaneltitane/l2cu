@@ -197,6 +197,10 @@ do
 			overwrite_option="overwrite"
 		;;
 
+		-pieces)
+			option="pieces"
+		;;
+
 		-download)
 			option="download"
 		;;
@@ -278,6 +282,7 @@ do
 			echo -e "overwrite         Overwrite the original model file after modification."
 			echo
 			echo -e "GET:"
+			echo
 			echo -e "-download         Download the LDraw parts library. [official | unofficlal]"
 			echo
 			echo -e "official          Download the LDraw parts library - complete official archive."
@@ -719,8 +724,14 @@ l2cu_render () {
 	wait
 }
 
-l2cu_instruction_pieces () {
+l2cu_pieces () {
 	# generate total piece count
+
+	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
+	echo
+
+	frobulator.fwd "Parsing..."
+	echo
 
 	part_count_file="${model_path%/*}"/parts.csv
 
@@ -748,7 +759,12 @@ l2cu_instruction_pieces () {
 
 		read -r _ _ part_count _ _ <<< "${line}"
 
-		echo "${part_count}" >> "${pieces_file}"
+		# filter out non-numerical lines
+
+		if [[ "${part_count}" =~ ^[0-9]+$ ]]
+		then
+			echo "${part_count}" >> "${pieces_file}"
+		fi
 
 		# reset IFS
 
@@ -774,6 +790,9 @@ l2cu_instruction_pieces () {
 	then
 		rm -rf "${part_count_file}"
 	fi
+
+	frobulator.inf "Pieces count" "[ ${total_pieces} ]"
+	echo
 }
 
 l2cu_instructions () {
@@ -1495,9 +1514,9 @@ then
 				exit 1
 			fi
 
-			# get model pieces count
+			# generate pieces count file
 
-			l2cu_instruction_pieces
+			l2cu_pieces
 
 			# enter model directory
 
@@ -1803,6 +1822,41 @@ then
 
 			l2cu_write
 		done
+	done
+fi
+
+# pieces //////////////////////////////////////////////////////////////////////
+
+if [[ "${option}" = "pieces" ]]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}"))
+
+		for model_path in ${models_list[@]}
+		do
+			# set IFS
+
+			IFS=' '
+
+			# get model base directory from path
+
+			model_directory="${model_path%/*}"
+
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# generate pieces count file
+
+			l2cu_pieces
+
+		done
+
 	done
 fi
 
