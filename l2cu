@@ -723,12 +723,8 @@ l2cu_instruction_pieces () {
 	# generate total piece count
 
 	part_count_file="${model_path%/*}"/parts.csv
-	pieces_file="${model_path%/*}"/pieces
 
-	if [ -f "${part_count_file}" ]
-	then
-		rm -rf "${part_count_file}"
-	fi
+	pieces_file="${model_path%/*}"/pieces
 
 	if [ -f "${pieces_file}" ]
 	then
@@ -774,7 +770,10 @@ l2cu_instruction_pieces () {
 
 	echo "${total_pieces}" > "${pieces_file}"
 
-	return "${total_pieces}"
+	if [ -f "${part_count_file}" ]
+	then
+		rm -rf "${part_count_file}"
+	fi
 }
 
 l2cu_instructions () {
