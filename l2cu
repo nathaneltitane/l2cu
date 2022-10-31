@@ -44,7 +44,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="10-24-2022"
+version="10-30-2022"
 
 # usage ///////////////////////////////////////////////////////////////////////
 
@@ -281,7 +281,11 @@ do
 			echo -e "step              Separate ldr based submodels using step meta tags."
 			echo -e "overwrite         Overwrite the original model file after modification."
 			echo
-			echo -e "GET:"
+			echo -e "PIECES:"
+			echo
+			echo -e "-pieces           Display and generate pieces count file."
+			echo
+			echo -e "DOWNLOAD:"
 			echo
 			echo -e "-download         Download the LDraw parts library. [official | unofficlal]"
 			echo
