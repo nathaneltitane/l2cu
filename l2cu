@@ -719,48 +719,18 @@ l2cu_render () {
 	wait
 }
 
-l2cu_instructions () {
-	# generate model instructions
-
-	frobulator.inf "Generating instructions" "[ ${model_name} ]"
-	echo
-
-	frobulator.fwd "Output" "[ ${instructions_file} ]"
-	echo
-
-	export_option="pdf"
-
-	renderer="native"
-	projection="perspective"
-
-	lpub3d24										\
-		--preferred-renderer "${renderer}"			\
-		--projection "${projection}"				\
-		--process-export							\
-		--clear-cache								\
-		--export-option "${export_option}"			\
-		--pdf-output-file "${instructions_file}"	\
-													"${instructions_model_path}" > /dev/null 2>&1
-	wait
-
-	# remove cache directory:
-	# prevents rendered files reuse and clutter
-
-	rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-}
-
-l2cu_count_parts () {
+l2cu_instruction_pieces () {
 	# generate total piece count
 
 	part_count_file="${model_path%/*}"/parts.csv
 	pieces_file="${model_path%/*}"/pieces
 
-	if [[ -f "${part_count_file}" ]]
+	if [ -f "${part_count_file}" ]
 	then
 		rm -rf "${part_count_file}"
 	fi
 
-	if [[ -f "${pieces_file}" ]]
+	if [ -f "${pieces_file}" ]
 	then
 		rm -rf "${pieces_file}"
 	fi
@@ -799,10 +769,42 @@ l2cu_count_parts () {
 	while read piece_coount
 	do
 		total_pieces=$(( total_pieces + piece_coount ))
+
 	done < "${pieces_file}"
 
-	return "${total_pieces}"
+	echo "${total_pieces}" > "${pieces_file}"
 
+	return "${total_pieces}"
+}
+
+l2cu_instructions () {
+	# generate model instructions
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	frobulator.fwd "Output" "[ ${instructions_file} ]"
+	echo
+
+	export_option="pdf"
+
+	renderer="native"
+	projection="perspective"
+
+	lpub3d24										\
+		--preferred-renderer "${renderer}"			\
+		--projection "${projection}"				\
+		--process-export							\
+		--clear-cache								\
+		--export-option "${export_option}"			\
+		--pdf-output-file "${instructions_file}"	\
+													"${instructions_model_path}" > /dev/null 2>&1
+	wait
+
+	# remove cache directory:
+	# prevents rendered files reuse and clutter
+
+	rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 }
 
 parse_input () {
@@ -1479,10 +1481,6 @@ then
 
 			# reset IFS
 
-			l2cu_count_parts
-
-			exit
-
 			IFS=''
 
 			# configuration check
@@ -1497,6 +1495,12 @@ then
 
 				exit 1
 			fi
+
+			# get model pieces count
+
+			l2cu_instruction_pieces
+
+			exit
 
 			# enter model directory
 
@@ -1532,6 +1536,13 @@ then
 					configuration_title_string=${configuration_title_string//\<\/\br\>/}
 
 					line=${line/'${configuration_title_string}'/${configuration_title_string}}
+				fi
+
+			    if [[ $line =~ configuration_pieces ]]
+				then
+					configuration_pieces=$(cat "${model_path%/*}"/pieces)
+
+					line=${line/'${configuration_pieces}'/${configuration_pieces}}
 				fi
 
 				if [[ $line =~ configuration_url_category ]]
