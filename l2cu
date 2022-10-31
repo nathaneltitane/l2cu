@@ -662,7 +662,7 @@ l2cu_export () {
 	wait
 }
 
-l2cu_export_size () {
+l2cu_size () {
 	# validate export file size
 
 	block_size=1024
@@ -752,6 +752,20 @@ l2cu_pieces () {
 
 	wait
 
+	# remove header
+
+	sed -i '1d' "${part_count_file}"
+
+	wait
+
+	# remove commas within quoted descriptors
+
+	sed -i					\
+		-e 's/\, //g'		\
+							"${part_count_file}"
+
+	wait
+
 	# generate piece count per part file
 
 	while IFS=''
@@ -763,12 +777,7 @@ l2cu_pieces () {
 
 		read -r _ _ part_count _ _ <<< "${line}"
 
-		# filter out non-numerical lines
-
-		if [[ "${part_count}" =~ ^[0-9]+$ ]]
-		then
-			echo "${part_count}" >> "${pieces_file}"
-		fi
+		echo "${part_count}" >> "${pieces_file}"
 
 		# reset IFS
 
@@ -788,7 +797,11 @@ l2cu_pieces () {
 
 	done < "${pieces_file}"
 
+	# write pieces count to pieces file
+
 	echo "${total_pieces}" > "${pieces_file}"
+
+	# cleanup
 
 	if [ -f "${part_count_file}" ]
 	then
@@ -1259,7 +1272,7 @@ then
 
 			# verify export size threshold
 
-			l2cu_export_size
+			l2cu_size
 
 			# unset IFS
 
