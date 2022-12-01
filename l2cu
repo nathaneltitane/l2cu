@@ -1453,15 +1453,6 @@ then
 
 			# render
 
-			if [[ -d "${render_directory}" ]]
-			then
-				rm -rf "${render_directory}"
-			fi
-
-			mkdir -p "${render_directory}"
-
-			cd "${render_directory}"
-
 			if [[ "${render_preset}" = "flat" ]]
 			then
 				if [[ -d "${flat_directory}" ]]
@@ -1504,7 +1495,7 @@ then
 					"${flat_directory}"/flat."${extension}"
 			fi
 
-			if [[ "${render_option}" = "flat" ]]
+			if [[ "${render_option}" = "thumbnail" ]]
 			then
 				# rename renders to designated splash images
 
