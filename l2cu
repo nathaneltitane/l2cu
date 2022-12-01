@@ -130,6 +130,11 @@ do
 				render_preset="flat"
 			;;
 
+			thumbnail)
+				render_option="thumbnail"
+				render_preset="thumbnail"
+			;;
+
 			1)
 				render_option="1"
 				render_preset="1"
@@ -265,6 +270,7 @@ do
 			echo
 			echo -e "full              Render series of images using options 0 to 7."
 			echo -e "flat              Render image using option 0 without edges or shading."
+			echo -e "thumbnail         Render image using option 0 without edges or shading at 12.5% of the original size."
 			echo
 			echo -e "INSTRUCTIONS:"
 			echo
@@ -708,8 +714,15 @@ l2cu_render () {
 	model_path="${1}"
 	coordinates="${2}"
 
-	height="4096"
-	width="4096"
+	if [[  -z "${height}" ]]
+	then
+		height="4096"
+	fi
+
+	if [[ -z "${width}" ]]
+	then
+		width="4096"
+	fi
 
 	antialias_samples="8"
 
@@ -1313,6 +1326,8 @@ then
 
 			flat_directory="${model_path%/*}"/renders/flat
 
+			thumbnail_directory="${model_path%/*}"/renders/thumbnail
+
 			# define coordinate values and labels
 
 			# camera latitude
@@ -1426,6 +1441,16 @@ then
 				line_width=0
 			fi
 
+			if [[ "${render_preset}" = "thumbnail" ]]
+			then
+				height=512
+				width=512
+
+				position=(1)
+				shading=flat
+				line_width=0
+			fi
+
 			# render
 
 			if [[ -d "${render_directory}" ]]
@@ -1449,6 +1474,18 @@ then
 				cd "${flat_directory}"
 			fi
 
+			if [[ "${render_preset}" = "thumbnail" ]]
+			then
+				if [[ -d "${thumbnail_directory}" ]]
+				then
+					rm -rf "${thumbnail_directory}"
+				fi
+
+				mkdir -p "${thumbnail_directory}"
+
+				cd "${thumbnail_directory}"
+			fi
+
 			for coordinates in ${position[@]}
 			do
 				render_file="${model_name}-${view[$coordinates]}.${extension}"
@@ -1466,6 +1503,16 @@ then
 					"${model_name}-${view[1]}.${extension}"		\
 					"${flat_directory}"/flat."${extension}"
 			fi
+
+			if [[ "${render_option}" = "flat" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${thumbnail_directory}"/thumbnail."${extension}"
+			fi
+
 
 			# unset IFS
 
