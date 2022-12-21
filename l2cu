@@ -1453,6 +1453,17 @@ then
 
 			# render
 
+			# prepare base render directory:
+			# generate if does not exist
+
+			if [[ ! -d "${render_directory}" ]]
+			then
+				mkdir -p "${render_directory}"
+			fi
+
+			# prepare render option directory:
+			# purge and regenerate if exists
+
 			if [[ "${render_preset}" = "flat" ]]
 			then
 				if [[ -d "${flat_directory}" ]]
@@ -2052,7 +2063,6 @@ then
 
     rm -rf "._.lst" ".~.lst"
 fi
-
 
 # complete ////////////////////////////////////////////////////////////////////
 
