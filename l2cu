@@ -23,7 +23,7 @@ then
 		mkdir -p "${HOME}"/.local/bin
 	fi
 
-	curl -s -L get.frbltr.app > "${HOME}"/.local/bin
+	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
 
 	chmod +x "${HOME}"/.local/bin/frobulator
 fi
