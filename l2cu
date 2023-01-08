@@ -38,7 +38,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="12-01-2022"
+version="01-08-2022"
 
 # usage ///////////////////////////////////////////////////////////////////////
 
@@ -765,14 +765,6 @@ l2cu_pieces () {
 
 	wait
 
-	# remove commas within quoted descriptors
-
-	sed -i					\
-		-e 's/\, //g'		\
-							"${part_count_file}"
-
-	wait
-
 	# generate piece count per part file
 
 	while IFS=''
@@ -798,7 +790,7 @@ l2cu_pieces () {
 
 	total_pieces=0
 
-	while read piece_coount
+	while read piece_count
 	do
 		total_pieces=$(( total_pieces + piece_count ))
 
