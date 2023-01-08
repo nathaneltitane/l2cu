@@ -800,7 +800,7 @@ l2cu_pieces () {
 
 	while read piece_coount
 	do
-		total_pieces=$(( total_pieces + piece_coount ))
+		total_pieces=$(( total_pieces + piece_count ))
 
 	done < "${pieces_file}"
 
@@ -1555,7 +1555,9 @@ then
 
 			instructions_file_path="${instructions_directory}"/"${instructions_file}"
 
-			instructions_configuration_file=/media/internal/Lego/lpub3d/configuration
+			instructions_base_directory=/media/internal/Lego/lpub3d
+
+			instructions_configuration_file="${instructions_base_directory}"/configuration
 
 			# reset IFS
 
@@ -1597,6 +1599,10 @@ then
 
 			mkdir -p "${instructions_directory}"
 
+			# copy logo file
+
+			frobulator.copy "${instructions_base_directory}" "${instructions_directory}" logo.png
+
 			# prepare instructions model file
 
 			while read -r line
@@ -1605,7 +1611,7 @@ then
 
 				# title
 
-			    if [[ $line =~ configuration_title_string ]]
+				if [[ $line =~ configuration_title_string ]]
 				then
 					configuration_title=$(cat "${model_path%/*}"/title)
 
@@ -1618,7 +1624,7 @@ then
 
 				# pieces
 
-			    if [[ $line =~ configuration_pieces ]]
+				if [[ $line =~ configuration_pieces ]]
 				then
 					configuration_pieces=$(cat "${model_path%/*}"/pieces)
 
