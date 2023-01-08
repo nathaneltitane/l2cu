@@ -20,7 +20,7 @@ then
 
 	if [ ! -d "${HOME}"/.local/bin ]
 	then
-		mkdir -p "${HOME}"/.local/bin
+		frobulator.directory "${HOME}"/.local/bin
 	fi
 
 	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
@@ -1241,7 +1241,7 @@ then
 				rm -rf "${export_directory}"
 			fi
 
-			mkdir -p "${export_directory}"
+			frobulator.directory "${export_directory}"
 
 			cd "${export_directory}"
 
@@ -1439,7 +1439,7 @@ then
 
 			if [[ ! -d "${render_directory}" ]]
 			then
-				mkdir -p "${render_directory}"
+				frobulator.directory "${render_directory}"
 			fi
 
 			# prepare render option directory:
@@ -1452,7 +1452,7 @@ then
 					rm -rf "${flat_directory}"
 				fi
 
-				mkdir -p "${flat_directory}"
+				frobulator.directory "${flat_directory}"
 
 				cd "${flat_directory}"
 			fi
@@ -1464,7 +1464,7 @@ then
 					rm -rf "${thumbnail_directory}"
 				fi
 
-				mkdir -p "${thumbnail_directory}"
+				frobulator.directory "${thumbnail_directory}"
 
 				cd "${thumbnail_directory}"
 			fi
@@ -1578,7 +1578,7 @@ then
 				rm -rf "${instructions_directory}"
 			fi
 
-			mkdir -p "${instructions_directory}"
+			frobulator.directory "${instructions_directory}"
 
 			# copy logo file
 
