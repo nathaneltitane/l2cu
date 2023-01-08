@@ -20,7 +20,7 @@ then
 
 	if [ ! -d "${HOME}"/.local/bin ]
 	then
-		frobulator.directory "${HOME}"/.local/bin
+		mkdir -p "${HOME}"/.local/bin
 	fi
 
 	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
