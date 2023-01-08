@@ -842,11 +842,6 @@ l2cu_instructions () {
 		--pdf-output-file "${instructions_file}"	\
 													"${instructions_model_path}" > /dev/null 2>&1
 	wait
-
-	# remove cache directory:
-	# prevents rendered files reuse and clutter
-
-	rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 }
 
 parse_input () {
@@ -1584,12 +1579,6 @@ then
 
 			cd "${model_directory}" || exit 1
 
-			# legacy content cleanup
-
-			rm -rf "${model_path%/*}"/[lL][pP][uU][bB][3][dD]
-
-			rm -rf "${model_path%/*}"/instructions*
-
 			# generate instructions directory
 
 			if [[ -d "${instructions_directory}" ]]
@@ -1662,6 +1651,10 @@ then
 			# generate instructions
 
 			l2cu_instructions
+
+			# remove cache files
+
+			rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 
 		done
 
