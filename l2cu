@@ -1496,7 +1496,6 @@ then
 					"${thumbnail_directory}"/thumbnail."${extension}"
 			fi
 
-
 			# unset IFS
 
 			IFS=''
