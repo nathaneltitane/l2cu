@@ -1275,6 +1275,9 @@ then
 	done
 fi
 
+frobulator.scs "Done" "[ ${script} // Export ]"
+echo
+
 # render ///////////////////////////////////////////////////////////////////////
 
 if [ "${option}" = "render" ]
@@ -1503,6 +1506,9 @@ then
 	done
 fi
 
+frobulator.scs "Done" "[ ${script} // Render ]"
+echo
+
 # instructions /////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "instructions" ]]
@@ -1653,6 +1659,9 @@ then
 
 	done
 fi
+
+frobulator.scs "Done" "[ ${script} // Instructions ]"
+echo
 
 # modify ///////////////////////////////////////////////////////////////////////
 
@@ -1877,6 +1886,9 @@ then
 	done
 fi
 
+frobulator.scs "Done" "[ ${script} // Modify ]"
+echo
+
 # pieces ///////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "pieces" ]]
@@ -1911,6 +1923,9 @@ then
 
 	done
 fi
+
+frobulator.scs "Done" "[ ${script} // Pieces ]"
+echo
 
 # download /////////////////////////////////////////////////////////////////////
 
@@ -1947,6 +1962,9 @@ then
 			"${directory}"/ldraw.zip
 	fi
 fi
+
+frobulator.scs "Done" "[ ${script} // Download ]"
+echo
 
 # list /////////////////////////////////////////////////////////////////////////
 
@@ -2050,7 +2068,10 @@ then
 	rm -rf "._.lst" ".~.lst"
 fi
 
+frobulator.scs "Done" "[ ${script} // List ]"
+echo
+
 # complete /////////////////////////////////////////////////////////////////////
 
-frobulator.scs "Done."
+frobulator.scs "Done" "[ ${script} ]"
 echo
