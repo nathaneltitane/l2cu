@@ -1245,6 +1245,8 @@ then
 
 			frobulator.directory "${model_directory}" exports
 
+			cd "${export_directory}"
+
 			l2cu_export
 
 			# 3ds
