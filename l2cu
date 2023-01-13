@@ -1243,7 +1243,7 @@ then
 				rm -rf "${export_directory}"
 			fi
 
-			frobulator.directory "${export_directory}"
+			frobulator.directory "${model_directory}" exports
 
 			cd "${export_directory}"
 
