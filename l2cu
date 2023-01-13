@@ -679,7 +679,7 @@ l2cu_size () {
 
 	if [ "${export_size}" -le "${export_size_threshold}" ]
 	then
-		frobulator.scs "File size" "[ ${export_size} ]"
+		frobulator.scs "File size" "[ ${export_size}B ]"
 		echo
 	fi
 
@@ -687,7 +687,7 @@ l2cu_size () {
 
 	if [ "${export_size}" -gt "${export_size_threshold}" ]
 	then
-		frobulator.wrn "File size" "[ ${export_size} ]"
+		frobulator.wrn "File size" "[ ${export_size}B ]"
 		echo
 
 		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B!"
