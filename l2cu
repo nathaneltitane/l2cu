@@ -1245,8 +1245,6 @@ then
 
 			frobulator.directory "${model_directory}" exports
 
-			cd "${export_directory}"
-
 			l2cu_export
 
 			# 3ds
@@ -1532,11 +1530,13 @@ then
 
 			model_name="${model_file%.*}"
 
-			# define export output directory
-
 			# use model directory as root
 
-			instructions_directory="${model_path%/*}"/instructions
+			model_directory="${model_path%/*}"
+
+			# define instruction output directories
+
+			export_directory="${model_directory}"/instructions
 
 			instructions_model_path="${instructions_directory}"/instructions."${extension}"
 
@@ -1580,7 +1580,7 @@ then
 				rm -rf "${instructions_directory}"
 			fi
 
-			frobulator.directory "${instructions_directory}"
+			frobulator.directory "${model_directory}" instructions
 
 			# copy logo file
 
