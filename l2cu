@@ -1216,11 +1216,13 @@ then
 
 			model_name="${model_file%.*}"
 
-			# define export output directory
-
 			# use model directory as root
 
-			export_directory="${model_path%/*}"/exports
+			model_directory="${model_path%/*}"
+
+			# define export output directories
+
+			export_directory="${model_directory}"/exports
 
 			# explicit export file types for optimization
 
@@ -1297,17 +1299,17 @@ then
 
 			model_name="${model_file%.*}"
 
-			# define render output directory
-
 			# use model directory as root
+
+			model_directory="${model_path%/*}"
+
+			# define render output directories
 
 			render_directory="${model_path%/*}"/renders
 
-			# use render directory as root
+			flat_directory="${render_directory}"/flat
 
-			flat_directory="${model_path%/*}"/renders/flat
-
-			thumbnail_directory="${model_path%/*}"/renders/thumbnail
+			thumbnail_directory="${render_directory}"/thumbnail
 
 			# define coordinate values and labels
 
@@ -1439,7 +1441,7 @@ then
 
 			if [[ ! -d "${render_directory}" ]]
 			then
-				frobulator.directory "${render_directory}"
+				frobulator.directory "${render_directory}" renders
 			fi
 
 			# prepare render option directory:
@@ -1452,7 +1454,7 @@ then
 					rm -rf "${flat_directory}"
 				fi
 
-				frobulator.directory "${flat_directory}"
+				frobulator.directory "${render_directory}" flat
 
 				cd "${flat_directory}"
 			fi
@@ -1464,7 +1466,7 @@ then
 					rm -rf "${thumbnail_directory}"
 				fi
 
-				frobulator.directory "${thumbnail_directory}"
+				frobulator.directory "${render_directory}" thumbnail
 
 				cd "${thumbnail_directory}"
 			fi
