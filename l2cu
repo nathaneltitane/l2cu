@@ -38,9 +38,9 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="01-08-2022"
+version="01-12-2022"
 
-# usage ///////////////////////////////////////////////////////////////////////
+# usage ////////////////////////////////////////////////////////////////////////
 
 while (($#))
 do
@@ -329,20 +329,20 @@ do
 		shift
 done
 
-# clear ///////////////////////////////////////////////////////////////////////
+# clear ////////////////////////////////////////////////////////////////////////
 
 frobulator.clear
 
-# prompt //////////////////////////////////////////////////////////////////////
+# prompt ///////////////////////////////////////////////////////////////////////
 
 frobulator.script "Setting up ${script#*-}"
 echo
 
-# variables ///////////////////////////////////////////////////////////////////
+# variables ////////////////////////////////////////////////////////////////////
 
 stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
-# defaults ////////////////////////////////////////////////////////////////////
+# defaults /////////////////////////////////////////////////////////////////////
 
 if [ -z "${directory}" ]
 then
@@ -1076,7 +1076,7 @@ l2cu_download () {
 	frobulator.download "${base_url}"/"${parts_url_release}" "${directory}" "${parts_archive}"
 }
 
-# requirements ////////////////////////////////////////////////////////////////
+# requirements /////////////////////////////////////////////////////////////////
 
 list=(
 	leocad
@@ -1137,7 +1137,7 @@ list=()
 
 l2cu_prepare
 
-# confirmation ////////////////////////////////////////////////////////////////
+# confirmation /////////////////////////////////////////////////////////////////
 
 if [ "${option}" = "export" ]       || \
    [ "${option}" = "render" ]       || \
@@ -1194,7 +1194,7 @@ echo
 frobulator.fwd "Proceeding..."
 echo
 
-# export //////////////////////////////////////////////////////////////////////
+# export ///////////////////////////////////////////////////////////////////////
 
 if [ "${option}" = "export" ]
 then
@@ -1275,7 +1275,7 @@ then
 	done
 fi
 
-# render //////////////////////////////////////////////////////////////////////
+# render ///////////////////////////////////////////////////////////////////////
 
 if [ "${option}" = "render" ]
 then
@@ -1655,7 +1655,7 @@ then
 	done
 fi
 
-# modify //////////////////////////////////////////////////////////////////////
+# modify ///////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "modify" ]]
 then
@@ -1693,7 +1693,7 @@ then
 			read -r line
 			do
 
-# modify: lint ////////////////////////////////////////////////////////////////
+# modify: lint /////////////////////////////////////////////////////////////////
 
 				if [[ "${modify_option}" = "lint" ]]
 				then
@@ -1772,7 +1772,7 @@ then
 
 				IFS=' '
 
-# modify: color ///////////////////////////////////////////////////////////////
+# modify: color ////////////////////////////////////////////////////////////////
 
 					# color substitution
 
@@ -1791,7 +1791,7 @@ then
 						fi
 					fi
 
-# modify: part ////////////////////////////////////////////////////////////////
+# modify: part /////////////////////////////////////////////////////////////////
 
 					# part substitution
 
@@ -1810,7 +1810,7 @@ then
 						fi
 					fi
 
-# modify: bind ////////////////////////////////////////////////////////////////
+# modify: bind /////////////////////////////////////////////////////////////////
 
 					# bind [ part + color ] color substitution
 
@@ -1835,7 +1835,7 @@ then
 						fi
 					fi
 
-# modify: step ////////////////////////////////////////////////////////////////
+# modify: step /////////////////////////////////////////////////////////////////
 
 					# step submodel [ldr] separation
 
@@ -1869,7 +1869,7 @@ then
 
 			done < "${model_path}" # feed model file into loop for parsing
 
-# modify: overwrite ///////////////////////////////////////////////////////////
+# modify: overwrite ////////////////////////////////////////////////////////////
 
 			# ammend modifications
 
@@ -1878,7 +1878,7 @@ then
 	done
 fi
 
-# pieces //////////////////////////////////////////////////////////////////////
+# pieces ///////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "pieces" ]]
 then
@@ -1913,7 +1913,7 @@ then
 	done
 fi
 
-# download ////////////////////////////////////////////////////////////////////
+# download /////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "download" ]]
 then
@@ -1949,7 +1949,7 @@ then
 	fi
 fi
 
-# list ///////////////////////////////////////////////////////////////////
+# list /////////////////////////////////////////////////////////////////////////
 
 if [[ "${option}" = "list" ]]
 then
@@ -1989,69 +1989,69 @@ then
 
 		for part_path in ${parts_list[@]}
 		do
-            part_file="${part_path##*/}"
-            part_file_header="$(head -n 1 "${part_path}")"
-            part_file_description="${part_file_header:2}"
+			part_file="${part_path##*/}"
+			part_file_header="$(head -n 1 "${part_path}")"
+			part_file_description="${part_file_header:2}"
 
-            if [[ "${part_file_description}" == *~Moved* ]]
-            then
-                : # pass
-            else
-                if [[ "${part_file_description}" == *_* ]]
-                then
-                    printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
+			if [[ "${part_file_description}" == *~Moved* ]]
+			then
+				: # pass
+			else
+				if [[ "${part_file_description}" == *_* ]]
+				then
+					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
 
-                elif [[ "${part_file_description}" == *~* ]]
-                then
-                    printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
+				elif [[ "${part_file_description}" == *~* ]]
+				then
+					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
 
-                else
-                    printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
-                fi
+				else
+					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
+				fi
 
-                frobulator.inf "Part count" "$((count++))\c"
-                echo
-            fi
-        done
-    done
+				frobulator.inf "Part count" "$((count++))\c"
+				echo
+			fi
+		done
+	done
 
-    # keep counter visible while looping
+	# keep counter visible while looping
 
-    echo
+	echo
 
-    # set separator
+	# set separator
 
-    separator=' '
+	separator=' '
 
-    # apply sorting method
+	# apply sorting method
 
-    for list in "._.lst" ".~.lst" parts.lst
-    do
-        if [[ "${sort_option}" = "description" ]]
-        then
-            sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
-        fi
+	for list in "._.lst" ".~.lst" parts.lst
+	do
+		if [[ "${sort_option}" = "description" ]]
+		then
+			sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
+		fi
 
-        if [[ "${sort_option}" = "number" ]]
-        then
-            sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
-        fi
-    done
+		if [[ "${sort_option}" = "number" ]]
+		then
+			sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
+		fi
+	done
 
-    # unset separator
+	# unset separator
 
-    separator=''
+	separator=''
 
-    # merge
+	# merge
 
-    cat "._.lst" ".~.lst" >> parts.lst
+	cat "._.lst" ".~.lst" >> parts.lst
 
-    # cleanup
+	# cleanup
 
-    rm -rf "._.lst" ".~.lst"
+	rm -rf "._.lst" ".~.lst"
 fi
 
-# complete ////////////////////////////////////////////////////////////////////
+# complete /////////////////////////////////////////////////////////////////////
 
 frobulator.scs "Done."
 echo
