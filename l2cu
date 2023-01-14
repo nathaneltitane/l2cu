@@ -1275,10 +1275,11 @@ then
 			IFS=''
 		done
 	done
-fi
 
-frobulator.scs "Done" "[ ${script} // Export ]"
-echo
+	frobulator.scs "Done" "[ ${script} // Export ]"
+	echo
+
+fi
 
 # render ///////////////////////////////////////////////////////////////////////
 
@@ -1506,10 +1507,11 @@ then
 			IFS=''
 		done
 	done
-fi
 
-frobulator.scs "Done" "[ ${script} // Render ]"
-echo
+	frobulator.scs "Done" "[ ${script} // Render ]"
+	echo
+
+fi
 
 # instructions /////////////////////////////////////////////////////////////////
 
@@ -1660,10 +1662,11 @@ then
 		done
 
 	done
-fi
 
-frobulator.scs "Done" "[ ${script} // Instructions ]"
-echo
+	frobulator.scs "Done" "[ ${script} // Instructions ]"
+	echo
+
+fi
 
 # modify ///////////////////////////////////////////////////////////////////////
 
@@ -1886,10 +1889,11 @@ then
 			l2cu_write
 		done
 	done
-fi
 
-frobulator.scs "Done" "[ ${script} // Modify ]"
-echo
+	frobulator.scs "Done" "[ ${script} // Modify ]"
+	echo
+
+fi
 
 # pieces ///////////////////////////////////////////////////////////////////////
 
@@ -1924,10 +1928,10 @@ then
 		done
 
 	done
-fi
 
-frobulator.scs "Done" "[ ${script} // Pieces ]"
-echo
+	frobulator.scs "Done" "[ ${script} // Pieces ]"
+	echo
+fi
 
 # download /////////////////////////////////////////////////////////////////////
 
@@ -1963,10 +1967,10 @@ then
 			"${directory}"/"${parts_archive}"	\
 			"${directory}"/ldraw.zip
 	fi
-fi
 
-frobulator.scs "Done" "[ ${script} // Download ]"
-echo
+	frobulator.scs "Done" "[ ${script} // Download ]"
+	echo
+fi
 
 # list /////////////////////////////////////////////////////////////////////////
 
@@ -2068,10 +2072,10 @@ then
 	# cleanup
 
 	rm -rf "._.lst" ".~.lst"
-fi
 
-frobulator.scs "Done" "[ ${script} // List ]"
-echo
+	frobulator.scs "Done" "[ ${script} // List ]"
+	echo
+fi
 
 # complete /////////////////////////////////////////////////////////////////////
 
