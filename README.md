@@ -168,7 +168,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 [[ Dextop // Project Page ]](https://github.com/nathaneltitane/dextop)
 
-[[Frobulator]](https://github.com/nathaneltitane/frobulator)
+[[ Frobulator // Project Page ]](https://github.com/nathaneltitane/frobulator)
 
 [[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu)
 
