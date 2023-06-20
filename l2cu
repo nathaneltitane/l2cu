@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="01-12-2022"
+version="06-20-2022"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -258,14 +258,14 @@ do
 			echo
 			echo -e "-render           Renders model files using the following parameters:"
 			echo
-			echo -e "0                 Render image using a quarter-back view preset.          [ 0 ] [ Lat.:30, Lon.: 0 ]"
-			echo -e "1                 Render image using a quarter-back view preset.          [ 1 ] [ Lat.:30, Lon.: 45 ]"
-			echo -e "2                 Render image using a quarter-back view preset.          [ 2 ] [ Lat.:30, Lon.: 90 ]"
-			echo -e "3                 Render image using a quarter-back view preset.          [ 3 ] [ Lat.:30, Lon.: 135 ]"
-			echo -e "4                 Render image using a quarter-back view preset.          [ 4 ] [ Lat.:30, Lon.: 180 ]"
-			echo -e "5                 Render image using a quarter-back view preset.          [ 5 ] [ Lat.:30, Lon.: 225 ]"
-			echo -e "6                 Render image using a quarter-back view preset.          [ 6 ] [ Lat.:30, Lon.: 270 ]"
-			echo -e "7                 Render image using a quarter-back view preset.          [ 7 ] [ Lat.:30, Lon.: 315 ]"
+			echo -e "0                 Render image using view preset.                         [ 0 ] [ Lat.:30, Lon.: 0 ]"
+			echo -e "1                 Render image using view preset.                         [ 1 ] [ Lat.:30, Lon.: 45 ]"
+			echo -e "2                 Render image using view preset.                         [ 2 ] [ Lat.:30, Lon.: 90 ]"
+			echo -e "3                 Render image using view preset.                         [ 3 ] [ Lat.:30, Lon.: 135 ]"
+			echo -e "4                 Render image using view preset.                         [ 4 ] [ Lat.:30, Lon.: 180 ]"
+			echo -e "5                 Render image using view preset.                         [ 5 ] [ Lat.:30, Lon.: 225 ]"
+			echo -e "6                 Render image using view preset.                         [ 6 ] [ Lat.:30, Lon.: 270 ]"
+			echo -e "7                 Render image using view preset.                         [ 7 ] [ Lat.:30, Lon.: 315 ]"
 			echo
 			echo -e "full              Render series of images using options 0 to 7."
 			echo -e "flat              Render image using option 0 without edges or shading."
