@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="06-20-2022"
+version="08-08-2023"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -1207,12 +1207,12 @@ then
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*") )
 
+		# set IFS
+
+		IFS=$'\n'
+
 		for model_path in ${models_list[@]}
 		do
-			# set IFS
-
-			IFS=' '
-
 			# get model file name from path
 
 			model_file="${model_path##*/}"
@@ -1274,11 +1274,11 @@ then
 			# verify export size threshold
 
 			l2cu_size
-
-			# unset IFS
-
-			IFS=''
 		done
+
+		# unset IFS
+
+		IFS=''
 	done
 
 	frobulator.scs "Done" "[ ${script} // Export ]"
@@ -1294,12 +1294,12 @@ then
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*") )
 
+		# set IFS
+
+		IFS=$'\n'
+
 		for model_path in ${models_list[@]}
 		do
-			# set IFS
-
-			IFS=' '
-
 			# get model file name from path
 
 			model_file="${model_path##*/}"
@@ -1314,7 +1314,7 @@ then
 
 			# define render output directories
 
-			render_directory="${model_path%/*}"/renders
+			render_directory="${model_directory}"/renders
 
 			flat_directory="${render_directory}"/flat
 
@@ -1448,20 +1448,17 @@ then
 			# prepare base render directory:
 			# generate if does not exist
 
-			if [[ ! -d "${render_directory}" ]]
-			then
-				frobulator.directory "${render_directory}" renders
-			fi
+
+			frobulator.directory "${model_directory}" renders
+
+			cd "${render_directory}"
 
 			# prepare render option directory:
 			# purge and regenerate if exists
 
 			if [[ "${render_preset}" = "flat" ]]
 			then
-				if [[ -d "${flat_directory}" ]]
-				then
-					rm -rf "${flat_directory}"
-				fi
+				rm -rf "${flat_directory}"
 
 				frobulator.directory "${render_directory}" flat
 
@@ -1470,10 +1467,7 @@ then
 
 			if [[ "${render_preset}" = "thumbnail" ]]
 			then
-				if [[ -d "${thumbnail_directory}" ]]
-				then
-					rm -rf "${thumbnail_directory}"
-				fi
+				rm -rf "${thumbnail_directory}"
 
 				frobulator.directory "${render_directory}" thumbnail
 
@@ -1506,11 +1500,10 @@ then
 					"${model_name}-${view[1]}.${extension}"		\
 					"${thumbnail_directory}"/thumbnail."${extension}"
 			fi
-
+		done
 			# unset IFS
 
 			IFS=''
-		done
 	done
 
 	frobulator.scs "Done" "[ ${script} // Render ]"
