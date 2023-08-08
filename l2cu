@@ -1519,12 +1519,12 @@ then
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}"))
 
+		# set IFS
+
+		IFS=$'\n'
+
 		for model_path in ${models_list[@]}
 		do
-			# set IFS
-
-			IFS=' '
-
 			# get model base directory from path
 
 			model_directory="${model_path%/*}"
