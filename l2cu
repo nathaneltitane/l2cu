@@ -651,10 +651,19 @@ l2cu_prepare () {
 l2cu_optimize () {
 	# optimize model mesh
 
+	frobulator.inf "Exporting" "[ ${export_name} // ${model_file} ]"
+	echo
+
+	frobulator.fwd "Output" "[ ${export_file} ]"
+	echo
+
 	blender						\
 		--background			\
 		--python "${optimize}"	\
-								"${export_file_3ds}" > "${sink}" 2>&1
+								"${export_file_3ds}" > "${sink}" 2>&1 &
+
+	frobulator.progress "Optimizing..."
+	echo
 }
 
 l2cu_export () {
@@ -666,9 +675,10 @@ l2cu_export () {
 
 	leocad											\
 		-"${export_extension}" "${export_file}" 	\
-													"${model_path}" > "${sink}" 2>&1
+													"${model_path}" > "${sink}" 2>&1 &
 
-	wait
+	frobulator.progress "Generating..."
+	echo
 }
 
 l2cu_size () {
@@ -739,9 +749,10 @@ l2cu_render () {
 		--line-width "${line_width}" 											\
 		--aa-samples "${antialias_samples}" 									\
 		--image "${model_name}-${view[$coordinates]}.${extension}"				\
-																				"${model_path}" > "${sink}" 2>&1
+																				"${model_path}" > "${sink}" 2>&1 &
 
-	wait
+	frobulator.progress "Rendering..."
+	echo
 }
 
 l2cu_pieces () {
@@ -764,9 +775,10 @@ l2cu_pieces () {
 
 	leocad									\
 		--export-csv "${part_count_file}"	\
-											"${model_path}" > "${sink}" 2>&1
+											"${model_path}" > "${sink}" 2>&1 &
 
-	wait
+	frobulator.progress "Generating..."
+	echo
 
 	# remove header
 
