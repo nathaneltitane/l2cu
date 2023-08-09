@@ -649,6 +649,8 @@ l2cu_prepare () {
 }
 
 l2cu_optimize () {
+	# optimize model mesh
+
 	blender						\
 		--background			\
 		--python "${optimize}"	\
