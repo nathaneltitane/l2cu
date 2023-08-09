@@ -718,7 +718,7 @@ l2cu_size () {
 l2cu_render () {
 	# render model
 
-	frobulator.inf "Rendering" "[ View ${view[coordinates]} // ${model_name} ]"
+	frobulator.inf "Rendering" "[ Instance ${view[coordinates]} // ${model_name} ]"
 	echo
 
 	frobulator.fwd "Output" "[ ${render_file} ]"
