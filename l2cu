@@ -1334,6 +1334,8 @@ then
 
 			render_directory="${model_directory}"/renders
 
+			full_directory="${render_directory}"/full
+
 			flat_directory="${render_directory}"/flat
 
 			thumbnail_directory="${render_directory}"/thumbnail
@@ -1466,13 +1468,21 @@ then
 			# prepare base render directory:
 			# generate if does not exist
 
-
 			frobulator.directory "${model_directory}" renders
 
 			cd "${render_directory}"
 
 			# prepare render option directory:
 			# purge and regenerate if exists
+
+			if [[ "${render_preset}" = "full" ]]
+			then
+				rm -rf "${full_directory}"
+
+				frobulator.directory "${render_directory}" full
+
+				cd "${full_directory}"
+			fi
 
 			if [[ "${render_preset}" = "flat" ]]
 			then
