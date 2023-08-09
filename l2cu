@@ -657,10 +657,10 @@ l2cu_optimize () {
 	frobulator.fwd "Output" "[ ${export_file} ]"
 	echo
 
-	blender						\
-		--background			\
-		--python "${optimize}"	\
-								"${export_file_3ds}" > "${sink}" 2>&1 &
+	blender								\
+		--background					\
+		--python		"${optimize}"	\
+										"${export_file_3ds}" > "${sink}" 2>&1 &
 
 	frobulator.progress "Optimizing..."
 	echo
@@ -674,7 +674,7 @@ l2cu_export () {
 	echo
 
 	leocad											\
-		-"${export_extension}" "${export_file}" 	\
+		-"${export_extension}"	"${export_file}" 	\
 													"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "Generating..."
@@ -742,13 +742,13 @@ l2cu_render () {
 	extension="png"
 
 	leocad																		\
-		--height "${height}"													\
-		--width "${width}"														\
-		--camera-angles ${latitude[$coordinates]} ${longitude[$coordinates]}	\
-		--shading "${shading}"													\
-		--line-width "${line_width}" 											\
-		--aa-samples "${antialias_samples}" 									\
-		--image "${model_name}-${view[$coordinates]}.${extension}"				\
+		--height		"${height}"												\
+		--width			"${width}"												\
+		--camera-angles	${latitude[$coordinates]} ${longitude[$coordinates]}	\
+		--shading		"${shading}"											\
+		--line-width	"${line_width}" 										\
+		--aa-samples	"${antialias_samples}" 									\
+		--image			"${model_name}-${view[$coordinates]}.${extension}"		\
 																				"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "Rendering..."
@@ -773,9 +773,9 @@ l2cu_pieces () {
 		rm -rf "${pieces_file}"
 	fi
 
-	leocad									\
-		--export-csv "${part_count_file}"	\
-											"${model_path}" > "${sink}" 2>&1 &
+	leocad										\
+		--export-csv	"${part_count_file}"	\
+												"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "Generating..."
 	echo
@@ -846,14 +846,14 @@ l2cu_instructions () {
 	renderer="native"
 	projection="perspective"
 
-	lpub3d24										\
-		--preferred-renderer "${renderer}"			\
-		--projection "${projection}"				\
-		--process-export							\
-		--clear-cache								\
-		--export-option "${export_option}"			\
-		--pdf-output-file "${instructions_file}"	\
-													"${instructions_model_path}" > "${sink}" 2>&1 &
+	lpub3d24												\
+		--preferred-renderer	"${renderer}"				\
+		--projection			"${projection}"				\
+		--process-export									\
+		--clear-cache										\
+		--export-option			"${export_option}"			\
+		--pdf-output-file		"${instructions_file}"		\
+															"${instructions_model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "Generating..."
 	echo
