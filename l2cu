@@ -647,7 +647,6 @@ l2cu_optimize () {
 										"${export_file_3ds}" > "${sink}" 2>&1 &
 
 	frobulator.progress "optimize"
-	echo
 }
 
 l2cu_export () {
@@ -662,7 +661,6 @@ l2cu_export () {
 													"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
-	echo
 }
 
 l2cu_size () {
@@ -736,7 +734,6 @@ l2cu_render () {
 																				"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "render"
-	echo
 }
 
 l2cu_pieces () {
@@ -762,7 +759,6 @@ l2cu_pieces () {
 												"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
-	echo
 
 	# remove header
 
@@ -840,7 +836,6 @@ l2cu_instructions () {
 															"${instructions_model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
-	echo
 }
 
 parse_input () {
