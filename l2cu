@@ -43,20 +43,20 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="08-08-2023"
+version="09-01-2023"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
 while (($#))
 do
 	case "${1}" in
-		-directory)
+		-d|--directory)
 			directory="${2}"
 
 			shift
 		;;
 
-		-all)
+		-a|--all)
 			extension_option="all"
 
 			extensions_list=(
@@ -65,7 +65,7 @@ do
 			)
 		;;
 
-		-ldr)
+		-l|--ldr)
 			extension_option="ldr"
 
 			extensions_list=(
@@ -73,7 +73,7 @@ do
 			)
 		;;
 
-		-mpd)
+		-m|--mpd)
 			extension_option="mpd"
 
 			extensions_list=(
@@ -81,7 +81,7 @@ do
 			)
 		;;
 
-		-export)
+		-e|--export)
 			option="export"
 		;;
 
@@ -115,7 +115,7 @@ do
 				export_name="Wavefront"
 			;;
 
-		-render)
+		-r|--render)
 			option="render"
 		;;
 
@@ -169,11 +169,11 @@ do
 				render_preset="7"
 			;;
 
-		-instructions)
+		-i|--instructions)
 			option="instructions"
 		;;
 
-		-modify)
+		-f|--modify)
 			option="modify"
 		;;
 
@@ -197,15 +197,15 @@ do
 				modify_option="step"
 			;;
 
-		-overwrite)
+		-o|--overwrite)
 			overwrite_option="overwrite"
 		;;
 
-		-pieces)
+		-p|--pieces)
 			option="pieces"
 		;;
 
-		-download)
+		-w|--download)
 			option="download"
 		;;
 
@@ -217,7 +217,7 @@ do
 				download_option="unofficial"
 			;;
 
-		-list)
+		-s|--list)
 			option="make-list"
 
 			extensions_list=(
@@ -225,7 +225,7 @@ do
 			)
 		;;
 
-			descritpion)
+			description)
 				sort_option="description"
 			;;
 
@@ -239,72 +239,58 @@ do
 			echo
 			echo -e "Utility options:"
 			echo
-			echo -e "-directory        Specify directory to load models from."
+			echo -e "-d, --directory        Specify directory to load models from."
 			echo
-			echo -e "-all              Selects ldr and mpd file formats as target."
-			echo -e "-ldr              Selects ldr file format as target."
-			echo -e "-mpd              Selects mpd file format as target."
+			echo -e "-a, --all              Selects ldr and mpd file formats as target."
+			echo -e "-l, --ldr              Selects ldr file format as target."
+			echo -e "-m, --mpd              Selects mpd file format as target."
 			echo
-			echo -e "EXPORT:"
+			echo -e "-e, --export           Exports model files using the following parameters:"
 			echo
-			echo -e "-export           Exports model files using the following parameters:"
+			echo -e "3dstudio               Export 3dstudio file format.                            [ 3ds]"
+			echo -e "collada                Export collada file format.                             [ dae ]"
+			echo -e "blender                Optimize 3dstudio and export to blender file format.    [ 3ds >>> blend ]"
+			echo -e "wavefront              Generate wavefront files and archive.                   [ obj + mtl ]"
 			echo
-			echo -e "3dstudio          Export 3dstudio file format.                            [ 3ds]"
-			echo -e "collada           Export collada file format.                             [ dae ]"
-			echo -e "blender           Optimize 3dstudio and export to blender file format.    [ 3ds > blend ]"
-			echo -e "wavefront         Generate wavefront files and archive.                   [ obj + mtl ]"
+			echo -e "-r, --render           Renders model files using the following parameters:"
 			echo
-			echo -e "RENDER:"
+			echo -e "full                   Render series of images using options 0 to 7."
+			echo -e "flat                   Render image using option 0 without edges or shading."
+			echo -e "thumbnail              Render image using option 0 without edges or shading at 12.5% of the original size."
 			echo
-			echo -e "-render           Renders model files using the following parameters:"
+			echo -e "0                      Render image using view preset 00.                      [ 0 ] [ Lat.:30, Lon.: 0 ]"
+			echo -e "1                      Render image using view preset 01.                      [ 1 ] [ Lat.:30, Lon.: 45 ]"
+			echo -e "2                      Render image using view preset 02.                      [ 2 ] [ Lat.:30, Lon.: 90 ]"
+			echo -e "3                      Render image using view preset 03.                      [ 3 ] [ Lat.:30, Lon.: 135 ]"
+			echo -e "4                      Render image using view preset 04.                      [ 4 ] [ Lat.:30, Lon.: 180 ]"
+			echo -e "5                      Render image using view preset 05.                      [ 5 ] [ Lat.:30, Lon.: 225 ]"
+			echo -e "6                      Render image using view preset 06.                      [ 6 ] [ Lat.:30, Lon.: 270 ]"
+			echo -e "7                      Render image using view preset 07.                      [ 7 ] [ Lat.:30, Lon.: 315 ]"
 			echo
-			echo -e "0                 Render image using view preset 00.                      [ 0 ] [ Lat.:30, Lon.: 0 ]"
-			echo -e "1                 Render image using view preset 01.                      [ 1 ] [ Lat.:30, Lon.: 45 ]"
-			echo -e "2                 Render image using view preset 02.                      [ 2 ] [ Lat.:30, Lon.: 90 ]"
-			echo -e "3                 Render image using view preset 03.                      [ 3 ] [ Lat.:30, Lon.: 135 ]"
-			echo -e "4                 Render image using view preset 04.                      [ 4 ] [ Lat.:30, Lon.: 180 ]"
-			echo -e "5                 Render image using view preset 05.                      [ 5 ] [ Lat.:30, Lon.: 225 ]"
-			echo -e "6                 Render image using view preset 06.                      [ 6 ] [ Lat.:30, Lon.: 270 ]"
-			echo -e "7                 Render image using view preset 07.                      [ 7 ] [ Lat.:30, Lon.: 315 ]"
+			echo -e "-i, --instructions     Generate model instruction file.                        [ pdf ]"
 			echo
-			echo -e "full              Render series of images using options 0 to 7."
-			echo -e "flat              Render image using option 0 without edges or shading."
-			echo -e "thumbnail         Render image using option 0 without edges or shading at 12.5% of the original size."
+			echo -e "-f, --modify           Modifies model files using the following parameters:"
 			echo
-			echo -e "INSTRUCTIONS:"
+			echo -e "lint                   Standardize and format model files for parsing."
+			echo -e "color                  Modify a part's color attribute only."
+			echo -e "part                   Modify a part for another by number attribute only."
+			echo -e "bind                   Match a part to a specific color and modify the color for that selection."
+			echo -e "step                   Separate ldr based submodels using step meta tags."
+			echo -e "overwrite              Overwrite the original model file after modification."
 			echo
-			echo -e "-instructions     Generate model instruction file.                        [ pdf ]"
+			echo -e "-p, --pieces           Display and generate pieces count file."
 			echo
-			echo -e "MODIFY:"
+			echo -e "-w, --download         Download the LDraw parts library. [official | unofficlal]"
 			echo
-			echo -e "-modify           Modifies model files using the following parameters:"
+			echo -e "official               Download the LDraw parts library - complete official archive."
+			echo -e "unofficial             Download the LDraw parts library - complete unofficial archive."
 			echo
-			echo -e "lint              Standardize and format model files for parsing."
-			echo -e "color             Modify a part's color attribute only."
-			echo -e "part              Modify a part for another by number attribute only."
-			echo -e "bind              Match a part to a specific color and modify the color for that selection."
-			echo -e "step              Separate ldr based submodels using step meta tags."
-			echo -e "overwrite         Overwrite the original model file after modification."
+			echo -e "-s, --list             Generate the LDraw parts list for use with legacy editors."
 			echo
-			echo -e "PIECES:"
+			echo -e "description            Sort list by part description."
+			echo -e "number                 Sort list by part number."
 			echo
-			echo -e "-pieces           Display and generate pieces count file."
-			echo
-			echo -e "DOWNLOAD:"
-			echo
-			echo -e "-download         Download the LDraw parts library. [official | unofficlal]"
-			echo
-			echo -e "official          Download the LDraw parts library - complete official archive."
-			echo -e "unofficial        Download the LDraw parts library - complete unofficial archive."
-			echo
-			echo -e "LIST:"
-			echo
-			echo -e "-list             Generate the LDraw parts list for use with legacy editors."
-			echo
-			echo -e "description       Sort list by part description."
-			echo -e "number            Sort list by part number."
-			echo
-			echo -e "'${script}'       [ Version ${version} ]"
+			echo -e "'${script}'            [ Version ${version} ]"
 			echo
 
 			exit
@@ -344,8 +330,6 @@ frobulator.script "Setting up ${script#*-}"
 echo
 
 # variables ////////////////////////////////////////////////////////////////////
-
-sink=/dev/null
 
 stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
@@ -662,7 +646,7 @@ l2cu_optimize () {
 		--python		"${optimize}"	\
 										"${export_file_3ds}" > "${sink}" 2>&1 &
 
-	frobulator.progress "Optimizing..."
+	frobulator.progress "optimize"
 	echo
 }
 
@@ -677,7 +661,7 @@ l2cu_export () {
 		-"${export_extension}"	"${export_file}" 	\
 													"${model_path}" > "${sink}" 2>&1 &
 
-	frobulator.progress "Generating..."
+	frobulator.progress "generate"
 	echo
 }
 
@@ -751,7 +735,7 @@ l2cu_render () {
 		--image			"${model_name}-${view[$coordinates]}.${extension}"		\
 																				"${model_path}" > "${sink}" 2>&1 &
 
-	frobulator.progress "Rendering..."
+	frobulator.progress "render"
 	echo
 }
 
@@ -761,7 +745,7 @@ l2cu_pieces () {
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Parsing..."
+	frobulator.fwd "parse"
 	echo
 
 	part_count_file="${model_path%/*}"/parts.csv
@@ -777,7 +761,7 @@ l2cu_pieces () {
 		--export-csv	"${part_count_file}"	\
 												"${model_path}" > "${sink}" 2>&1 &
 
-	frobulator.progress "Generating..."
+	frobulator.progress "generate"
 	echo
 
 	# remove header
@@ -855,7 +839,7 @@ l2cu_instructions () {
 		--pdf-output-file		"${instructions_file}"		\
 															"${instructions_model_path}" > "${sink}" 2>&1 &
 
-	frobulator.progress "Generating..."
+	frobulator.progress "generate"
 	echo
 }
 
