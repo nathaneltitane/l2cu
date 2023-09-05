@@ -391,6 +391,7 @@ fi
 # functions ////////////////////////////////////////////////////////////////////
 
 l2cu_prepare () {
+
 	if [[ "${option}" = "export" ]]
 	then
 		optimize=$(mktemp /tmp/optimize.XXXXXX)
@@ -633,6 +634,7 @@ l2cu_prepare () {
 }
 
 l2cu_optimize () {
+
 	# optimize model mesh
 
 	frobulator.inf "Exporting" "[ ${export_name} // ${model_file} ]"
@@ -650,6 +652,7 @@ l2cu_optimize () {
 }
 
 l2cu_export () {
+
 	frobulator.inf "Exporting" "[ ${export_name} // ${model_file} ]"
 	echo
 
@@ -664,6 +667,7 @@ l2cu_export () {
 }
 
 l2cu_size () {
+
 	# validate export file size
 
 	block_size=1024
@@ -698,6 +702,7 @@ l2cu_size () {
 }
 
 l2cu_render () {
+
 	# render model
 
 	frobulator.inf "Rendering" "[ Instance ${view[coordinates]} // ${model_name} ]"
@@ -737,6 +742,7 @@ l2cu_render () {
 }
 
 l2cu_pieces () {
+
 	# generate total piece count
 
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
@@ -813,6 +819,7 @@ l2cu_pieces () {
 }
 
 l2cu_instructions () {
+
 	# generate model instructions
 
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
@@ -839,6 +846,7 @@ l2cu_instructions () {
 }
 
 parse_input () {
+
 	# read and parse user input
 
 	while true
@@ -857,6 +865,7 @@ parse_input () {
 }
 
 parse_colors () {
+
 	parse_input
 
 	# set to lowercase for input match
@@ -924,6 +933,7 @@ parse_colors () {
 }
 
 parse_parts () {
+
 	# read and parse part selection
 
 	parse_input
@@ -934,6 +944,7 @@ parse_parts () {
 }
 
 parse_modification () {
+
 	# read and parse modification input request
 
 	if [ "${modify_option}" = "color" ]
@@ -1003,6 +1014,7 @@ parse_modification () {
 }
 
 l2cu_write () {
+
 	# manage model file overwrite
 
 	if [ "${overwrite_option}" = "overwrite" ]
@@ -1046,6 +1058,7 @@ l2cu_write () {
 }
 
 l2cu_download () {
+
 	# manage library dowload
 
 	if [ -z "${directory}" ]
