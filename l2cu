@@ -1707,7 +1707,7 @@ then
 
 			model_buffer="${model_path}.tmp"
 
-			# parse
+			# parse model file
 
 			while IFS=''
 			read -r line
