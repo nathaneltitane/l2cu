@@ -1024,41 +1024,21 @@ l2cu_write () {
 
 	if [ "${overwrite_option}" = "overwrite" ]
 	then
-		frobulator.wrn "Writing to model file" "[ overwrite ]"
+		frobulator.wrn "Overwriting model file" "[ overwrite ]"
 		echo
 
 		frobulator.inf "Writing" "[ ${model_file} ]"
 		echo
 
 		mv "${model_buffer}" "${model_buffer%.tmp}"
-	fi
-
-	if [ -z "${overwrite_option}" ]
-	then
-		frobulator.ipt "Write to model file?"
+	else
+		frobulator.wrn "Writing to model file copy."
 		echo
 
-		read reply
+		frobulator.fwd "Writing..."
+		echo
 
-		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-		then
-			frobulator.inf "Writing to model file" "[ overwrite ]"
-			echo
-
-			frobulator.inf "Writing" "[ ${model_file} ]"
-			echo
-
-			mv "${model_buffer}" "${model_buffer%.tmp}"
-
-		else
-			frobulator.inf "Writing to model file copy."
-			echo
-
-			frobulator.fwd "Writing..."
-			echo
-
-			mv "${model_buffer}" "${model_buffer%.tmp}-modified-${stamp}.${extension}"
-		fi
+		mv "${model_buffer}" "${model_buffer%.tmp}-modified-${stamp}.${extension}"
 	fi
 }
 
@@ -1705,7 +1685,7 @@ then
 
 	for extension in ${extensions_list[@]}
 	do
-		echo $(find ${directory} -type f -iname "*.${extension}") | while read -r model_path
+		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}") | while read -r model_path
 		do
 			# get model base directory from path
 
@@ -1718,6 +1698,10 @@ then
 			# strip extension from model file name
 
 			model_name="${model_file%.*}"
+
+			# use model directory as root
+
+			model_directory="${model_path%/*}"
 
 			# set model buffer file
 
