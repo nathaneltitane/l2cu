@@ -760,10 +760,6 @@ l2cu_pieces () {
 	frobulator.fwd "parse"
 	echo
 
-	part_count_file="${model_path%/*}"/parts.csv
-
-	pieces_file="${model_path%/*}"/pieces
-
 	if [ -f "${pieces_file}" ]
 	then
 		rm -rf "${pieces_file}"
@@ -1930,12 +1926,12 @@ then
 	do
 		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}"))
 
+		# set IFS
+
+		IFS=$'\n'
+
 		for model_path in ${models_list[@]}
 		do
-			# set IFS
-
-			IFS=' '
-
 			# get model base directory from path
 
 			model_directory="${model_path%/*}"
@@ -1947,6 +1943,12 @@ then
 			# strip extension from model file name
 
 			model_name="${model_file%.*}"
+
+			# define pieces output files
+
+			part_count_file="${model_directory}"/parts.csv
+
+			pieces_file="${model_directory}"/pieces
 
 			# generate pieces count file
 
