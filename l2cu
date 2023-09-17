@@ -663,6 +663,14 @@ l2cu_export () {
 													"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
+
+	if [[ "${export_option}" = "collada" ]]
+	then
+		sed																\
+			-i															\
+			-e		's/<transparent>/<transparent opaque="A_ONE">/g'	\
+																		"${export_file}"
+	fi
 }
 
 l2cu_size () {
@@ -679,11 +687,13 @@ l2cu_size () {
 
 	export_size_threshold="25600"
 
+	size_unit="Bytes"
+
 	# if lesser than threshold
 
 	if [ "${export_size}" -le "${export_size_threshold}" ]
 	then
-		frobulator.scs "File size" "[ ${export_size}B ]"
+		frobulator.scs "File size" "[ ${size_unit} // ${export_size} ]"
 		echo
 	fi
 
@@ -691,7 +701,7 @@ l2cu_size () {
 
 	if [ "${export_size}" -gt "${export_size_threshold}" ]
 	then
-		frobulator.wrn "File size" "[ ${export_size}B ]"
+		frobulator.wrn "File size" "[ ${size_unit} // ${export_size} ]"
 		echo
 
 		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B!"
