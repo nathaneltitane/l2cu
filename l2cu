@@ -2,36 +2,36 @@
 
 # dependencies /////////////////////////////////////////////////////////////////
 
-if [ -f "${HOME}"/.local/bin/frobulator ]
-then
-	rm -r -f "${HOME}"/.local/bin/frobulator
-fi
-
-if [[ -z $(command -v frobulator) ]]
-then
-	if [[ $(id -u -n) = "root" ]]
-	then
-		SUDO_HOME=/root
-
-		USER="${SUDO_USER}"
-
-		HOME=/home/"${USER}"
-	fi
-
-	if [[ -z $(command -v curl) ]]
-	then
-		yes | apt-get install curl
-	fi
-
-	if [ ! -d "${HOME}"/.local/bin ]
-	then
-		mkdir -p "${HOME}"/.local/bin
-	fi
-
-	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
-
-	chmod +x "${HOME}"/.local/bin/frobulator
-fi
+# if [ -f "${HOME}"/.local/bin/frobulator ]
+# then
+# 	rm -r -f "${HOME}"/.local/bin/frobulator
+# fi
+#
+# if [[ -z $(command -v frobulator) ]]
+# then
+# 	if [[ $(id -u -n) = "root" ]]
+# 	then
+# 		SUDO_HOME=/root
+#
+# 		USER="${SUDO_USER}"
+#
+# 		HOME=/home/"${USER}"
+# 	fi
+#
+# 	if [[ -z $(command -v curl) ]]
+# 	then
+# 		yes | apt-get install curl
+# 	fi
+#
+# 	if [ ! -d "${HOME}"/.local/bin ]
+# 	then
+# 		mkdir -p "${HOME}"/.local/bin
+# 	fi
+#
+# 	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
+#
+# 	chmod +x "${HOME}"/.local/bin/frobulator
+# fi
 
 . "${HOME}"/.local/bin/frobulator
 
@@ -1685,7 +1685,7 @@ then
 
 	for extension in ${extensions_list[@]}
 	do
-		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}") | while read -r model_path
+		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}") | while read -r model_path
 		do
 			# get model base directory from path
 
