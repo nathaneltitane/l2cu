@@ -63,7 +63,7 @@ do
 				ldr
 				mpd
 			)
-		;;
+			;;
 
 		-l|--ldr)
 			extension_option="ldr"
@@ -752,12 +752,18 @@ l2cu_render () {
 
 l2cu_pieces () {
 
+	# define pieces output files
+
+	part_count_file="${model_directory}"/parts.csv
+
+	pieces_file="${model_directory}"/pieces
+
 	# generate total piece count
 
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "parse"
+	frobulator.fwd "Parsing..."
 	echo
 
 	if [ -f "${pieces_file}" ]
@@ -1927,12 +1933,6 @@ then
 			# strip extension from model file name
 
 			model_name="${model_file%.*}"
-
-			# define pieces output files
-
-			part_count_file="${model_directory}"/parts.csv
-
-			pieces_file="${model_directory}"/pieces
 
 			# generate pieces count file
 
