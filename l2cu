@@ -938,7 +938,7 @@ help_colors () {
 	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
 	echo
 
-	sed -e 's/^/      /g' -e 's/_/ /g' ${colors} | cat
+	sed -e "s/^/${marker_nul}/g" -e "s/_/ /g" "${colors}" | cat
 
 	echo
 }
