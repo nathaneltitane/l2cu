@@ -933,6 +933,16 @@ parse_input () {
 	done
 }
 
+help_colors () {
+
+	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
+	echo
+
+	sed -e 's/^/      /g,s/_/ /g' ${colors} | cat
+
+	echo
+}
+
 parse_colors () {
 
 	parse_input
@@ -995,7 +1005,7 @@ parse_colors () {
 	frobulator.err "No color match for input" "[ ${input} ]"
 	echo
 
-	# DISPLAY COLOR HELP? //////////////////////////////////////////////////////
+	help_colors
 
 	frobulator.fwd "Exiting..."
 	echo
