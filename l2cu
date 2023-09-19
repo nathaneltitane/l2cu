@@ -822,7 +822,7 @@ l2cu_pieces () {
 		rm -rf "${part_count_file}"
 	fi
 
-	frobulator.inf "Pieces" "[ ${total_pieces} ]"
+	frobulator.fwd "Pieces" "[ ${total_pieces} ]"
 	echo
 }
 
