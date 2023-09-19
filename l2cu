@@ -411,6 +411,9 @@ then
 			fi
 		done
 	else
+		# set default to ldr file extension:
+		# mpd file extension officially deprecated in favor of ldr
+
 		frobulator.err "No file type specified."
 		echo
 
