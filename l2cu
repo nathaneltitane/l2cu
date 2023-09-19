@@ -427,11 +427,6 @@ then
 	fi
 fi
 
-if [ -z "${extension_option}" ]
-then
-	extension_option="mpd"
-fi
-
 if [ -z "${render_option}" ]
 then
 	render_option="full"
