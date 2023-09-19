@@ -353,9 +353,8 @@ stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 if [ -z "${directory}" ]
 then
 	frobulator.ask "Specify directory?"
-	echo
 
-	read reply
+	frobulator.read reply
 
 	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 	then
@@ -376,9 +375,8 @@ fi
 if [ -z "${file}" ]
 then
 	frobulator.ask "Specify model file type?"
-	echo
 
-	read reply
+	frobulator.read reply
 
 	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 	then
@@ -388,7 +386,7 @@ then
 
 		while true
 		do
-			read extension_option
+			frobulator.read extension_option
 
 			if [ -z "${extension_option}" ] || [[ ! "${extension_option}" =~ [all|dat|ldr|mpd] ]]
 			then
@@ -544,9 +542,9 @@ l2cu_prepare () {
 
 		trap 'rm -rf "${colors}"' EXIT
 
-		cat <<- 'COLORS' > "${colors}"
-		# ldraw colors
+		# push ldraw colors descriptors to temporary file
 
+		cat <<- 'COLORS' > "${colors}"
 		Black                                   0          #05131D
 		Blue                                    1          #0055BF
 		Green                                   2          #257A3E
@@ -924,13 +922,11 @@ parse_input () {
 
 	while true
 	do
-		read input
+		frobulator.read input
 
 		if [ -z "${input}" ]
 		then
-			frobulator.wrn "Input cannot be empty."
-			frobulator.wrn "Try again."
-			echo
+			frobulator.ipt "Input cannot be empty - Try again."
 		else
 			break
 		fi
@@ -998,6 +994,8 @@ parse_colors () {
 
 	frobulator.err "No color match for input" "[ ${input} ]"
 	echo
+
+	# DISPLAY COLOR HELP? //////////////////////////////////////////////////////
 
 	frobulator.fwd "Exiting..."
 	echo
@@ -1119,7 +1117,7 @@ l2cu_download () {
 		frobulator.ask "Specify download location?"
 		echo
 
-		read reply
+		frobulator.read reply
 
 		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 		then
