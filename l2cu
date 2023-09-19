@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="09-16-2023"
+version="09-19-2023"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -56,30 +56,43 @@ do
 			shift
 		;;
 
-		-a|--all)
-			extension_option="all"
+		-f|--file)
+			file="file"
+		;;
 
-			extensions_list=(
-				ldr
-				mpd
-			)
+			all)
+				extension_option="all"
+
+				extensions_list=(
+					dat
+					ldr
+					mpd
+				)
+				;;
+
+			dat)
+				extension_option="dat"
+
+				extensions_list=(
+					dat
+				)
 			;;
 
-		-l|--ldr)
-			extension_option="ldr"
+			ldr)
+				extension_option="ldr"
 
-			extensions_list=(
-				ldr
-			)
-		;;
+				extensions_list=(
+					ldr
+				)
+			;;
 
-		-m|--mpd)
-			extension_option="mpd"
+			mpd)
+				extension_option="mpd"
 
-			extensions_list=(
-				mpd
-			)
-		;;
+				extensions_list=(
+					mpd
+				)
+			;;
 
 		-e|--export)
 			option="export"
@@ -241,9 +254,12 @@ do
 			echo
 			echo -e "-d, --directory        Specify directory to load models from."
 			echo
-			echo -e "-a, --all              Selects ldr and mpd file formats as target."
-			echo -e "-l, --ldr              Selects ldr file format as target."
-			echo -e "-m, --mpd              Selects mpd file format as target."
+			echo -e "-f, --file             Specify model file extension to work on."
+			echo
+			echo -e "all                    Selects ldr and mpd file formats as target."
+			echo -e "dat                    Selects dat file format as target."
+			echo -e "ldr                    Selects ldr file format as target."
+			echo -e "mpd                    Selects mpd file format as target."
 			echo
 			echo -e "-e, --export           Exports model files using the following parameters:"
 			echo
@@ -354,6 +370,60 @@ then
 		echo
 
 		directory="${PWD}"
+	fi
+fi
+
+if [ -z "${file}" ]
+then
+	frobulator.ask "Specify model file type?"
+	echo
+
+	read reply
+
+	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+	then
+		# specify directory location or exit on 'cancel'
+
+		frobulator.ipt "Specify model file extension [ dat / ldr / mpd ]"
+
+		while true
+		do
+			read extension_option
+
+			if [ -z "${extension_option}" ] || [[ ! "${extension_option}" =~ [all|dat|ldr|mpd] ]]
+			then
+				frobulator.wrn "Unrecognized model file extension."
+				frobulator.wrn "Try again."
+				echo
+			else
+				if [[ "${extension_option}" = "all" ]]
+				then
+					extensions_list=(
+						dat
+						ldr
+						mpd
+					)
+				else
+					extensions_list=(
+						${extension_option}
+					)
+				fi
+
+				break
+			fi
+		done
+	else
+		frobulator.err "No file type specified."
+		echo
+
+		frobulator.fwd "Assuming defaults..."
+		echo
+
+		extension_option="mpd"
+
+		extensions_list=(
+			mpd
+		)
 	fi
 fi
 
@@ -822,7 +892,7 @@ l2cu_pieces () {
 		rm -rf "${part_count_file}"
 	fi
 
-	frobulator.fwd "Pieces" "[ ${total_pieces} ]"
+	frobulator.stp "Pieces" "[ ${total_pieces} ]"
 	echo
 }
 
