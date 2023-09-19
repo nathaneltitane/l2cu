@@ -995,14 +995,17 @@ parse_colors () {
 		then
 			# confirmation
 
-			frobulator.fwd "Confirming input value:"
+			frobulator.fwd "Confirming input..."
 			echo
+
 			frobulator.inf "Color name "              "[ ${ldraw_color_name} ]"
 			frobulator.inf "Color value "             "[ ${ldraw_color_value} ]"
 			frobulator.inf "Color hexadecimal value " "[ ${ldraw_color_hex_value} ]"
 			echo
 
 			return "${ldraw_color_value}"
+
+			frobulator.timeout
 		fi
 
 	done < "${colors}"
