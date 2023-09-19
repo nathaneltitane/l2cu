@@ -763,8 +763,6 @@ l2cu_pieces () {
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
 	echo
 
-
-
 	if [ -f "${pieces_file}" ]
 	then
 		rm -rf "${pieces_file}"
