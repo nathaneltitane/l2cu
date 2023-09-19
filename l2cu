@@ -763,8 +763,7 @@ l2cu_pieces () {
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Parsing..."
-	echo
+
 
 	if [ -f "${pieces_file}" ]
 	then
@@ -775,7 +774,7 @@ l2cu_pieces () {
 		--export-csv	"${part_count_file}"	\
 												"${model_path}" > "${sink}" 2>&1 &
 
-	frobulator.progress "generate"
+	frobulator.progress "parse"
 
 	# remove header
 
