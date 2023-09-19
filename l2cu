@@ -935,6 +935,11 @@ parse_input () {
 
 help_colors () {
 
+	frobulator.fwd "Displaying colors cheat sheet..."
+	echo
+
+	frobulator.timeout
+
 	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
 	echo
 
