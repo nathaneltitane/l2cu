@@ -186,7 +186,7 @@ do
 			option="instructions"
 		;;
 
-		-f|--modify)
+		-m|--modify)
 			option="modify"
 		;;
 
@@ -218,7 +218,7 @@ do
 			option="pieces"
 		;;
 
-		-w|--download)
+		-d|--download)
 			option="download"
 		;;
 
@@ -230,7 +230,7 @@ do
 				download_option="unofficial"
 			;;
 
-		-s|--list)
+		-l|--list)
 			option="make-list"
 
 			extensions_list=(
@@ -285,7 +285,7 @@ do
 			echo
 			echo -e "-i, --instructions     Generate model instruction file.                        [ pdf ]"
 			echo
-			echo -e "-f, --modify           Modifies model files using the following parameters:"
+			echo -e "-m, --modify           Modifies model files using the following parameters:"
 			echo
 			echo -e "lint                   Standardize and format model files for parsing."
 			echo -e "color                  Modify a part's color attribute only."
@@ -296,12 +296,12 @@ do
 			echo
 			echo -e "-p, --pieces           Display and generate pieces count file."
 			echo
-			echo -e "-w, --download         Download the LDraw parts library. [official | unofficlal]"
+			echo -e "-d, --download         Download the LDraw parts library. [official | unofficlal]"
 			echo
 			echo -e "official               Download the LDraw parts library - complete official archive."
 			echo -e "unofficial             Download the LDraw parts library - complete unofficial archive."
 			echo
-			echo -e "-s, --list             Generate the LDraw parts list for use with legacy editors."
+			echo -e "-l, --list             Generate the LDraw parts list for use with legacy editors."
 			echo
 			echo -e "description            Sort list by part description."
 			echo -e "number                 Sort list by part number."
@@ -1264,14 +1264,16 @@ then
 	echo
 fi
 
-if [ "${option}" = "overwrite" ]
+if [ "${overwrite_option}" = "overwrite" ]
 then
 	frobulator.wrn "WARNING"
 	echo
 
 	frobulator.wrn "Overwrite option selected:"
-	frobulator.wrn "Modifications will be written to model file directly!"
+	frobulator.nul "Modifications will be written to model file directly!"
 	echo
+
+	sleep 10
 fi
 
 frobulator.inf "Option" "[ ${option} ]"
