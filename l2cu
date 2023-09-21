@@ -1235,10 +1235,10 @@ if [ "${option}" = "export" ]       || \
 then
 	frobulator.stp "Extension option" "[ ${extension_option} ]"
 	echo
-fi
 
-frobulator.inf "Option" "[ ${option} ]"
-echo
+	frobulator.inf "Option" "[ ${option} ]"
+	echo
+fi
 
 if [ "${option}" = "download" ]
 then
