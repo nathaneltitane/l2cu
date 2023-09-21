@@ -461,7 +461,9 @@ l2cu_prepare () {
 	then
 		optimize=$(mktemp /tmp/optimize.XXXXXX)
 
-		trap 'rm -rf "${optimize}"' EXIT
+		trap 'rm				\
+				--recursive		\
+				--force			 "${optimize}"' EXIT
 
 		# push blender conversion script to temporary file
 
@@ -543,7 +545,9 @@ l2cu_prepare () {
 	then
 		colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
 
-		trap 'rm -rf "${colors}"' EXIT
+		trap 'rm				\
+				--recursive		\
+				--force			 "${colors}"' EXIT
 
 		# push ldraw colors descriptors to temporary file
 
@@ -831,7 +835,9 @@ l2cu_pieces () {
 
 	if [ -f "${pieces_file}" ]
 	then
-		rm -rf "${pieces_file}"
+		rm					\
+			--recursive		\
+			--force			 "${pieces_file}"
 	fi
 
 	leocad										\
@@ -885,7 +891,9 @@ l2cu_pieces () {
 
 	if [ -f "${part_count_file}" ]
 	then
-		rm -rf "${part_count_file}"
+		rm					\
+			--recursive		\
+			--force			 "${part_count_file}"
 	fi
 
 	frobulator.stp "Pieces" "[ ${total_pieces} ]"
@@ -1245,7 +1253,8 @@ echo
 if [ "${option}" = "export" ]       || \
    [ "${option}" = "render" ]       || \
    [ "${option}" = "instructions" ] || \
-   [ "${option}" = "modify" ]
+   [ "${option}" = "modify" ]       || \
+   [ "${option}" = "pieces" ]
 then
 	frobulator.stp "Extension option" "[ ${extension_option} ]"
 	echo
@@ -1345,7 +1354,9 @@ then
 
 			if [[ -d "${export_directory}" ]]
 			then
-				rm -rf "${export_directory}"
+				rm				\
+				--recursive		\
+				--force			"${export_directory}"
 			fi
 
 			frobulator.directory "${model_directory}" exports
@@ -1368,7 +1379,9 @@ then
 
 				# cleanup
 
-				rm -rf "${export_file_3ds}"
+				rm					\
+					--recursive		\
+					--force			 "${export_file_3ds}"
 			fi
 
 			# verify export size threshold
@@ -1559,7 +1572,9 @@ then
 
 			if [[ "${render_preset}" = "full" ]]
 			then
-				rm -rf "${full_directory}"
+				rm					\
+					--recursive		\
+					--force			 "${full_directory}"
 
 				frobulator.directory "${render_directory}" full
 
@@ -1568,7 +1583,9 @@ then
 
 			if [[ "${render_preset}" = "flat" ]]
 			then
-				rm -rf "${flat_directory}"
+				rm					\
+					--recursive		\
+					--force			 "${flat_directory}"
 
 				frobulator.directory "${render_directory}" flat
 
@@ -1577,7 +1594,9 @@ then
 
 			if [[ "${render_preset}" = "thumbnail" ]]
 			then
-				rm -rf "${thumbnail_directory}"
+				rm					\
+					--recursive		\
+					--force			 "${thumbnail_directory}"
 
 				frobulator.directory "${render_directory}" thumbnail
 
@@ -1694,7 +1713,9 @@ then
 
 			if [[ -d "${instructions_directory}" ]]
 			then
-				rm -rf "${instructions_directory}"
+				rm					\
+					--recursive		\
+					--force			 "${instructions_directory}"
 			fi
 
 			frobulator.directory "${model_directory}" instructions
@@ -1765,7 +1786,9 @@ then
 
 			# remove cache files
 
-			rm -rf "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+			rm					\
+				--recursive		\
+				--force			 "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 
 		done
 
@@ -2189,7 +2212,9 @@ then
 
 	# cleanup
 
-	rm -rf "._.lst" ".~.lst"
+	rm					\
+		--recursive		\
+		--force			 "._.lst" ".~.lst"
 
 	frobulator.scs "Done" "[ ${script} // List ]"
 	echo
