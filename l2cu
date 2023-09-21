@@ -787,7 +787,7 @@ l2cu_render () {
 	frobulator.inf "Rendering" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ Image Preset ${view[coordinates]} // ${render_file} ]"
+	frobulator.fwd "Output" "[ View Preset ${view[coordinates]} // ${render_file} ]"
 	echo
 
 	model_path="${1}"
