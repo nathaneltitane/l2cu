@@ -1020,6 +1020,8 @@ parse_colors () {
 
 	help_colors
 
+	frobulator.timeout
+
 	frobulator.fwd "Exiting..."
 	echo
 
