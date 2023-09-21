@@ -946,7 +946,7 @@ help_colors () {
 	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
 	echo
 
-	sed -e "s/^/${marker_nul}/g" -e "s/_/ /g" "${colors}" | cat
+	sed -e "s/^/${marker_idt}/g" -e "s/_/ /g" "${colors}" | cat
 
 	echo
 }
@@ -1233,9 +1233,12 @@ if [ "${option}" = "export" ]       || \
    [ "${option}" = "instructions" ] || \
    [ "${option}" = "modify" ]
 then
-	frobulator.wrn "Extension option" "[ ${extension_option} ]"
+	frobulator.stp "Extension option" "[ ${extension_option} ]"
 	echo
 fi
+
+frobulator.inf "Option" "[ ${option} ]"
+echo
 
 if [ "${option}" = "download" ]
 then
@@ -1266,9 +1269,6 @@ then
 	frobulator.inf "Modify option" "[ ${modify_option} ]"
 	echo
 fi
-
-frobulator.inf "Option" "[ ${option} ]"
-echo
 
 if [ "${overwrite_option}" = "overwrite" ]
 then
