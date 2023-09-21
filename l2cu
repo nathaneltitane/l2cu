@@ -1013,7 +1013,9 @@ parse_colors () {
 			frobulator.timeout
 		fi
 
-	done <<< "${colors}"
+	done < "${colors}"
+
+	frobulator.timeout
 
 	frobulator.err "No match for input" "[ ${input} ]"
 	echo
@@ -1123,7 +1125,7 @@ l2cu_write () {
 
 	if [ "${overwrite_option}" = "overwrite" ]
 	then
-		frobulator.wrn "Overwriting model file" "[ ${model_name} ]"
+		frobulator.wrn "Writing to model file original" "[ ${model_name} ]"
 		echo
 
 		frobulator.timeout
@@ -1820,7 +1822,10 @@ then
 
 				if [[ "${modify_option}" = "lint" ]]
 				then
-					frobulator.inf "Linting model" "[ ${model_file} ]"
+					frobulator.stp "Model"      "[ ${model_file} ]"
+					echo
+
+					frobulator.fwd "Linting..."
 					echo
 
 					# substitute windows carriage return for unix newline
@@ -1905,7 +1910,7 @@ then
 					then
 						color="${new_color}"
 
-						frobulator.inf "Model"      "[ ${model_file} ]"
+						frobulator.stp "Model"      "[ ${model_file} ]"
 						echo
 
 						frobulator.inf "Modifying " "[ ${old_color} ]"
@@ -1924,7 +1929,7 @@ then
 					then
 						part="${new_part}"
 
-						frobulator.inf "Model"     "[ ${model_file} ]"
+						frobulator.stp "Model"     "[ ${model_file} ]"
 						echo
 
 						frobulator.inf "Modifying" "[ ${old_part} ]"
@@ -1945,7 +1950,7 @@ then
 						then
 							color="${new_color}"
 
-							frobulator.inf "Model"     "[ ${model_file} ]"
+							frobulator.stp "Model"     "[ ${model_file} ]"
 							echo
 
 							frobulator.inf "Part"      "[ ${part} ]"
@@ -1972,7 +1977,10 @@ then
 							color="0"
 							descriptor="ldr\n0 STEP\n"
 
-							frobulator.inf "Stepping"      "[ ${model_file} ]"
+							frobulator.stp "Model"     "[ ${model_file} ]"
+							echo
+
+							frobulator.inf "Stepping"  "[ ${model_file} ]"
 							echo
 						fi
 					fi
