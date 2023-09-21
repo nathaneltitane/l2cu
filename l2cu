@@ -722,10 +722,10 @@ l2cu_optimize () {
 
 l2cu_export () {
 
-	frobulator.inf "Exporting" "[ ${export_name} // ${model_file} ]"
+	frobulator.inf "Exporting" "[ ${model_file} ]"
 	echo
 
-	frobulator.fwd "Output" "[ ${export_file} ]"
+	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
 	echo
 
 	leocad											\
@@ -907,7 +907,7 @@ l2cu_instructions () {
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ ${instructions_file} ]"
+	frobulator.fwd "Output" "[ Instructions // ${instructions_file} ]"
 	echo
 
 	export_option="pdf"
@@ -1387,6 +1387,8 @@ then
 			# verify export size threshold
 
 			l2cu_size
+
+			echo
 		done
 
 		# unset IFS
