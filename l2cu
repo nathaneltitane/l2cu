@@ -1225,6 +1225,9 @@ l2cu_prepare
 
 # confirmation /////////////////////////////////////////////////////////////////
 
+frobulator.fwd "Confirming settings..."
+echo
+
 if [ "${option}" = "export" ]       || \
    [ "${option}" = "render" ]       || \
    [ "${option}" = "instructions" ] || \
@@ -1264,6 +1267,9 @@ then
 	echo
 fi
 
+frobulator.inf "Option" "[ ${option} ]"
+echo
+
 if [ "${overwrite_option}" = "overwrite" ]
 then
 	frobulator.wrn "WARNING"
@@ -1272,12 +1278,9 @@ then
 	frobulator.wrn "Overwrite option selected:"
 	frobulator.nul "Modifications will be written to model file directly!"
 	echo
-
-	sleep 10
 fi
 
-frobulator.inf "Option" "[ ${option} ]"
-echo
+frobulator.timeout
 
 frobulator.fwd "Proceeding..."
 echo
