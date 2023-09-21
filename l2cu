@@ -1280,7 +1280,7 @@ then
 	echo
 fi
 
-frobulator.timeout
+frobulator.countdown 3
 
 frobulator.fwd "Proceeding..."
 echo
