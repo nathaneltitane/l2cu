@@ -1016,6 +1016,8 @@ parse_colors () {
 	frobulator.err "No match for input" "[ ${input} ]"
 	echo
 
+	frobulator.timeout
+
 	help_colors
 
 	frobulator.fwd "Exiting..."
