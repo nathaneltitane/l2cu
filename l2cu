@@ -374,7 +374,7 @@ fi
 
 if [ -z "${file}" ]
 then
-	frobulator.ask "Specify model file type?"
+	frobulator.ask "Specify model file type? [ simple / multipart ]"
 
 	frobulator.read reply
 
@@ -780,10 +780,10 @@ l2cu_render () {
 
 	# render model
 
-	frobulator.inf "Rendering" "[ Instance ${view[coordinates]} // ${model_name} ]"
+	frobulator.inf "Rendering" "[ Preset ${view[coordinates]} // ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ ${render_file} ]"
+	frobulator.fwd "Output" "[ Image // ${render_file} ]"
 	echo
 
 	model_path="${1}"
@@ -938,7 +938,7 @@ parse_input () {
 
 help_colors () {
 
-	frobulator.fwd "Displaying colors cheat sheet..."
+	frobulator.fwd "Displaying official colors selections..."
 	echo
 
 	frobulator.timeout
@@ -1001,9 +1001,9 @@ parse_colors () {
 			frobulator.fwd "Confirming input..."
 			echo
 
-			frobulator.inf "Color name "              "[ ${ldraw_color_name} ]"
-			frobulator.inf "Color value "             "[ ${ldraw_color_value} ]"
-			frobulator.inf "Color hexadecimal value " "[ ${ldraw_color_hex_value} ]"
+			frobulator.inf "Color name"              "[ ${ldraw_color_name} ]"
+			frobulator.inf "Color value"             "[ ${ldraw_color_value} ]"
+			frobulator.inf "Color hexadecimal value" "[ ${ldraw_color_hex_value} ]"
 			echo
 
 			return "${ldraw_color_value}"
@@ -1013,7 +1013,7 @@ parse_colors () {
 
 	done < "${colors}"
 
-	frobulator.err "No color match for input" "[ ${input} ]"
+	frobulator.err "No match for input" "[ ${input} ]"
 	echo
 
 	help_colors
@@ -1087,7 +1087,7 @@ parse_modification () {
 
 		part_selection="${part_input}"
 
-		frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
+		frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
 
 		parse_colors
 
@@ -1095,7 +1095,7 @@ parse_modification () {
 
 		old_color="${ldraw_color_value}"
 
-		frobulator.ipt "Enter color to set" "[ name / number / hexadecimal ]"
+		frobulator.ipt "Enter part color to set" "[ name / number / hexadecimal ]"
 
 		parse_colors
 
@@ -1111,15 +1111,14 @@ l2cu_write () {
 
 	if [ "${overwrite_option}" = "overwrite" ]
 	then
-		frobulator.wrn "Overwriting model file" "[ overwrite ]"
+		frobulator.wrn "Overwriting model file" "[ ${model_name} ]"
 		echo
 
-		frobulator.inf "Writing" "[ ${model_file} ]"
-		echo
+		frobulator.timeout
 
 		mv "${model_buffer}" "${model_buffer%.tmp}"
 	else
-		frobulator.wrn "Writing to model file copy."
+		frobulator.wrn "Writing to model file copy" "[ ${model_buffer} ]"
 		echo
 
 		frobulator.fwd "Writing..."
@@ -1151,7 +1150,7 @@ l2cu_download () {
 			frobulator.wrn "No directory location specified."
 			echo
 
-			frobulator.wrn "Using current directory." "[ ${PWD} ]"
+			frobulator.wrn "Defaulting to current directory" "[ ${PWD} ]"
 			echo
 
 			directory="${PWD}"
