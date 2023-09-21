@@ -1049,6 +1049,7 @@ parse_modification () {
 
 		parse_colors
 
+		# substitution:
 		# $? returning wrong arbitrary value
 
 		old_color="${ldraw_color_value}"
@@ -1057,6 +1058,7 @@ parse_modification () {
 
 		parse_colors
 
+		# substitution:
 		# $? returning wrong arbitrary value
 
 		new_color="${ldraw_color_value}"
@@ -1068,6 +1070,7 @@ parse_modification () {
 
 		parse_parts
 
+		# substitution:
 		# $? returning wrong arbitrary value
 
 		old_part="${part_input}"
@@ -1076,6 +1079,7 @@ parse_modification () {
 
 		parse_parts
 
+		# substitution:
 		# $? returning wrong arbitrary value
 
 		new_part="${part_input}"
@@ -1087,6 +1091,7 @@ parse_modification () {
 
 		parse_parts
 
+		# substitution:
 		# $? returning wrong arbitrary value
 
 		part_selection="${part_input}"
@@ -1094,7 +1099,7 @@ parse_modification () {
 		frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
 
 		parse_colors
-
+		# substitution:
 		# $? returning wrong arbitrary value
 
 		old_color="${ldraw_color_value}"
@@ -1103,7 +1108,8 @@ parse_modification () {
 
 		parse_colors
 
-		# $? returning wrong arbitrary value for $new_color
+		# substitution:
+		# $? returning wrong arbitrary value
 
 		new_color="${ldraw_color_value}"
 	fi
