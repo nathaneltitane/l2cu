@@ -706,10 +706,10 @@ l2cu_optimize () {
 
 	# optimize model mesh
 
-	frobulator.inf "Exporting" "[ ${export_name} // ${model_file} ]"
+	frobulator.inf "Exporting" "[ ${model_file} ]"
 	echo
 
-	frobulator.fwd "Output" "[ ${export_file} ]"
+	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
 	echo
 
 	blender								\
@@ -775,7 +775,7 @@ l2cu_size () {
 		echo
 
 		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B!"
-		frobulator.wrn "You may experience higher than average loading times."
+		frobulator.nul "You may experience higher than average loading times."
 		echo
 	fi
 }
@@ -784,10 +784,10 @@ l2cu_render () {
 
 	# render model
 
-	frobulator.inf "Rendering" "[ Preset ${view[coordinates]} // ${model_name} ]"
+	frobulator.inf "Rendering" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ Image // ${render_file} ]"
+	frobulator.fwd "Output" "[ Image Preset ${view[coordinates]} // ${render_file} ]"
 	echo
 
 	model_path="${1}"
