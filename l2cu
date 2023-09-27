@@ -142,6 +142,11 @@ do
 				render_preset="flat"
 			;;
 
+			overlay)
+				render_option="overlay"
+				render_preset="overlay"
+			;;
+
 			thumbnail)
 				render_option="thumbnail"
 				render_preset="thumbnail"
@@ -1435,6 +1440,8 @@ then
 
 			flat_directory="${render_directory}"/flat
 
+			overlay_directory="${render_directory}"/overlay
+
 			thumbnail_directory="${render_directory}"/thumbnail
 
 			# define coordinate values and labels
@@ -1550,6 +1557,13 @@ then
 				line_width=0
 			fi
 
+			if [[ "${render_preset}" = "overlay" ]]
+			then
+				position=(1)
+				shading=full
+				line_width=1
+			fi
+
 			if [[ "${render_preset}" = "thumbnail" ]]
 			then
 				height=512
@@ -1594,6 +1608,17 @@ then
 				cd "${flat_directory}"
 			fi
 
+			if [[ "${render_preset}" = "overlay" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${overlay_directory}"
+
+				frobulator.directory "${render_directory}" overlay
+
+				cd "${flat_directory}"
+			fi
+
 			if [[ "${render_preset}" = "thumbnail" ]]
 			then
 				rm					\
@@ -1630,6 +1655,15 @@ then
 				mv												\
 					"${model_name}-${view[1]}.${extension}"		\
 					"${thumbnail_directory}"/thumbnail."${extension}"
+			fi
+
+			if [[ "${render_option}" = "overlay" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${thumbnail_directory}"/overlay."${extension}"
 			fi
 		done
 			# unset IFS
@@ -2226,3 +2260,4 @@ fi
 
 frobulator.scs "Done" "[ ${script} ]"
 echo
+
