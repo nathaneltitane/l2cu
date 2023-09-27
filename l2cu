@@ -1663,7 +1663,7 @@ then
 
 				mv												\
 					"${model_name}-${view[1]}.${extension}"		\
-					"${thumbnail_directory}"/overlay."${extension}"
+					"${overlay_directory}"/overlay."${extension}"
 			fi
 		done
 			# unset IFS
