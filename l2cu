@@ -1561,7 +1561,7 @@ then
 			then
 				position=(1)
 				shading=full
-				line_width=4
+				line_width=2
 			fi
 
 			if [[ "${render_preset}" = "thumbnail" ]]
