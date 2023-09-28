@@ -1319,7 +1319,7 @@ if [ "${option}" = "export" ]
 then
 	for extension in ${extensions_list[@]}
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*") )
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*" | sort) )
 
 		# set IFS
 
@@ -1412,7 +1412,7 @@ if [ "${option}" = "render" ]
 then
 	for extension in ${extensions_list[@]}
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*") )
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*" | sort) )
 
 		# set IFS
 
@@ -1561,7 +1561,7 @@ then
 			then
 				position=(1)
 				shading=full
-				line_width=1
+				line_width=4
 			fi
 
 			if [[ "${render_preset}" = "thumbnail" ]]
@@ -1682,7 +1682,7 @@ if [[ "${option}" = "instructions" ]]
 then
 	for extension in ${extensions_list[@]}
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}"))
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort)
 
 		# set IFS
 
@@ -1849,7 +1849,7 @@ then
 
 	for extension in ${extensions_list[@]}
 	do
-		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}") | while read -r model_path
+		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}" | sort) | while read -r model_path
 		do
 			# get model base directory from path
 
@@ -2078,7 +2078,7 @@ if [[ "${option}" = "pieces" ]]
 then
 	for extension in ${extensions_list[@]}
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}"))
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort) )
 
 		# set IFS
 
