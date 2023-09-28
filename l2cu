@@ -1682,7 +1682,7 @@ if [[ "${option}" = "instructions" ]]
 then
 	for extension in ${extensions_list[@]}
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort)
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort) )
 
 		# set IFS
 
