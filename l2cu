@@ -1428,8 +1428,13 @@ fi
 
 if [ "${option}" = "instructions" ]
 then
-	frobulator.inf "Instructions option" "[ ${instructions_option} ]"
-	echo
+	if [ -z "${instructions_option}" ]
+	then
+		:
+	else
+		frobulator.inf "Instructions option" "[ ${instructions_option} ]"
+		echo
+	fi
 fi
 
 if [ "${option}" = "modify" ]
