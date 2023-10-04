@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # dependencies /////////////////////////////////////////////////////////////////
 
 if [ -f "${HOME}"/.local/bin/frobulator ]
@@ -43,7 +45,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="09-19-2023"
+version="10-04-2023"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -223,6 +225,10 @@ do
 			option="pieces"
 		;;
 
+		-s|--sample)
+			option="sample"
+		;;
+
 		-d|--download)
 			option="download"
 		;;
@@ -300,6 +306,8 @@ do
 			echo -e "overwrite              Overwrite the original model file after modification."
 			echo
 			echo -e "-p, --pieces           Display and generate pieces count file."
+			echo
+			echo -e "-s, --sample           Generate instructions sample preview file."
 			echo
 			echo -e "-d, --download         Download the LDraw parts library. [official | unofficlal]"
 			echo
@@ -930,6 +938,131 @@ l2cu_instructions () {
 															"${instructions_model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
+
+	# remove cache files
+
+	rm					\
+		--recursive		\
+		--force			 "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+
+}
+
+l2cu_sample () {
+
+	# generate model instructions sample
+
+	frobulator.inf "Generating instructions sample" "[ ${model_name} ]"
+	echo
+
+	frobulator.fwd "Output" "[ Sample // ${instructions_file} ]"
+	echo
+
+	instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
+
+	sample_page_offset=25
+
+	sample_page_first=2
+	sample_page_last=$(( ${instructions_page_count} - ${sample_page_offset} ))
+
+	sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
+
+	export_file_name="sample"
+
+	export_option="png"
+
+	pdftoppm							\
+		-"${export_option}"				\
+		-f "${sample_page_random}"		\
+		-l "${sample_page_random}"		\
+										"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}" > "${sink}" 2>&1 &
+
+	frobulator.progress "generate"
+
+	mv "${instructions_directory}"/sample* "${instructions_directory}"/"${export_file_name}"."${export_option}"
+
+}
+
+prepare_instructions () {
+
+	# enter model directory
+
+	cd "${model_directory}" || exit 1
+
+	# generate instructions directory
+
+	if [[ -d "${instructions_directory}" ]]
+	then
+		rm					\
+			--recursive		\
+			--force			 "${instructions_directory}"
+	fi
+
+	frobulator.directory "${model_directory}" instructions
+
+	# copy logo file
+
+	frobulator.copy "${instructions_base_directory}" "${instructions_directory}" logo.png
+
+}
+
+parse_instructions () {
+
+	# prepare instructions model file
+
+	while read -r line
+	do
+		# substitute variables
+
+		# title
+
+		if [[ $line =~ configuration_title_string ]]
+		then
+			configuration_title=$(cat "${model_path%/*}"/title)
+
+			configuration_title_string=${configuration_title//$'\n'/ }
+
+			configuration_title_string=${configuration_title_string//\<\/\br\>/}
+
+			line=${line/'${configuration_title_string}'/${configuration_title_string}}
+		fi
+
+		# pieces
+
+		if [[ $line =~ configuration_pieces ]]
+		then
+			configuration_pieces=$(cat "${model_path%/*}"/pieces)
+
+			line=${line/'${configuration_pieces}'/${configuration_pieces}}
+		fi
+
+		# category
+
+		if [[ $line =~ configuration_url_category ]]
+		then
+			configuration_url_category=$(cat "${model_path%/*/*}"/title)
+
+			configuration_url_category="${configuration_url_category// /-}"
+
+			line=${line/'${configuration_url_category}'/${configuration_url_category}}
+		fi
+
+		# url
+
+		if [[ $line =~ configuration_url_name ]]
+		then
+			configuration_url_name="${model_name^^}"
+
+			line=${line/'${configuration_url_name}'/${configuration_url_name}}
+		fi
+
+		# write line to instructions file
+
+		echo "${line}"
+
+	done < /media/internal/Lego/lpub3d/configuration > "${instructions_directory}"/configuration
+
+	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
+
 }
 
 parse_input () {
@@ -1259,7 +1392,8 @@ if [ "${option}" = "export" ]       || \
    [ "${option}" = "render" ]       || \
    [ "${option}" = "instructions" ] || \
    [ "${option}" = "modify" ]       || \
-   [ "${option}" = "pieces" ]
+   [ "${option}" = "pieces" ]       || \
+   [ "${option}" = "sample" ]
 then
 	frobulator.stp "Extension option" "[ ${extension_option} ]"
 	echo
@@ -1718,6 +1852,8 @@ then
 
 			instructions_base_directory=/media/internal/Lego/lpub3d
 
+			# define instructions configuration / recipe
+
 			instructions_configuration_file="${instructions_base_directory}"/configuration
 
 			# reset IFS
@@ -1741,90 +1877,19 @@ then
 
 			l2cu_pieces
 
-			# enter model directory
+			# prepare instructions setup
 
-			cd "${model_directory}" || exit 1
+			prepare_instructions
 
-			# generate instructions directory
-
-			if [[ -d "${instructions_directory}" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${instructions_directory}"
-			fi
-
-			frobulator.directory "${model_directory}" instructions
-
-			# copy logo file
-
-			frobulator.copy "${instructions_base_directory}" "${instructions_directory}" logo.png
-
-			# prepare instructions model file
-
-			while read -r line
-			do
-				# substitute variables
-
-				# title
-
-				if [[ $line =~ configuration_title_string ]]
-				then
-					configuration_title=$(cat "${model_path%/*}"/title)
-
-					configuration_title_string=${configuration_title//$'\n'/ }
-
-					configuration_title_string=${configuration_title_string//\<\/\br\>/}
-
-					line=${line/'${configuration_title_string}'/${configuration_title_string}}
-				fi
-
-				# pieces
-
-				if [[ $line =~ configuration_pieces ]]
-				then
-					configuration_pieces=$(cat "${model_path%/*}"/pieces)
-
-					line=${line/'${configuration_pieces}'/${configuration_pieces}}
-				fi
-
-				# category
-
-				if [[ $line =~ configuration_url_category ]]
-				then
-					configuration_url_category=$(cat "${model_path%/*/*}"/title)
-
-					configuration_url_category="${configuration_url_category// /-}"
-
-					line=${line/'${configuration_url_category}'/${configuration_url_category}}
-				fi
-
-				# url
-
-				if [[ $line =~ configuration_url_name ]]
-				then
-					configuration_url_name="${model_name^^}"
-
-					line=${line/'${configuration_url_name}'/${configuration_url_name}}
-				fi
-
-				# write line to instructions file
-
-				echo "${line}"
-
-			done < /media/internal/Lego/lpub3d/configuration > "${instructions_directory}"/configuration
-
-			cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
+			parse_instructions
 
 			# generate instructions
 
 			l2cu_instructions
 
-			# remove cache files
+			# generate instructions sample
 
-			rm					\
-				--recursive		\
-				--force			 "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+			l2cu_sample
 
 		done
 
@@ -2108,6 +2173,87 @@ then
 
 	frobulator.scs "Done" "[ ${script} // Pieces ]"
 	echo
+fi
+
+# sample ///////////////////////////////////////////////////////////////////////
+
+if [[ "${option}" = "sample" ]]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort) )
+
+		# set IFS
+
+		IFS=$'\n'
+
+		for model_path in ${models_list[@]}
+		do
+			# get model base directory from path
+
+			model_directory="${model_path%/*}"
+
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# use model directory as root
+
+			model_directory="${model_path%/*}"
+
+			# define instruction output directories
+
+			instructions_directory="${model_directory}"/instructions
+
+			instructions_model_path="${instructions_directory}"/instructions."${extension}"
+
+			instructions_file="${model_name}".pdf
+
+			instructions_file_path="${instructions_directory}"/"${instructions_file}"
+
+			instructions_base_directory=/media/internal/Lego/lpub3d
+
+			instructions_configuration_file="${instructions_base_directory}"/configuration
+
+			# reset IFS
+
+			IFS=''
+
+			if [[ ! -f "${instructions_file_path}" ]]
+			then
+				frobulator.wrn "Instructions file not found" "[ ${model_name} ]"
+				echo
+
+				frobulator.inf "Instructions file required to proceed"
+				echo
+
+				frobulator.fwd "Generating..."
+				echo
+
+				# prepare instructions setup
+
+				prepare_instructions
+
+				parse_instructions
+
+				# generate instructions
+
+				l2cu_instructions
+
+			else
+				# generate sample
+
+				l2cu_sample
+
+				break
+			fi
+
+		done
+	done
 fi
 
 # download /////////////////////////////////////////////////////////////////////
