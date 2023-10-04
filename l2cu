@@ -966,15 +966,21 @@ l2cu_sample () {
 
 	export_option="png"
 
+	if [[ -f "${instructions_directory}"/"sample*.png" ]]
+	then
+		rm	\
+			--recursive		\
+			--force			\
+							"${instructions_directory}"/"sample*.png"
+	fi
+
 	pdftoppm							\
 		-"${export_option}"				\
 		-f "${sample_page_random}"		\
-		-l "${sample_page_random}"		\
+		-singlefile						\
 										"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
-
-	#mv "${instructions_directory}"/sample* "${instructions_directory}"/"${export_file_name}"."${export_option}"
 
 }
 
