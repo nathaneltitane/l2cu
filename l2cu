@@ -938,7 +938,8 @@ l2cu_instructions () {
 
 	rm					\
 		--recursive		\
-		--force			 "${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+		--force			"${instructions_directory}"/[lL][pP][uU][bB][3][dD] \
+						"${instructions_directory}"/logo.png
 
 }
 
