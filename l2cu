@@ -463,7 +463,7 @@ fi
 
 # functions ////////////////////////////////////////////////////////////////////
 
-l2cu_prepare () {
+l2cu_initialize () {
 
 	if [[ "${option}" = "export" ]]
 	then
@@ -751,7 +751,7 @@ l2cu_export () {
 	fi
 }
 
-l2cu_size () {
+l2cu_export_size () {
 
 	# validate export file size
 
@@ -943,7 +943,7 @@ l2cu_instructions () {
 
 }
 
-l2cu_sample () {
+l2cu_instructions_sample () {
 
 	# generate model instructions sample
 
@@ -984,7 +984,7 @@ l2cu_sample () {
 
 }
 
-prepare_instructions () {
+l2cu_prepare_instructions () {
 
 	# enter model directory
 
@@ -1007,7 +1007,7 @@ prepare_instructions () {
 
 }
 
-parse_instructions () {
+l2cu_parse_instructions () {
 
 	# prepare instructions model file
 
@@ -1067,7 +1067,7 @@ parse_instructions () {
 
 }
 
-parse_input () {
+l2cu_parse_input () {
 
 	# read and parse user input
 
@@ -1084,7 +1084,7 @@ parse_input () {
 	done
 }
 
-help_colors () {
+l2cu_help_colors () {
 
 	frobulator.fwd "Displaying official colors selections..."
 	echo
@@ -1099,7 +1099,7 @@ help_colors () {
 	echo
 }
 
-parse_colors () {
+l2cu_parse_colors () {
 
 	parse_input
 
@@ -1170,7 +1170,7 @@ parse_colors () {
 
 	frobulator.timeout
 
-	help_colors
+	l2cu_help_colors
 
 	frobulator.timeout
 
@@ -1180,7 +1180,7 @@ parse_colors () {
 	exit 1
 }
 
-parse_parts () {
+l2cu_parse_parts () {
 
 	# read and parse part selection
 
@@ -1191,7 +1191,7 @@ parse_parts () {
 	return "${part_input}"
 }
 
-parse_modification () {
+l2cu_parse_modification () {
 
 	# read and parse modification input request
 
@@ -1383,7 +1383,7 @@ list=()
 
 # generate necessary process files
 
-l2cu_prepare
+l2cu_initialize
 
 # confirmation /////////////////////////////////////////////////////////////////
 
@@ -1536,7 +1536,7 @@ then
 
 			# verify export size threshold
 
-			l2cu_size
+			l2cu_export_size
 
 			echo
 		done
@@ -1896,7 +1896,7 @@ then
 
 					# prepare instructions setup
 
-					prepare_instructions
+					l2cu_prepare_instructions
 
 					parse_instructions
 
@@ -1906,12 +1906,12 @@ then
 
 					# generate sample
 
-					l2cu_sample
+					l2cu_instructions_sample
 
 				else
 					# generate sample
 
-					l2cu_sample
+					l2cu_instructions_sample
 
 				fi
 
@@ -1938,7 +1938,7 @@ then
 
 				# prepare instructions setup
 
-				prepare_instructions
+				l2cu_prepare_instructions
 
 				parse_instructions
 
@@ -1948,7 +1948,7 @@ then
 
 				# generate instructions sample
 
-				l2cu_sample
+				l2cu_instructions_sample
 			fi
 
 		done
