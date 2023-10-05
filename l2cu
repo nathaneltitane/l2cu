@@ -965,7 +965,7 @@ l2cu_instructions_samples () {
 
 	export_option="png"
 
-	for (( i=1; i<=3; ++i ))
+	for (( i=1; i<=6; ++i ))
 	do
 		instance="0${i}"
 
