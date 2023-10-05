@@ -953,19 +953,6 @@ l2cu_instructions_sample () {
 	frobulator.fwd "Output" "[ Sample // ${instructions_file} ]"
 	echo
 
-	instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
-
-	sample_page_offset=25
-
-	sample_page_first=2
-	sample_page_last=$(( ${instructions_page_count} - ${sample_page_offset} ))
-
-	sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
-
-	export_file_name="sample"
-
-	export_option="png"
-
 	if [[ -f "${instructions_directory}"/"sample*.png" ]]
 	then
 		rm	\
@@ -974,14 +961,37 @@ l2cu_instructions_sample () {
 							"${instructions_directory}"/"sample*.png"
 	fi
 
-	pdftoppm							\
-		-"${export_option}"				\
-		-f "${sample_page_random}"		\
-		-singlefile						\
-										"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}" > "${sink}" 2>&1 &
+	export_file_name="sample"
 
-	frobulator.progress "generate"
+	export_option="png"
 
+	for (( i=1; i<=3; ++i ))
+	do
+		instance="0${i}"
+
+		instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
+
+		sample_page_offset=25
+
+		sample_page_first=2
+		sample_page_last=$(( ${instructions_page_count} - ${sample_page_offset} ))
+
+		sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
+
+
+		frobulator.inf "Generating sample file" "[ Sample ${instance} ]"
+		echo
+
+		pdftoppm							\
+			-"${export_option}"				\
+			-f "${sample_page_random}"		\
+			-singlefile						\
+											"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}-${instance}" > "${sink}" 2>&1 &
+
+		frobulator.progress "generate"
+
+
+	done
 }
 
 l2cu_prepare_instructions () {
