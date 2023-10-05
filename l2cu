@@ -965,9 +965,9 @@ l2cu_instructions_sample () {
 
 	export_option="png"
 
-	for (( i=1; i<=3; ++i ))
+	for (( instance=1; instance<=3; ++instance ))
 	do
-		instance="0${i}"
+		instance="0${instance}"
 
 		instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
 
