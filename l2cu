@@ -1889,14 +1889,14 @@ then
 				frobulator.cpt "Complete" "[ ${script} // Pieces ]"
 				echo
 
-			elif [[ "${instructions_option}" = "sample" ]]
+			elif [[ "${instructions_option}" = "samples" ]]
 			then
 				if [[ ! -f "${instructions_file_path}" ]]
 				then
-					frobulator.wrn "Instructions file not found" "[ ${model_name} ]"
+					frobulator.err "Instructions file not found" "[ ${model_name} ]"
 					echo
 
-					frobulator.inf "Instructions file required to proceed"
+					frobulator.wrn "Instructions file required to proceed"
 					echo
 
 					frobulator.fwd "Generating..."
