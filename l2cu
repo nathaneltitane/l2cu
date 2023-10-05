@@ -193,8 +193,8 @@ do
 			pieces)
 				instructions_option="pieces"
 			;;
-			sample)
-				instructions_option="sample"
+			samples)
+				instructions_option="samples"
 			;;
 
 		-m|--modify)
@@ -293,7 +293,7 @@ do
 			echo -e "-i, --instructions     Generate model instruction file.                        [ pdf ]"
 			echo
 			echo -e "pieces                 Display and generate pieces count file."
-			echo -e "sample                 Generate instructions sample preview file."
+			echo -e "samples                Generate instructions sample preview files.             [ png ] [ Default count: 3 ]"
 			echo
 			echo -e "-m, --modify           Modifies model files using the following parameters:"
 			echo
@@ -943,14 +943,14 @@ l2cu_instructions () {
 
 }
 
-l2cu_instructions_sample () {
+l2cu_instructions_samples () {
 
-	# generate model instructions sample
+	# generate model instructions samples
 
-	frobulator.inf "Generating instructions sample" "[ ${model_name} ]"
+	frobulator.inf "Generating instructions samples" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ Sample // ${instructions_file} ]"
+	frobulator.fwd "Output" "[ Samples // ${instructions_file} ]"
 	echo
 
 	if [[ -f "${instructions_directory}"/"sample*.png" ]]
@@ -978,8 +978,7 @@ l2cu_instructions_sample () {
 
 		sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
 
-
-		frobulator.inf "Generating sample file" "[ Sample ${instance} ]"
+		frobulator.inf "Generating sample file" "[ Instance ${instance} // Sample ]"
 		echo
 
 		pdftoppm							\
@@ -989,7 +988,6 @@ l2cu_instructions_sample () {
 											"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}-${instance}" > "${sink}" 2>&1 &
 
 		frobulator.progress "generate"
-
 
 	done
 }
@@ -1556,7 +1554,7 @@ then
 		IFS=''
 	done
 
-	frobulator.scs "Done" "[ ${script} // Export ]"
+	frobulator.cpt "Complete" "[ ${script} // Export ]"
 	echo
 
 fi
@@ -1826,7 +1824,7 @@ then
 			IFS=''
 	done
 
-	frobulator.scs "Done" "[ ${script} // Render ]"
+	frobulator.cpt "Complete" "[ ${script} // Render ]"
 	echo
 
 fi
@@ -1888,7 +1886,7 @@ then
 
 				l2cu_pieces
 
-				frobulator.scs "Done" "[ ${script} // Pieces ]"
+				frobulator.cpt "Complete" "[ ${script} // Pieces ]"
 				echo
 
 			elif [[ "${instructions_option}" = "sample" ]]
@@ -1908,7 +1906,7 @@ then
 
 					l2cu_prepare_instructions
 
-					parse_instructions
+					l2cu_parse_instructions
 
 					# generate instructions
 
@@ -1916,16 +1914,16 @@ then
 
 					# generate sample
 
-					l2cu_instructions_sample
+					l2cu_instructions_samples
 
 				else
 					# generate sample
 
-					l2cu_instructions_sample
+					l2cu_instructions_samples
 
 				fi
 
-				frobulator.scs "Done" "[ ${script} // Sample ]"
+				frobulator.cpt "Complete" "[ ${script} // Samples ]"
 				echo
 
 			else
@@ -1950,7 +1948,7 @@ then
 
 				l2cu_prepare_instructions
 
-				parse_instructions
+				l2cu_parse_instructions
 
 				# generate instructions
 
@@ -1958,14 +1956,14 @@ then
 
 				# generate instructions sample
 
-				l2cu_instructions_sample
+				l2cu_instructions_samples
 			fi
 
 		done
 
 	done
 
-	frobulator.scs "Done" "[ ${script} // Instructions ]"
+	frobulator.cpt "Complete" "[ ${script} // Instructions ]"
 	echo
 
 fi
@@ -2202,7 +2200,7 @@ then
 		done
 	done
 
-	frobulator.scs "Done" "[ ${script} // Modify ]"
+	frobulator.cpt "Complete" "[ ${script} // Modify ]"
 	echo
 
 fi
@@ -2242,7 +2240,7 @@ then
 			"${directory}"/ldraw.zip
 	fi
 
-	frobulator.scs "Done" "[ ${script} // Download ]"
+	frobulator.cpt "Complete" "[ ${script} // Download ]"
 	echo
 fi
 
@@ -2349,7 +2347,7 @@ then
 		--recursive		\
 		--force			 "._.lst" ".~.lst"
 
-	frobulator.scs "Done" "[ ${script} // List ]"
+	frobulator.cpt "Complete" "[ ${script} // List ]"
 	echo
 fi
 
