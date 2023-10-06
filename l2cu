@@ -1940,7 +1940,7 @@ then
 
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
-					Frobulator.wrn "Model work in progress" "[ Instructions ]"
+					frobulator.wrn "Model work in progress" "[ Instructions ]"
 					echo
 
 					l2cu_instructions_samples
