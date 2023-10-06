@@ -962,7 +962,7 @@ l2cu_instructions_samples () {
 		for (( i=1; i<=6; ++i ))
 		do
 			cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/sample-${instance}.png
-		fi
+		done
 
 	else
 		# generate samples
