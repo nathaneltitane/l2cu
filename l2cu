@@ -953,43 +953,58 @@ l2cu_instructions_samples () {
 	frobulator.fwd "Output" "[ Samples // ${instructions_file} ]"
 	echo
 
-	if [[ -f "${instructions_directory}"/"sample*.png" ]]
+	if [[ -f "${instructions_directory}"/work-in-progress ]]
 	then
-		rm	\
-			--recursive		\
-			--force			\
-							"${instructions_directory}"/"sample*.png"
-	fi
+		# generate placeholder
 
-	export_file_name="sample"
-
-	export_option="png"
-
-	for (( i=1; i<=6; ++i ))
-	do
 		instance="0${i}"
 
-		instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
+		for (( i=1; i<=6; ++i ))
+		do
+			cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/sample-${instance}.png
+		fi
 
-		sample_page_offset=25
+	else
+		# generate samples
 
-		sample_page_first=2
-		sample_page_last=$(( ${instructions_page_count} - ${sample_page_offset} ))
+		if [[ -f "${instructions_directory}"/"sample*.png" ]]
+		then
+			rm	\
+				--recursive		\
+				--force			\
+								"${instructions_directory}"/"sample*.png"
+		fi
 
-		sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
+		export_file_name="sample"
 
-		frobulator.inf "Generating sample file" "[ Instance ${instance} // Sample ]"
-		echo
+		export_option="png"
 
-		pdftoppm							\
-			-"${export_option}"				\
-			-f "${sample_page_random}"		\
-			-singlefile						\
-											"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}-${instance}" > "${sink}" 2>&1 &
+		for (( i=1; i<=6; ++i ))
+		do
+			instance="0${i}"
 
-		frobulator.progress "generate"
+			instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
 
-	done
+			sample_page_offset=25
+
+			sample_page_first=2
+			sample_page_last=$(( ${instructions_page_count} - ${sample_page_offset} ))
+
+			sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
+
+			frobulator.inf "Generating sample file" "[ Instance ${instance} // Sample ]"
+			echo
+
+			pdftoppm							\
+				-"${export_option}"				\
+				-f "${sample_page_random}"		\
+				-singlefile						\
+												"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}-${instance}" > "${sink}" 2>&1 &
+
+			frobulator.progress "generate"
+
+		done
+	fi
 }
 
 l2cu_prepare_instructions () {
@@ -1069,7 +1084,7 @@ l2cu_parse_instructions () {
 
 		echo "${line}"
 
-	done < /media/internal/Lego/lpub3d/configuration > "${instructions_directory}"/configuration
+	done < "${instructions_base_directory}"/configuration > "${instructions_directory}"/configuration
 
 	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
 
