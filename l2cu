@@ -947,33 +947,28 @@ l2cu_instructions_samples () {
 
 	# generate model instructions samples
 
-	frobulator.inf "Generating instructions samples" "[ ${model_name} ]"
+	frobulator.inf "Generating samples" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ Samples // ${instructions_file} ]"
-	echo
-
-	if [[ -f "${instructions_directory}"/work-in-progress ]]
+	if [[ -f "${model_directory}"/work-in-progress ]]
 	then
-		# generate placeholder
+		frobulator.wrn "Instructions in progress"
+		echo
 
-		instance="0${i}"
+		frobulator.fwd "Generating placeholder..."
+		echo
+
+		# generate placeholder
 
 		for (( i=1; i<=6; ++i ))
 		do
+			instance="0${i}"
+
 			cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/sample-${instance}.png
 		done
 
 	else
 		# generate samples
-
-		if [[ -f "${instructions_directory}"/"sample*.png" ]]
-		then
-			rm	\
-				--recursive		\
-				--force			\
-								"${instructions_directory}"/"sample*.png"
-		fi
 
 		export_file_name="sample"
 
@@ -992,7 +987,7 @@ l2cu_instructions_samples () {
 
 			sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
 
-			frobulator.inf "Generating sample file" "[ Instance ${instance} // Sample ]"
+			frobulator.inf "Generating sample" "[ Instance ${instance} // Sample ]"
 			echo
 
 			pdftoppm							\
