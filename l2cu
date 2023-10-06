@@ -1937,36 +1937,45 @@ then
 				echo
 
 			else
-				# configuration check
 
-				if [[ ! -f "${instructions_configuration_file}" ]]
+				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
-					frobulator.err "Missing instructions configuration file"
+					Frobulator.wrn "Model work in progress" "[ Instructions ]"
 					echo
 
-					frobulator.inf "Instructions configuration file required to proceed"
-					echo
+					l2cu_instructions_samples
+				else
+					# configuration check
 
-					exit 1
+					if [[ ! -f "${instructions_configuration_file}" ]]
+					then
+						frobulator.err "Missing instructions configuration file"
+						echo
+
+						frobulator.inf "Instructions configuration file required to proceed"
+						echo
+
+						exit 1
+					fi
+
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# prepare instructions setup
+
+					l2cu_prepare_instructions
+
+					l2cu_parse_instructions
+
+					# generate instructions
+
+					l2cu_instructions
+
+					# generate instructions sample
+
+					l2cu_instructions_samples
 				fi
-
-				# generate pieces count file
-
-				l2cu_pieces
-
-				# prepare instructions setup
-
-				l2cu_prepare_instructions
-
-				l2cu_parse_instructions
-
-				# generate instructions
-
-				l2cu_instructions
-
-				# generate instructions sample
-
-				l2cu_instructions_samples
 			fi
 
 		done
