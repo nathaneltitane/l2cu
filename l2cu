@@ -1889,6 +1889,9 @@ then
 
 			IFS=''
 
+			# prepare instructions setup
+
+			l2cu_prepare_instructions
 
 			if [[ "${instructions_option}" = "pieces" ]]
 			then
@@ -1901,36 +1904,45 @@ then
 
 			elif [[ "${instructions_option}" = "samples" ]]
 			then
-				if [[ ! -f "${instructions_file_path}" ]]
+				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
-					frobulator.err "Instructions file not found" "[ ${model_name} ]"
+					frobulator.wrn "Model work in progress" "[ Instructions ]"
 					echo
 
-					frobulator.wrn "Instructions file required to proceed"
-					echo
-
-					frobulator.fwd "Generating..."
-					echo
-
-					# prepare instructions setup
-
-					l2cu_prepare_instructions
-
-					l2cu_parse_instructions
-
-					# generate instructions
-
-					l2cu_instructions
-
-					# generate sample
+					# generate samples
 
 					l2cu_instructions_samples
-
 				else
-					# generate sample
 
-					l2cu_instructions_samples
+					if [[ ! -f "${instructions_file_path}" ]]
+					then
+						frobulator.err "Instructions file not found" "[ ${model_name} ]"
+						echo
 
+						frobulator.wrn "Instructions file required to proceed"
+						echo
+
+						frobulator.fwd "Generating..."
+						echo
+
+						# parse instructions configuration
+
+						l2cu_parse_instructions
+
+						# generate instructions
+
+						l2cu_instructions
+
+						# generate samples
+
+						l2cu_instructions_samples
+
+					else
+						# generate sample
+
+						l2cu_instructions_samples
+
+					fi
 				fi
 
 				frobulator.cpt "Complete" "[ ${script} // Samples ]"
@@ -1962,9 +1974,7 @@ then
 
 					l2cu_pieces
 
-					# prepare instructions setup
-
-					l2cu_prepare_instructions
+					# parse instructions configuration
 
 					l2cu_parse_instructions
 
