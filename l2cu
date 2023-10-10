@@ -997,7 +997,7 @@ l2cu_instructions_samples () {
 
 		sample_page_range+=( "${sample_page_first}," )
 
-		for (( i=0 ; i<=3 ; ++i ))
+		for (( i=0 ; i<=4 ; ++i ))
 		do
 			sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
 
