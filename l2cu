@@ -997,7 +997,7 @@ l2cu_instructions_samples () {
 
 		sample_page_range+=( "${sample_page_first}," )
 
-		for (( i=0 ; i<=4 ; ++i ))
+		for (( i=1 ; i<=4 ; ++i ))
 		do
 			sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
 
@@ -1025,19 +1025,38 @@ l2cu_instructions_samples () {
 
 		frobulator.progress "generate"
 
+		# configuration cleanup
+
+		l2cu_instructions_clean
+
+		# rename sample files
+
 		file_counter=1
 
-		for file in "${instructions_directory}/instructions_"*
+		for extension in "${export_option}"
 		do
-			mv "${file}" "${instructions_directory}/sample-0${file_counter}.png"
+			samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${extension}" | sort -V) )
 
-			(( file_counter ++ ))
+			# set IFS
+
+			IFS=$'\n'
+
+			for sample_path in ${samples_list[@]}
+			do
+				sample_name="sample-0${file_counter}"
+				sample_file_name="${sample_name}.${extension}"
+
+				mv "${sample_path}" "${instructions_directory}"/"${sample_file_name}"
+
+				(( file_counter ++ ))
+			done
 		done
+
+		# reset IFS
+
+		IFS=''
+
 	fi
-
-	# configuration cleanup
-
-	l2cu_instructions_clean
 }
 
 l2cu_prepare_instructions () {
