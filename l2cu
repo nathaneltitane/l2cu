@@ -1023,7 +1023,7 @@ l2cu_instructions_samples () {
 
 		file_counter=1
 
-		for file "${instructions_directory}/instructions_"*
+		for file in "${instructions_directory}/instructions_"*
 		do
 			mv "${file}" "${instructions_directory}/sample-0${file_counter}.png"
 
