@@ -915,19 +915,16 @@ l2cu_instructions () {
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ Instructions // ${instructions_file} ]"
-	echo
-
 	export_option="pdf"
 
 	renderer="native"
 	projection="perspective"
 
 	lpub3d24												\
+		--clear-cache										\
 		--preferred-renderer	"${renderer}"				\
 		--projection			"${projection}"				\
 		--process-export									\
-		--clear-cache										\
 		--export-option			"${export_option}"			\
 		--pdf-output-file		"${instructions_file}"		\
 															"${instructions_model_path}" > "${sink}" 2>&1 &
@@ -979,34 +976,58 @@ l2cu_instructions_samples () {
 	else
 		# generate samples
 
-		export_file_name="sample"
+
+		# generate model instructions
+
+		frobulator.inf "Generating instructions" "[ ${model_name} ]"
+		echo
+
+		instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
+
+		sample_page_first=1
+
+		sample_page_last=${instructions_page_count}
+
+		sample_minimum=$(( ${sample_page_first} + 4 ))
+		sample_maximum=$(( ${sample_page_last} - 10 ))
+
+		sample_page_range+=( "${sample_page_first}," )
+
+		for (( i=0 ; i<=3 ; ++i ))
+		do
+			sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
+
+			sample_page_range+=( "${sample_page_random}," )
+
+		done
+
+		sample_page_range+=( "${sample_page_last}" )
+
+		range=$(echo ${sample_page_range[@]})
 
 		export_option="png"
 
-		for (( i=1; i<=6; ++i ))
+		renderer="native"
+		projection="perspective"
+
+		lpub3d24										\
+			--clear-cache								\
+			--preferred-renderer	"${renderer}"		\
+			--projection			"${projection}"		\
+			--process-export							\
+			--export-option			"${export_option}"	\
+			--range					"${range}"			\
+														"${instructions_model_path}" > ${sink} 2>&1 &
+
+		frobulator.progress "generate"
+
+		file_counter=1
+
+		for file "${instructions_directory}/instructions_"*
 		do
-			instance="0${i}"
+			mv "${file}" "${instructions_directory}/sample-0${file_counter}.png"
 
-			instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
-
-			sample_page_offset=25
-
-			sample_page_first=2
-			sample_page_last=$(( ${instructions_page_count} - ${sample_page_offset} ))
-
-			sample_page_random=$(( ( RANDOM % ${sample_page_last} )  + ${sample_page_first} ))
-
-			frobulator.inf "Generating sample" "[ Instance ${instance} // Sample ]"
-			echo
-
-			pdftoppm							\
-				-"${export_option}"				\
-				-f "${sample_page_random}"		\
-				-singlefile						\
-												"${instructions_file_path}" "${instructions_directory}"/"${export_file_name}-${instance}" > "${sink}" 2>&1 &
-
-			frobulator.progress "generate"
-
+			(( file_counter ++ ))
 		done
 	fi
 }
