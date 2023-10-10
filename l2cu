@@ -931,19 +931,18 @@ l2cu_instructions () {
 
 	frobulator.progress "generate"
 
-	# remove cache files
+	# remove files
 
 	files_removal_list=(
 		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-		"${instructions_directory}"/logo.png
+		"${instructions_directory}"/configuration
 	)
 
 	for file in ${files_removal_list[@]}
 	do
-
-	rm					\
-		--recursive		\
-		--force			"${file}"
+		rm					\
+			--recursive		\
+			--force			"${file}"
 	done
 
 	files_removal_list=()
@@ -1033,6 +1032,9 @@ l2cu_instructions_samples () {
 }
 
 l2cu_prepare_instructions () {
+
+	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
+	echo
 
 	# enter model directory
 
@@ -1148,10 +1150,6 @@ l2cu_configure_instructions () {
 	# concatenate configuration from base instructions framework
 
 	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
-
-	# copy logo file
-
-	frobulator.copy "${instructions_base_directory}" "${instructions_directory}" logo.png
 
 }
 
@@ -1949,7 +1947,7 @@ then
 
 			instructions_file_path="${instructions_directory}"/"${instructions_file}"
 
-			instructions_base_directory=/media/internal/Lego/lpub3d
+			instructions_base_directory=/media/internal/Lego/lpub3d/instructions
 
 			# define instructions configuration / recipe
 
