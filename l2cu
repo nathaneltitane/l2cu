@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="10-08-2023"
+version="10-09-2023"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -936,11 +936,20 @@ l2cu_instructions () {
 
 	# remove cache files
 
+	files_removal_list=(
+		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+		"${instructions_directory}"/logo.png
+	)
+
+	for file in ${files_removal_list[@]}
+	do
+
 	rm					\
 		--recursive		\
-		--force			"${instructions_directory}"/[lL][pP][uU][bB][3][dD] \
-						"${instructions_directory}"/logo.png
+		--force			"${file}"
+	done
 
+	files_removal_list=()
 }
 
 l2cu_instructions_samples () {
@@ -1006,7 +1015,7 @@ l2cu_prepare_instructions () {
 
 	# enter model directory
 
-	cd "${model_directory}" || exit 1
+	cd "${model_directory}"
 
 	# generate instructions directory
 
@@ -1019,13 +1028,44 @@ l2cu_prepare_instructions () {
 
 	frobulator.directory "${model_directory}" instructions
 
-	# copy logo file
-
-	frobulator.copy "${instructions_base_directory}" "${instructions_directory}" logo.png
-
 }
 
-l2cu_parse_instructions () {
+l2cu_configure_instructions () {
+
+	frobulator.inf "Configuring instructions" "[ ${model_name} ]"
+	echo
+
+	frobulator.inf "Validating configuration elements"
+	echo
+
+	configuration_files_list=(
+		"${model_path%/*}"/title
+		"${model_path%/*}"/pieces
+		"${model_path%/*/*}"/title
+	)
+
+	for configuration_file in ${configuration_files_list[@]}
+	do
+		if [[ -f "${configuration_file}" ]]
+		then
+			:
+		else
+			frobulator.err "Configuration element missing" "[ ${configuration_file} ]"
+			echo
+
+			frobulator.fwd "Aborting..."
+			echo
+
+			break
+
+			exit 1
+		fi
+	done
+
+	configuration_files_list=()
+
+	frobulator.fwd "Parsing..."
+	echo
 
 	# prepare instructions model file
 
@@ -1081,7 +1121,16 @@ l2cu_parse_instructions () {
 
 	done < "${instructions_base_directory}"/configuration > "${instructions_directory}"/configuration
 
+	frobulator.fwd "Configuring..."
+	echo
+
+	# concatenate configuration from base instructions framework
+
 	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
+
+	# copy logo file
+
+	frobulator.copy "${instructions_base_directory}" "${instructions_directory}" logo.png
 
 }
 
@@ -1889,9 +1938,7 @@ then
 
 			IFS=''
 
-			# prepare instructions setup
-
-			l2cu_prepare_instructions
+			# pieces ///////////////////////////////////////////////////////////
 
 			if [[ "${instructions_option}" = "pieces" ]]
 			then
@@ -1902,20 +1949,38 @@ then
 				frobulator.cpt "Complete" "[ ${script} // Pieces ]"
 				echo
 
+			# samples //////////////////////////////////////////////////////////
+
 			elif [[ "${instructions_option}" = "samples" ]]
 			then
+				# samples: model work in progress //////////////////////////////
+
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
 					frobulator.wrn "Model work in progress" "[ Instructions ]"
 					echo
 
-					# generate samples
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# generate samples:
+					# placeholder
 
 					l2cu_instructions_samples
 				else
+					# generate samples:
+					# model instructions file samples
 
-					if [[ ! -f "${instructions_file_path}" ]]
+					if [[ -f "${instructions_file_path}" ]]
 					then
+						# generate sample
+
+						l2cu_instructions_samples
+
+					else
+						# generate instructions as prerequiste the samples
+
 						frobulator.err "Instructions file not found" "[ ${model_name} ]"
 						echo
 
@@ -1925,9 +1990,17 @@ then
 						frobulator.fwd "Generating..."
 						echo
 
-						# parse instructions configuration
+						# generate pieces count file
 
-						l2cu_parse_instructions
+						l2cu_pieces
+
+						# prepare instructions setup
+
+						l2cu_prepare_instructions
+
+						# configure instructions
+
+						l2cu_configure_instructions
 
 						# generate instructions
 
@@ -1936,12 +2009,6 @@ then
 						# generate samples
 
 						l2cu_instructions_samples
-
-					else
-						# generate sample
-
-						l2cu_instructions_samples
-
 					fi
 				fi
 
@@ -1949,18 +2016,45 @@ then
 				echo
 
 			else
+				# instructions /////////////////////////////////////////////////
 
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
 					frobulator.wrn "Model work in progress" "[ Instructions ]"
 					echo
 
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# generate samples:
+					# placeholder
+
 					l2cu_instructions_samples
 				else
 					# configuration check
 
-					if [[ ! -f "${instructions_configuration_file}" ]]
+					if [[ -f "${instructions_configuration_file}" ]]
 					then
+						# generate pieces count file
+
+						l2cu_pieces
+
+						# prepare instructions setup
+
+						l2cu_prepare_instructions
+
+						# configure instructions
+
+						l2cu_configure_instructions
+
+						# generate instructions
+
+						l2cu_instructions
+
+					else
+						# no configuration or model instructions setup
+
 						frobulator.err "Missing instructions configuration file"
 						echo
 
@@ -1970,22 +2064,8 @@ then
 						exit 1
 					fi
 
-					# generate pieces count file
-
-					l2cu_pieces
-
-					# parse instructions configuration
-
-					l2cu_parse_instructions
-
-					# generate instructions
-
-					l2cu_instructions
-
-					# generate instructions sample
-
-					l2cu_instructions_samples
 				fi
+
 			fi
 
 		done
