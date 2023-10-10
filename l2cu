@@ -908,6 +908,26 @@ l2cu_pieces () {
 	echo
 }
 
+l2cu_instructions_clean () {
+
+	# remove files
+
+	files_removal_list=(
+		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+		"${instructions_directory}"/configuration
+	)
+
+	for file in ${files_removal_list[@]}
+	do
+		rm					\
+			--recursive		\
+			--force			"${file}"
+	done
+
+	files_removal_list=()
+
+}
+
 l2cu_instructions () {
 
 	# generate model instructions
@@ -931,21 +951,9 @@ l2cu_instructions () {
 
 	frobulator.progress "generate"
 
-	# remove files
+	# configuration cleanup
 
-	files_removal_list=(
-		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-		"${instructions_directory}"/configuration
-	)
-
-	for file in ${files_removal_list[@]}
-	do
-		rm					\
-			--recursive		\
-			--force			"${file}"
-	done
-
-	files_removal_list=()
+	l2cu_instructions_clean
 }
 
 l2cu_instructions_samples () {
@@ -974,9 +982,6 @@ l2cu_instructions_samples () {
 
 	else
 		# generate samples
-
-
-		# generate model instructions
 
 		frobulator.inf "Generating instructions" "[ ${model_name} ]"
 		echo
@@ -1029,6 +1034,10 @@ l2cu_instructions_samples () {
 			(( file_counter ++ ))
 		done
 	fi
+
+	# configuration cleanup
+
+	l2cu_instructions_clean
 }
 
 l2cu_prepare_instructions () {
