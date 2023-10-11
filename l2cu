@@ -914,8 +914,7 @@ l2cu_instructions_clean () {
 
 	files_removal_list=(
 		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-		"${instructions_directory}"/configuration*
-		"${instructions_directory}"/instructions*
+		"${instructions_directory}"/configuration
 	)
 
 	for file in ${files_removal_list[@]}
@@ -1062,7 +1061,7 @@ l2cu_instructions_samples () {
 
 	# temporary bypass: cannot specify last page with lpub3d without generating pdf
 
-	instructions_page_count=$(sort -V "${instructions_directory}"/instructions.mpd | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
+	instructions_page_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
 
 	sample_page_first=1
 
@@ -1122,7 +1121,7 @@ l2cu_instructions_samples () {
 
 	for extension in "${export_option}"
 	do
-		samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${extension}" | sort -V) )
+		samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${export_option}" | sort -V) )
 
 		# set IFS
 
