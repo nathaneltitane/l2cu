@@ -928,145 +928,6 @@ l2cu_instructions_clean () {
 
 }
 
-l2cu_instructions () {
-
-	# generate model instructions
-
-	frobulator.inf "Generating instructions" "[ ${model_name} ]"
-	echo
-
-	export_option="pdf"
-
-	renderer="native"
-	projection="perspective"
-
-	lpub3d24												\
-		--clear-cache										\
-		--preferred-renderer	"${renderer}"				\
-		--projection			"${projection}"				\
-		--process-export									\
-		--export-option			"${export_option}"			\
-		--pdf-output-file		"${instructions_file}"		\
-															"${instructions_model_path}" > "${sink}" 2>&1 &
-
-	frobulator.progress "generate"
-
-	# configuration cleanup
-
-	l2cu_instructions_clean
-}
-
-l2cu_instructions_samples () {
-
-	# generate model instructions samples
-
-	frobulator.inf "Generating samples" "[ ${model_name} ]"
-	echo
-
-	if [[ -f "${model_directory}"/work-in-progress ]]
-	then
-		frobulator.wrn "Instructions in progress"
-		echo
-
-		frobulator.fwd "Generating placeholder..."
-		echo
-
-		# generate placeholder
-
-		for (( i=1; i<=6; ++i ))
-		do
-			instance="0${i}"
-
-			cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/sample-${instance}.png
-		done
-
-	else
-		# generate samples
-
-		frobulator.inf "Generating instructions" "[ ${model_name} ]"
-		echo
-
-		instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
-
-		sample_page_first=1
-
-		sample_page_last=${instructions_page_count}
-
-		sample_minimum=$(( ${sample_page_first} + 4 ))
-		sample_maximum=$(( ${sample_page_last} - 10 ))
-
-		# include frst page in samples
-
-		sample_page_range+=( "${sample_page_first}," )
-
-		# generate random page range
-
-		for (( i=1 ; i<=4 ; ++i ))
-		do
-			sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
-
-			sample_page_range+=( "${sample_page_random}," )
-
-		done
-
-		# include last page in samples
-
-		sample_page_range+=( "${sample_page_last}" )
-
-		# generate samples
-
-		export_option="png"
-
-		renderer="native"
-		projection="perspective"
-
-		range=$(echo ${sample_page_range[@]})
-
-		lpub3d24										\
-			--clear-cache								\
-			--preferred-renderer	"${renderer}"		\
-			--projection			"${projection}"		\
-			--process-export							\
-			--export-option			"${export_option}"	\
-			--range					"${range}"			\
-														"${instructions_model_path}" > ${sink} 2>&1 &
-
-		frobulator.progress "generate"
-
-		# configuration cleanup
-
-		l2cu_instructions_clean
-
-		# rename sample files
-
-		file_counter=1
-
-		for extension in "${export_option}"
-		do
-			samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${extension}" | sort -V) )
-
-			# set IFS
-
-			IFS=$'\n'
-
-			for sample_path in ${samples_list[@]}
-			do
-				sample_name="sample-0${file_counter}"
-				sample_file_name="${sample_name}.${extension}"
-
-				mv "${sample_path}" "${instructions_directory}"/"${sample_file_name}"
-
-				(( file_counter ++ ))
-			done
-		done
-
-		# reset IFS
-
-		IFS=''
-
-	fi
-}
-
 l2cu_prepare_instructions () {
 
 	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
@@ -1188,6 +1049,138 @@ l2cu_configure_instructions () {
 	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
 
 }
+
+l2cu_instructions_samples () {
+
+	# generate samples
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
+
+	sample_page_first=1
+
+	sample_page_last=${instructions_page_count}
+
+	sample_minimum=$(( ${sample_page_first} + 4 ))
+	sample_maximum=$(( ${sample_page_last} - 10 ))
+
+	# include frst page in samples
+
+	sample_page_range+=( "${sample_page_first}," )
+
+	# generate random page range
+
+	for (( i=1 ; i<=4 ; ++i ))
+	do
+		sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
+
+		sample_page_range+=( "${sample_page_random}," )
+
+	done
+
+	# include last page in samples
+
+	sample_page_range+=( "${sample_page_last}" )
+
+	# generate samples
+
+	export_option="png"
+
+	renderer="native"
+	projection="perspective"
+
+	range=$(echo ${sample_page_range[@]})
+
+	lpub3d24										\
+		--clear-cache								\
+		--preferred-renderer	"${renderer}"		\
+		--projection			"${projection}"		\
+		--process-export							\
+		--export-option			"${export_option}"	\
+		--range					"${range}"			\
+													"${instructions_model_path}" > ${sink} 2>&1 &
+
+	frobulator.progress "generate"
+
+	# configuration cleanup
+
+	l2cu_instructions_clean
+
+	# rename sample files
+
+	file_counter=1
+
+	for extension in "${export_option}"
+	do
+		samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${extension}" | sort -V) )
+
+		# set IFS
+
+		IFS=$'\n'
+
+		for sample_path in ${samples_list[@]}
+		do
+			sample_name="sample-0${file_counter}"
+			sample_file_name="${sample_name}.${extension}"
+
+			mv "${sample_path}" "${instructions_directory}"/"${sample_file_name}"
+
+			(( file_counter ++ ))
+		done
+	done
+
+	# reset IFS
+
+	IFS=''
+
+}
+
+l2cu_instructions () {
+
+	# generate model instructions
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	export_option="pdf"
+
+	renderer="native"
+	projection="perspective"
+
+	lpub3d24												\
+		--clear-cache										\
+		--preferred-renderer	"${renderer}"				\
+		--projection			"${projection}"				\
+		--process-export									\
+		--export-option			"${export_option}"			\
+		--pdf-output-file		"${instructions_file}"		\
+															"${instructions_model_path}" > "${sink}" 2>&1 &
+
+	frobulator.progress "generate"
+
+	# configuration cleanup
+
+	l2cu_instructions_clean
+}
+
+l2cu_instructions_samples_placeholders () {
+
+	# generate placeholder
+
+	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
+	echo
+
+	for (( i=1; i<=6; ++i ))
+	do
+		instance="0${i}"
+
+		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/sample-${instance}.png
+	done
+
+}
+
 
 l2cu_parse_input () {
 
@@ -2043,7 +2036,7 @@ then
 					# generate samples:
 					# placeholder
 
-					l2cu_instructions_samples
+					l2cu_instructions_samples_placeholders
 				else
 					# generate pieces count file
 
@@ -2080,7 +2073,7 @@ then
 					# generate samples:
 					# placeholder
 
-					l2cu_instructions_samples
+					l2cu_instructions_samples_placeholders
 				else
 					# generate pieces count file
 
