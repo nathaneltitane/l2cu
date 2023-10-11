@@ -995,7 +995,11 @@ l2cu_instructions_samples () {
 		sample_minimum=$(( ${sample_page_first} + 4 ))
 		sample_maximum=$(( ${sample_page_last} - 10 ))
 
+		# include frst page in samples
+
 		sample_page_range+=( "${sample_page_first}," )
+
+		# generate random page range
 
 		for (( i=1 ; i<=4 ; ++i ))
 		do
@@ -1005,14 +1009,18 @@ l2cu_instructions_samples () {
 
 		done
 
+		# include last page in samples
+
 		sample_page_range+=( "${sample_page_last}" )
 
-		range=$(echo ${sample_page_range[@]})
+		# generate samples
 
 		export_option="png"
 
 		renderer="native"
 		projection="perspective"
+
+		range=$(echo ${sample_page_range[@]})
 
 		lpub3d24										\
 			--clear-cache								\
