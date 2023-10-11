@@ -130,6 +130,7 @@ do
 
 		-r|--render)
 			option="render"
+			export_extension="png"
 		;;
 
 			full)
@@ -189,12 +190,15 @@ do
 
 		-i|--instructions)
 			option="instructions"
+			export_extension="pdf"
 		;;
 			pieces)
 				instructions_option="pieces"
 			;;
+
 			samples)
 				instructions_option="samples"
+				export_extension="png"
 			;;
 
 		-m|--modify)
@@ -812,8 +816,7 @@ l2cu_render () {
 	fi
 
 	antialias_samples="8"
-
-	extension="png"
+	extension="${export_extension}"
 
 	leocad																		\
 		--height		"${height}"												\
@@ -1086,10 +1089,11 @@ l2cu_instructions_samples () {
 
 	# generate samples
 
-	export_option="png"
 
 	renderer="native"
 	projection="perspective"
+
+	export_option="${export_extension}"
 
 	range=$(echo ${sample_page_range[@]})
 
@@ -1148,10 +1152,10 @@ l2cu_instructions () {
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 	echo
 
-	export_option="pdf"
-
 	renderer="native"
 	projection="perspective"
+
+	export_option="${export_extension}"
 
 	lpub3d24												\
 		--clear-cache										\
