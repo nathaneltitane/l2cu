@@ -1057,36 +1057,29 @@ l2cu_instructions_samples () {
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 	echo
 
-	# temporary bypass: cannot specify last page with lpub3d without generating pdf /////////////////////////////////////////////////////////////
-
-	# instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
-
-	instructions_page_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
-
-	# ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	instructions_step_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
 
 	sample_page_first=1
 
-	sample_page_last=${instructions_page_count}
-
-	sample_minimum=$(( ${sample_page_first} + 2 ))
-	sample_maximum=$(( ${sample_page_last} - 8 ))
-
-	# include frst page in samples
-
 	sample_page_range+=( "${sample_page_first}," )
 
-	# generate random page range
+	sample_page_second=$(( 2 + ( ${instructions_step_count} / 5 ) ))
 
-	for (( i=2 ; i<=5 ; ++i ))
-	do
-		sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
+	sample_page_range+=( "${sample_page_second}," )
 
-		sample_page_range+=( "${sample_page_random}," )
+	sample_page_third=$(( 3 + ( ${instructions_step_count} / 4 ) ))
 
-	done
+	sample_page_range+=( "${sample_page_third}," )
 
-	# include last page in samples
+	sample_page_fourth=$(( 4 + ( ${instructions_step_count} / 3 ) ))
+
+	sample_page_range+=( "${sample_page_fourth}," )
+
+	sample_page_fifth=$((  5 + ( ${instructions_step_count} / 2 ) ))
+
+	sample_page_range+=( "${sample_page_fifth}," )
+
+	sample_page_last=${instructions_step_count}
 
 	sample_page_range+=( "${sample_page_last}" )
 
@@ -1102,6 +1095,7 @@ l2cu_instructions_samples () {
 	frobulator.inf "Generating range" "[ ${range} ]"
 	echo
 
+	exit
 	lpub3d24										\
 		--clear-cache								\
 		--preferred-renderer	"${renderer}"		\
