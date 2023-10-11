@@ -1059,29 +1059,30 @@ l2cu_instructions_samples () {
 
 	instructions_step_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
 
-	sample_page_first=$(( 0 + ( ${instructions_step_count} / ${instructions_step_count} ) ))
+	# generate sample page numbers
 
-	sample_page_range+=( "${sample_page_first}," )
+	sample_page_first=$(( ( ${instructions_step_count} / ${instructions_step_count} ) ))
 
-	sample_page_second=$(( 1 + ( ${instructions_step_count} / 4 ) ))
+	sample_page_second=$(( ( ${instructions_step_count} / 5 ) - 2 ))
 
-	sample_page_range+=( "${sample_page_second}," )
+	sample_page_third=$(( ( ${instructions_step_count} / 4 ) - 3 ))
 
-	sample_page_third=$(( 2 + ( ${instructions_step_count} / 3 ) ))
+	sample_page_fourth=$(( ( ${instructions_step_count} / 3 ) - 4 ))
 
-	sample_page_range+=( "${sample_page_third}," )
+	sample_page_fifth=$((  ( ${instructions_step_count} / 2 )  - 5 ))
 
-	sample_page_fourth=$(( 3 + ( ${instructions_step_count} / 2 ) ))
+	sample_page_last=$(( ${instructions_step_count} ))
 
-	sample_page_range+=( "${sample_page_fourth}," )
+	# generate sample page range
 
-	sample_page_fifth=$((  4 + ( ${instructions_step_count} / 1 ) ))
-
-	sample_page_range+=( "${sample_page_fifth}," )
-
-	sample_page_last=$(( 0 + ( ${instructions_step_count} ) ))
-
-	sample_page_range+=( "${sample_page_last}" )
+	sample_page_range+=(
+		"${sample_page_first},"
+		"${sample_page_second},"
+		"${sample_page_third},"
+		"${sample_page_fourth},"
+		"${sample_page_fifth},"
+		"${sample_page_last}"
+	)
 
 	# generate samples
 
