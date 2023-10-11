@@ -1993,6 +1993,27 @@ then
 
 			IFS=''
 
+			# configuration check
+
+			if [[ -f "${instructions_configuration_file}" ]]
+			then
+				frobulator.inf "configuration file available"
+				echo
+
+				frobulator.fwd "Proceeding..."
+				echo
+			else
+				# no configuration or model instructions setup
+
+				frobulator.err "Missing instructions configuration file"
+				echo
+
+				frobulator.inf "Instructions configuration file required to proceed"
+				echo
+
+				exit 1
+			fi
+
 			# pieces ///////////////////////////////////////////////////////////
 
 			if [[ "${instructions_option}" = "pieces" ]]
@@ -2012,7 +2033,7 @@ then
 
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
-					frobulator.wrn "Model work in progress" "[ Instructions ]"
+					frobulator.wrn "Model work in progress" "[ Samples ]"
 					echo
 
 					# generate pieces count file
@@ -2024,47 +2045,21 @@ then
 
 					l2cu_instructions_samples
 				else
-					# generate samples:
-					# model instructions file samples
+					# generate pieces count file
 
-					if [[ -f "${instructions_file_path}" ]]
-					then
-						# generate sample
+					l2cu_pieces
 
-						l2cu_instructions_samples
+					# prepare instructions setup
 
-					else
-						# generate instructions as prerequiste the samples
+					l2cu_prepare_instructions
 
-						frobulator.err "Instructions file not found" "[ ${model_name} ]"
-						echo
+					# configure instructions
 
-						frobulator.wrn "Instructions file required to proceed"
-						echo
+					l2cu_configure_instructions
 
-						frobulator.fwd "Generating..."
-						echo
+					# generate instructions
 
-						# generate pieces count file
-
-						l2cu_pieces
-
-						# prepare instructions setup
-
-						l2cu_prepare_instructions
-
-						# configure instructions
-
-						l2cu_configure_instructions
-
-						# generate instructions
-
-						l2cu_instructions
-
-						# generate samples
-
-						l2cu_instructions_samples
-					fi
+					l2cu_instructions_samples
 				fi
 
 				frobulator.cpt "Complete" "[ ${script} // Samples ]"
@@ -2087,37 +2082,21 @@ then
 
 					l2cu_instructions_samples
 				else
-					# configuration check
+					# generate pieces count file
 
-					if [[ -f "${instructions_configuration_file}" ]]
-					then
-						# generate pieces count file
+					l2cu_pieces
 
-						l2cu_pieces
+					# prepare instructions setup
 
-						# prepare instructions setup
+					l2cu_prepare_instructions
 
-						l2cu_prepare_instructions
+					# configure instructions
 
-						# configure instructions
+					l2cu_configure_instructions
 
-						l2cu_configure_instructions
+					# generate instructions
 
-						# generate instructions
-
-						l2cu_instructions
-
-					else
-						# no configuration or model instructions setup
-
-						frobulator.err "Missing instructions configuration file"
-						echo
-
-						frobulator.inf "Instructions configuration file required to proceed"
-						echo
-
-						exit 1
-					fi
+					l2cu_instructions
 
 				fi
 
