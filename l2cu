@@ -1095,7 +1095,6 @@ l2cu_instructions_samples () {
 	frobulator.inf "Generating range" "[ ${range} ]"
 	echo
 
-	exit
 	lpub3d24										\
 		--clear-cache								\
 		--preferred-renderer	"${renderer}"		\
