@@ -1126,7 +1126,7 @@ l2cu_instructions_samples () {
 		for sample_path in ${samples_list[@]}
 		do
 			sample_name="sample-0${file_counter}"
-			sample_file_name="${sample_name}.${extension}"
+			sample_file_name="${sample_name}.${export_option}"
 
 			mv "${sample_path}" "${instructions_directory}"/"${sample_file_name}"
 
