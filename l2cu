@@ -1059,7 +1059,7 @@ l2cu_instructions_samples () {
 
 	instructions_step_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
 
-	sample_page_first=1
+	sample_page_first=$(( 0 + ( ${instructions_step_count} / ${instructions_step_count} ) ))
 
 	sample_page_range+=( "${sample_page_first}," )
 
