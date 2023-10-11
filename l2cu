@@ -1063,23 +1063,23 @@ l2cu_instructions_samples () {
 
 	sample_page_range+=( "${sample_page_first}," )
 
-	sample_page_second=$(( 2 + ( ${instructions_step_count} / 5 ) ))
+	sample_page_second=$(( 1 + ( ${instructions_step_count} / 4 ) ))
 
 	sample_page_range+=( "${sample_page_second}," )
 
-	sample_page_third=$(( 3 + ( ${instructions_step_count} / 4 ) ))
+	sample_page_third=$(( 2 + ( ${instructions_step_count} / 3 ) ))
 
 	sample_page_range+=( "${sample_page_third}," )
 
-	sample_page_fourth=$(( 4 + ( ${instructions_step_count} / 3 ) ))
+	sample_page_fourth=$(( 3 + ( ${instructions_step_count} / 2 ) ))
 
 	sample_page_range+=( "${sample_page_fourth}," )
 
-	sample_page_fifth=$((  5 + ( ${instructions_step_count} / 2 ) ))
+	sample_page_fifth=$((  4 + ( ${instructions_step_count} / 1 ) ))
 
 	sample_page_range+=( "${sample_page_fifth}," )
 
-	sample_page_last=${instructions_step_count}
+	sample_page_last=$(( 0 + ( ${instructions_step_count} ) ))
 
 	sample_page_range+=( "${sample_page_last}" )
 
