@@ -914,7 +914,8 @@ l2cu_instructions_clean () {
 
 	files_removal_list=(
 		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-		"${instructions_directory}"/configuration
+		"${instructions_directory}"/configuration*
+		"${instructions_directory}"/instructions*
 	)
 
 	for file in ${files_removal_list[@]}
