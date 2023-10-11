@@ -1059,6 +1059,8 @@ l2cu_instructions_samples () {
 
 	# instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
 
+	# temporary bypass: cannot specify last page with lpub3d without generating pdf
+
 	instructions_page_count=$(sort -V "${instructions_directory}"/instructions.mpd | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
 
 	sample_page_first=1
