@@ -916,8 +916,9 @@ l2cu_instructions_clean () {
 	# remove files
 
 	files_removal_list=(
-		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 		"${instructions_directory}"/configuration
+		"${instructions_directory}"/instructions.mpd
+		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 	)
 
 	for file in ${files_removal_list[@]}
@@ -1053,6 +1054,26 @@ l2cu_configure_instructions () {
 
 }
 
+l2cu_instructions_samples_placeholders () {
+
+	# generate placeholder
+
+	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
+	echo
+
+	for (( i=1; i<=6; ++i ))
+	do
+		pad="0"
+		instance="${pad}${i}"
+
+		sample_name="sample"
+		sample_file="${sample_name}-${instance}.${export_extension}"
+
+		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/"${sample_file}"
+	done
+
+}
+
 l2cu_instructions_samples () {
 
 	# generate samples
@@ -1117,7 +1138,7 @@ l2cu_instructions_samples () {
 
 	# rename sample files
 
-	file_counter=1
+	instance_count=1
 
 	for extension in "${export_option}"
 	do
@@ -1129,12 +1150,15 @@ l2cu_instructions_samples () {
 
 		for sample_path in ${samples_list[@]}
 		do
-			sample_name="sample-0${file_counter}"
-			sample_file_name="${sample_name}.${export_option}"
+			pad="0"
+			instance="${pad}${instance_count}"
 
-			mv "${sample_path}" "${instructions_directory}"/"${sample_file_name}"
+			sample_name="sample"
+			sample_file="${sample_name}-${instance}.${export_extension}"
 
-			(( file_counter ++ ))
+			mv "${sample_path}" "${instructions_directory}"/"${sample_file}"
+
+			(( instance_count ++ ))
 		done
 	done
 
@@ -1172,23 +1196,6 @@ l2cu_instructions () {
 
 	l2cu_instructions_clean
 }
-
-l2cu_instructions_samples_placeholders () {
-
-	# generate placeholder
-
-	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
-	echo
-
-	for (( i=1; i<=6; ++i ))
-	do
-		instance="0${i}"
-
-		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/sample-${instance}.png
-	done
-
-}
-
 
 l2cu_parse_input () {
 
