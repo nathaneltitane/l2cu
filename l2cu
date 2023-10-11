@@ -950,8 +950,7 @@ l2cu_prepare_instructions () {
 			--force			 "${instructions_directory}"
 	fi
 
-	frobulator.directory "${model_directory}" instructions
-
+		frobulator.directory "${model_directory}" instructions/samples
 }
 
 l2cu_configure_instructions () {
@@ -1069,7 +1068,7 @@ l2cu_instructions_samples_placeholders () {
 		sample_name="sample"
 		sample_file="${sample_name}-${instance}.${export_extension}"
 
-		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_directory}"/"${sample_file}"
+		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_samples_directory}"/"${sample_file}"
 	done
 
 }
@@ -1142,7 +1141,7 @@ l2cu_instructions_samples () {
 
 	for extension in "${export_option}"
 	do
-		samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${export_option}" | sort -V) )
+		samples_list=( $(find "${instructions_samples_directory}" -type f -iname "*page*.${export_option}" | sort -V) )
 
 		# set IFS
 
