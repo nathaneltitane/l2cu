@@ -1057,14 +1057,14 @@ l2cu_instructions_samples () {
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 	echo
 
-	instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
+	# instructions_page_count=$(strings < "${instructions_file_path}" | sed -n 's|.*/Count -\{0,1\}\([0-9]\{1,\}\).*|\1|p' | sort -n | head -n 1)
 
 	sample_page_first=1
 
 	sample_page_last=${instructions_page_count}
 
-	sample_minimum=$(( ${sample_page_first} + 4 ))
-	sample_maximum=$(( ${sample_page_last} - 10 ))
+	sample_minimum=$(( ${sample_page_first} + 2 ))
+	sample_maximum=$(( ${sample_page_last} - 8 ))
 
 	# include frst page in samples
 
@@ -1072,7 +1072,7 @@ l2cu_instructions_samples () {
 
 	# generate random page range
 
-	for (( i=1 ; i<=4 ; ++i ))
+	for (( i=2 ; i<=5 ; ++i ))
 	do
 		sample_page_random=$(( $RANDOM % ( ${sample_maximum} - ${sample_minimum} + 1 ) + ${sample_minimum} ))
 
@@ -1082,7 +1082,7 @@ l2cu_instructions_samples () {
 
 	# include last page in samples
 
-	sample_page_range+=( "${sample_page_last}" )
+	# sample_page_range+=( "${sample_page_last}" )
 
 	# generate samples
 
@@ -2033,6 +2033,10 @@ then
 
 					l2cu_pieces
 
+					# prepare instructions setup
+
+					l2cu_prepare_instructions
+
 					# generate samples:
 					# placeholder
 
@@ -2069,6 +2073,10 @@ then
 					# generate pieces count file
 
 					l2cu_pieces
+
+					# prepare instructions setup
+
+					l2cu_prepare_instructions
 
 					# generate samples:
 					# placeholder
