@@ -1092,7 +1092,7 @@ l2cu_instructions_samples () {
 
 	range=$(echo ${sample_page_range[@]})
 
-	frobulator.inf "Generating range" "[ ${range} ]"
+	frobulator.stp "Generating range" "[ ${range} ]"
 	echo
 
 	lpub3d24										\
