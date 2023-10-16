@@ -143,6 +143,11 @@ do
 				render_preset="flat"
 			;;
 
+			wireframe)
+				render_option="wireframe"
+				render_preset="wireframe"
+			;;
+
 			overlay)
 				render_option="overlay"
 				render_preset="overlay"
@@ -283,6 +288,7 @@ do
 			echo
 			echo -e "full                   Render series of images using options 0 to 7."
 			echo -e "flat                   Render image using option 0 without edges or shading."
+			echo -e "wireframe              Render image using option 0 without faces or shading."
 			echo -e "thumbnail              Render image using option 0 without edges or shading at 12.5% of the original size."
 			echo
 			echo -e "0                      Render image using view preset 00.                      [ 0 ] [ Lat.:30, Lon.: 0 ]"
@@ -1716,6 +1722,8 @@ then
 
 			flat_directory="${render_directory}"/flat
 
+			wireframe_directory="${render_directory}"/wireframe
+
 			overlay_directory="${render_directory}"/overlay
 
 			thumbnail_directory="${render_directory}"/thumbnail
@@ -1833,6 +1841,13 @@ then
 				line_width=0
 			fi
 
+			if [[ "${render_preset}" = "wireframe" ]]
+			then
+				position=(1)
+				shading=wireframe
+				line_width=1
+			fi
+
 			if [[ "${render_preset}" = "overlay" ]]
 			then
 				position=(1)
@@ -1882,6 +1897,17 @@ then
 				frobulator.directory "${render_directory}" flat
 
 				cd "${flat_directory}"
+			fi
+
+			if [[ "${render_preset}" = "wireframe" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${wireframe_directory}"
+
+				frobulator.directory "${render_directory}" flat
+
+				cd "${wireframe_directory}"
 			fi
 
 			if [[ "${render_preset}" = "overlay" ]]
