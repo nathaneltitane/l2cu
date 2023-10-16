@@ -1678,9 +1678,10 @@ then
 			echo
 		done
 
-		# unset IFS
+		# reset IFS
 
 		IFS=''
+
 	done
 
 	frobulator.cpt "Complete" "[ ${script} // Export ]"
@@ -1968,7 +1969,7 @@ then
 					"${overlay_directory}"/overlay."${extension}"
 			fi
 		done
-			# unset IFS
+			# reset IFS
 
 			IFS=''
 	done
@@ -2366,7 +2367,7 @@ then
 					fi
 				fi
 
-				# unset IFS
+				# reset IFS
 
 				IFS=''
 
