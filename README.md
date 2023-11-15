@@ -178,8 +178,6 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 [[ Terminal // Project Page ]](https://github.com/nathaneltitane/terminal)
 
-[[ Termux // Project Page ]](https://github.com/nathaneltitane/termux)
-
 ### Reports:
 
 [Submit bug report or feature request](https://github.com/nathaneltitane/l2cu/issues)
