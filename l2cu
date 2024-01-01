@@ -1641,9 +1641,9 @@ then
 
 			if [[ -d "${export_directory}" ]]
 			then
-				rm				\
-				--recursive		\
-				--force			"${export_directory}"
+				rm					\
+					--recursive		\
+					--force			"${export_directory}"
 			fi
 
 			frobulator.directory "${model_directory}" exports
