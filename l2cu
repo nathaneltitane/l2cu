@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="10-16-2023"
+version="02-10-2024"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -469,6 +469,13 @@ fi
 if [ -z "${sort_option}" ]
 then
 	sort_option="description"
+fi
+
+if [[ $(command -v lpub3d) ]]
+then
+    lpub=lpub3d
+else
+    lpub=lpub3d24
 fi
 
 # functions ////////////////////////////////////////////////////////////////////
@@ -1128,7 +1135,7 @@ l2cu_instructions_samples () {
 	frobulator.stp "Generating range" "[ ${range} ]"
 	echo
 
-	lpub3d24										\
+	"${lpub}"										\
 		--clear-cache								\
 		--preferred-renderer	"${renderer}"		\
 		--projection			"${projection}"		\
