@@ -2074,18 +2074,8 @@ then
 
 			elif [[ "${instructions_option}" = "samples" ]]
 			then
-				# samples: skip existing ///////////////////////////////////////
-				
-				if [[ -d "${model_directory}"/instructions/samples ]]
-                then
-                    sample_file_count=$(ls "${model_directory}"/instructions/samples/sample* 2> "${sink}" | wc -l)
-                    
-                    if [[ "${sample_file_count}" = "6" ]]
-                    then
-                        :
-                    fi
-			
-                # samples: model work in progress //////////////////////////////
+
+			# samples: model work in progress //////////////////////////////
 
 				elif [[ -f "${model_directory}"/work-in-progress ]]
 				then
