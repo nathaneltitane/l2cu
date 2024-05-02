@@ -2077,7 +2077,7 @@ then
 
 			# samples: model work in progress //////////////////////////////
 
-				elif [[ -f "${model_directory}"/work-in-progress ]]
+				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
 					frobulator.wrn "Model work in progress" "[ Samples ]"
 					echo
