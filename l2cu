@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="05-02-2024"
+version="07-18-2024"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -1245,7 +1245,7 @@ l2cu_help_colors () {
 
 l2cu_parse_colors () {
 
-	parse_input
+	l2cu_parse_input
 
 	# set to lowercase for input match
 
@@ -1328,7 +1328,7 @@ l2cu_parse_parts () {
 
 	# read and parse part selection
 
-	parse_input
+	l2cu_parse_input
 
 	part_input="${input}"
 
@@ -1343,7 +1343,7 @@ l2cu_parse_modification () {
 	then
 		frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
 
-		parse_colors
+		l2cu_parse_colors
 
 		# substitution:
 		# $? returning wrong arbitrary value
@@ -1352,7 +1352,7 @@ l2cu_parse_modification () {
 
 		frobulator.ipt "Enter color to set" "[ name / number / hexadecimal ]"
 
-		parse_colors
+		l2cu_parse_colors
 
 		# substitution:
 		# $? returning wrong arbitrary value
@@ -1364,7 +1364,7 @@ l2cu_parse_modification () {
 	then
 		frobulator.ipt "Enter part to modify" "[ number ]"
 
-		parse_parts
+		l2cu_parse_parts
 
 		# substitution:
 		# $? returning wrong arbitrary value
@@ -1373,7 +1373,7 @@ l2cu_parse_modification () {
 
 		frobulator.ipt "Enter part to set" "[ number ]"
 
-		parse_parts
+		l2cu_parse_parts
 
 		# substitution:
 		# $? returning wrong arbitrary value
@@ -1385,7 +1385,7 @@ l2cu_parse_modification () {
 	then
 		frobulator.ipt "Enter part to modify" "[ number ]"
 
-		parse_parts
+		l2cu_parse_parts
 
 		# substitution:
 		# $? returning wrong arbitrary value
@@ -1394,7 +1394,7 @@ l2cu_parse_modification () {
 
 		frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
 
-		parse_colors
+		l2cu_parse_colors
 		# substitution:
 		# $? returning wrong arbitrary value
 
@@ -1402,7 +1402,7 @@ l2cu_parse_modification () {
 
 		frobulator.ipt "Enter part color to set" "[ name / number / hexadecimal ]"
 
-		parse_colors
+		l2cu_parse_colors
 
 		# substitution:
 		# $? returning wrong arbitrary value
@@ -2171,7 +2171,7 @@ if [[ "${option}" = "modify" ]]
 then
 	# get input
 
-	parse_modification
+	l2cu_parse_modification
 
 	# substitution
 
