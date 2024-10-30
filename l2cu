@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="07-18-2024"
+version="10-29-2024"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -945,7 +945,7 @@ l2cu_instructions_clean () {
 
 }
 
-l2cu_prepare_instructions () {
+l2cu_instructions_prepare () {
 
 	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
 	echo
@@ -968,7 +968,7 @@ l2cu_prepare_instructions () {
 		frobulator.directory "${instructions_directory}" samples
 }
 
-l2cu_configure_instructions () {
+l2cu_instructions_configure () {
 
 	frobulator.inf "Configuring instructions" "[ ${model_name} ]"
 	echo
@@ -2088,7 +2088,7 @@ then
 
 					# prepare instructions setup
 
-					l2cu_prepare_instructions
+					l2cu_instructions_prepare
 
 					# generate samples:
 					# placeholder
@@ -2101,11 +2101,11 @@ then
 
 					# prepare instructions setup
 
-					l2cu_prepare_instructions
+					l2cu_instructions_prepare
 
 					# configure instructions
 
-					l2cu_configure_instructions
+					l2cu_instructions_configure
 
 					# generate instructions
 
@@ -2129,7 +2129,7 @@ then
 
 					# prepare instructions setup
 
-					l2cu_prepare_instructions
+					l2cu_instructions_prepare
 
 					# generate samples:
 					# placeholder
@@ -2142,11 +2142,11 @@ then
 
 					# prepare instructions setup
 
-					l2cu_prepare_instructions
+					l2cu_instructions_prepare
 
 					# configure instructions
 
-					l2cu_configure_instructions
+					l2cu_instructions_configure
 
 					# generate instructions
 
