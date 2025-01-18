@@ -182,6 +182,8 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/nathaneltitane/nathaneltitane?style=for-the-badge&logo=gnubash&logoColor=ffffff&label=NATHANEL+TITANE)](https://github.com/nathaneltitane/nathaneltitane)
 
+[![GitHub Repo stars](https://img.shields.io/github/stars/nathaneltitane/pewpewprints?style=for-the-badge&logo=gnubash&logoColor=ffffff&label=PEWPEWPRINTS)](https://github.com/nathaneltitane/pewpewprints)
+
 ---
 
 [[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 01-21-2023 ]
