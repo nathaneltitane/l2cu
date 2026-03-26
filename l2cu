@@ -1870,7 +1870,7 @@ then
 				width=512
 
 				position=(1)
-				shading=flat
+				shading=full
 				line_width=0
 			fi
 
