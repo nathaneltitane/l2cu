@@ -1871,7 +1871,7 @@ then
 
 				position=(1)
 				shading=flat
-				line_width=1
+				line_width=2
 			fi
 
 			# render
