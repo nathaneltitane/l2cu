@@ -1871,7 +1871,7 @@ then
 
 				position=(1)
 				shading=full
-				line_width=0
+				line_width=1
 			fi
 
 			# render
