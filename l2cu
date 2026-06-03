@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="10-29-2024"
+version="06-03-2026"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -151,6 +151,11 @@ do
 			overlay)
 				render_option="overlay"
 				render_preset="overlay"
+			;;
+
+			social)
+				render_option="social"
+				render_preset="social"
 			;;
 
 			thumbnail)
@@ -289,6 +294,7 @@ do
 			echo -e "full                   Render series of images using options 0 to 7."
 			echo -e "flat                   Render image using option 0 without edges or shading."
 			echo -e "wireframe              Render image using option 0 without faces or shading."
+			echo -e "social                 Render image using option 0 with edges with a size of 1200 x 600 pixels"
 			echo -e "thumbnail              Render image using option 0 without edges or shading at 12.5% of the original size."
 			echo
 			echo -e "0                      Render image using view preset 00.                      [ 0 ] [ Lat.:30, Lon.: 0 ]"
@@ -1735,6 +1741,8 @@ then
 
 			overlay_directory="${render_directory}"/overlay
 
+			social_directory="${render_directory}"/social
+
 			thumbnail_directory="${render_directory}"/thumbnail
 
 			# define coordinate values and labels
@@ -1864,6 +1872,16 @@ then
 				line_width=2
 			fi
 
+			if [[ "${render_preset}" = "social" ]]
+			then
+				height=600
+				width=1200
+
+				position=(1)
+				shading=flat
+				line_width=2
+			fi
+
 			if [[ "${render_preset}" = "thumbnail" ]]
 			then
 				height=512
@@ -1930,6 +1948,17 @@ then
 				cd "${flat_directory}"
 			fi
 
+			if [[ "${render_preset}" = "social" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${social_directory}"
+
+				frobulator.directory "${render_directory}" social
+
+				cd "${social_directory}"
+			fi
+
 			if [[ "${render_preset}" = "thumbnail" ]]
 			then
 				rm					\
@@ -1957,6 +1986,15 @@ then
 				mv												\
 					"${model_name}-${view[1]}.${extension}"		\
 					"${flat_directory}"/flat."${extension}"
+			fi
+
+			if [[ "${render_option}" = "social" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${social_directory}"/social."${extension}"
 			fi
 
 			if [[ "${render_option}" = "thumbnail" ]]
