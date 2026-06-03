@@ -1,0 +1,2594 @@
+#!/bin/bash
+
+# dependencies /////////////////////////////////////////////////////////////////
+
+if [ -f "${HOME}"/.local/bin/frobulator ]
+then
+	rm -r -f "${HOME}"/.local/bin/frobulator
+fi
+
+if [[ -z $(command -v frobulator) ]]
+then
+	if [[ $(id -u -n) = "root" ]]
+	then
+		SUDO_HOME=/root
+
+		USER="${SUDO_USER}"
+
+		HOME=/home/"${USER}"
+	fi
+
+	if [[ -z $(command -v curl) ]]
+	then
+		yes | apt-get install curl
+	fi
+
+	if [ ! -d "${HOME}"/.local/bin ]
+	then
+		mkdir -p "${HOME}"/.local/bin
+	fi
+
+	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
+
+	chmod +x "${HOME}"/.local/bin/frobulator
+fi
+
+. "${HOME}"/.local/bin/frobulator
+
+# superuser ////////////////////////////////////////////////////////////////////
+
+# script ///////////////////////////////////////////////////////////////////////
+
+script=$(basename -- "${BASH_SOURCE[0]}")
+
+# version //////////////////////////////////////////////////////////////////////
+
+version="06-03-2026"
+
+# usage ////////////////////////////////////////////////////////////////////////
+
+while (($#))
+do
+	case "${1}" in
+		-d|--directory)
+			directory="${2}"
+
+			shift
+		;;
+
+		-f|--file)
+			file="file"
+		;;
+
+			all)
+				extension_option="all"
+
+				extensions_list=(
+					dat
+					ldr
+					mpd
+				)
+				;;
+
+			dat)
+				extension_option="dat"
+
+				extensions_list=(
+					dat
+				)
+			;;
+
+			ldr)
+				extension_option="ldr"
+
+				extensions_list=(
+					ldr
+				)
+			;;
+
+			mpd)
+				extension_option="mpd"
+
+				extensions_list=(
+					mpd
+				)
+			;;
+
+		-e|--export)
+			option="export"
+		;;
+
+			csv)
+				export_option="csv"
+				export_extension="csv"
+				export_name="Comma Separated Values"
+			;;
+
+			3dstudio)
+				export_option="3dstudio"
+				export_extension="3ds"
+				export_name="3DS"
+			;;
+
+			collada)
+				export_option="collada"
+				export_extension="dae"
+				export_name="Collada"
+			;;
+
+			blender)
+				export_option="3dstudio"
+				export_extension="blend"
+				export_name="Blender"
+			;;
+
+			wavefront)
+				export_option="wavefront"
+				export_extension="obj"
+				export_name="Wavefront"
+			;;
+
+		-r|--render)
+			option="render"
+			export_extension="png"
+		;;
+
+			full)
+				render_option="full"
+				render_preset="full"
+			;;
+
+			flat)
+				render_option="flat"
+				render_preset="flat"
+			;;
+
+			wireframe)
+				render_option="wireframe"
+				render_preset="wireframe"
+			;;
+
+			overlay)
+				render_option="overlay"
+				render_preset="overlay"
+			;;
+
+			social)
+				render_option="social"
+				render_preset="social"
+			;;
+
+			thumbnail)
+				render_option="thumbnail"
+				render_preset="thumbnail"
+			;;
+
+			1)
+				render_option="1"
+				render_preset="1"
+			;;
+
+			2)
+				render_option="2"
+				render_preset="2"
+			;;
+
+			3)
+				render_option="3"
+				render_preset="3"
+			;;
+
+			4)
+				render_option="4"
+				render_preset="4"
+			;;
+
+			5)
+				render_option="5"
+				render_preset="5"
+			;;
+
+			6)
+				render_option="6"
+				render_preset="6"
+			;;
+
+			7)
+				render_option="7"
+				render_preset="7"
+			;;
+
+		-i|--instructions)
+			option="instructions"
+			export_extension="pdf"
+		;;
+			pieces)
+				instructions_option="pieces"
+			;;
+
+			samples)
+				instructions_option="samples"
+				export_extension="png"
+			;;
+
+		-m|--modify)
+			option="modify"
+		;;
+
+			color)
+				modify_option="color"
+			;;
+
+			part)
+				modify_option="part"
+			;;
+
+			bind)
+				modify_option="bind"
+			;;
+
+			lint)
+				modify_option="lint"
+			;;
+
+			step)
+				modify_option="step"
+			;;
+
+		-o|--overwrite)
+			overwrite_option="overwrite"
+		;;
+
+		-d|--download)
+			option="download"
+		;;
+
+			official)
+				download_option="official"
+			;;
+
+			unofficial)
+				download_option="unofficial"
+			;;
+
+		-l|--list)
+			option="make-list"
+
+			extensions_list=(
+				dat
+			)
+		;;
+
+			description)
+				sort_option="description"
+			;;
+
+			number)
+				sort_option="number"
+			;;
+
+		-h|--help)
+			echo
+			echo -e "Usage: ./${script} [EXTENSION] | [OPTION] [PARAMETER]"
+			echo
+			echo -e "Utility options:"
+			echo
+			echo -e "-d, --directory        Specify directory to load models from."
+			echo
+			echo -e "-f, --file             Specify model file extension to work on."
+			echo
+			echo -e "all                    Selects ldr and mpd file formats as target."
+			echo -e "dat                    Selects dat file format as target."
+			echo -e "ldr                    Selects ldr file format as target."
+			echo -e "mpd                    Selects mpd file format as target."
+			echo
+			echo -e "-e, --export           Exports model files using the following parameters:"
+			echo
+			echo -e "3dstudio               Export 3dstudio file format.                            [ 3ds]"
+			echo -e "collada                Export collada file format.                             [ dae ]"
+			echo -e "blender                Optimize 3dstudio and export to blender file format.    [ 3ds >>> blend ]"
+			echo -e "wavefront              Generate wavefront files and archive.                   [ obj + mtl ]"
+			echo
+			echo -e "-r, --render           Renders model files using the following parameters:"
+			echo
+			echo -e "full                   Render series of images using options 0 to 7."
+			echo -e "flat                   Render image using option 0 without edges or shading."
+			echo -e "wireframe              Render image using option 0 without faces or shading."
+			echo -e "social                 Render image using option 0 with edges with a size of 1200 x 600 pixels"
+			echo -e "thumbnail              Render image using option 0 without edges or shading at 12.5% of the original size."
+			echo
+			echo -e "0                      Render image using view preset 00.                      [ 0 ] [ Lat.:30, Lon.: 0 ]"
+			echo -e "1                      Render image using view preset 01.                      [ 1 ] [ Lat.:30, Lon.: 45 ]"
+			echo -e "2                      Render image using view preset 02.                      [ 2 ] [ Lat.:30, Lon.: 90 ]"
+			echo -e "3                      Render image using view preset 03.                      [ 3 ] [ Lat.:30, Lon.: 135 ]"
+			echo -e "4                      Render image using view preset 04.                      [ 4 ] [ Lat.:30, Lon.: 180 ]"
+			echo -e "5                      Render image using view preset 05.                      [ 5 ] [ Lat.:30, Lon.: 225 ]"
+			echo -e "6                      Render image using view preset 06.                      [ 6 ] [ Lat.:30, Lon.: 270 ]"
+			echo -e "7                      Render image using view preset 07.                      [ 7 ] [ Lat.:30, Lon.: 315 ]"
+			echo
+			echo -e "-i, --instructions     Generate model instruction file.                        [ pdf ]"
+			echo
+			echo -e "pieces                 Display and generate pieces count file."
+			echo -e "samples                Generate instructions sample preview files.             [ png ] [ Default count: 3 ]"
+			echo
+			echo -e "-m, --modify           Modifies model files using the following parameters:"
+			echo
+			echo -e "lint                   Standardize and format model files for parsing."
+			echo -e "color                  Modify a part's color attribute only."
+			echo -e "part                   Modify a part for another by number attribute only."
+			echo -e "bind                   Match a part to a specific color and modify the color for that selection."
+			echo -e "step                   Separate ldr based submodels using step meta tags."
+			echo -e "overwrite              Overwrite the original model file after modification."
+			echo
+			echo -e "-d, --download         Download the LDraw parts library. [official | unofficlal]"
+			echo
+			echo -e "official               Download the LDraw parts library - complete official archive."
+			echo -e "unofficial             Download the LDraw parts library - complete unofficial archive."
+			echo
+			echo -e "-l, --list             Generate the LDraw parts list for use with legacy editors."
+			echo
+			echo -e "description            Sort list by part description."
+			echo -e "number                 Sort list by part number."
+			echo
+			echo -e "'${script}'            [ Version ${version} ]"
+			echo
+
+			exit
+		;;
+
+		"")
+			# handle empty argument:
+			# use default values specified in script
+
+			:
+		;;
+
+		*)
+			echo
+			echo -e "Usage: ./${script} [EXTENSION] | [OPTION] [PARAMETER]"
+			echo
+			echo -e "${script}: Unknown option '${1}'"
+			echo -e "Type './${script} --help' for help and usage information."
+			echo
+
+			exit 1
+
+		;;
+
+	esac
+
+	shift
+
+done
+
+# clear ////////////////////////////////////////////////////////////////////////
+
+frobulator.clear
+
+# prompt ///////////////////////////////////////////////////////////////////////
+
+frobulator.script "Setting up ${script#*-}"
+
+# variables ////////////////////////////////////////////////////////////////////
+
+stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+
+# defaults /////////////////////////////////////////////////////////////////////
+
+if [ -z "${directory}" ]
+then
+	frobulator.ask "Specify directory?"
+
+	frobulator.read reply
+
+	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+	then
+		# specify directory location or exit on 'cancel'
+
+		directory=$(frobulator.dialog "Directory")
+	else
+		frobulator.err "No directory specified."
+		echo
+
+		frobulator.fwd "Assuming defaults..."
+		echo
+
+		directory="${PWD}"
+	fi
+fi
+
+if [ -z "${file}" ]
+then
+	frobulator.ask "Specify model file type? [ simple / multipart ]"
+
+	frobulator.read reply
+
+	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+	then
+		# specify directory location or exit on 'cancel'
+
+		frobulator.ipt "Specify model file extension [ dat / ldr / mpd ]"
+
+		while true
+		do
+			frobulator.read extension_option
+
+			if [ -z "${extension_option}" ] || [[ ! "${extension_option}" =~ [all|dat|ldr|mpd] ]]
+			then
+				frobulator.wrn "Unrecognized model file extension."
+				frobulator.wrn "Try again."
+				echo
+			else
+				if [[ "${extension_option}" = "all" ]]
+				then
+					extensions_list=(
+						dat
+						ldr
+						mpd
+					)
+				else
+					extensions_list=(
+						${extension_option}
+					)
+				fi
+
+				break
+			fi
+		done
+	else
+		# set default to ldr file extension:
+		# mpd file extension officially deprecated in favor of ldr
+
+		frobulator.err "No file type specified."
+		echo
+
+		frobulator.fwd "Assuming defaults..."
+		echo
+
+		extension_option="mpd"
+
+		extensions_list=(
+			mpd
+		)
+	fi
+fi
+
+if [ -z "${render_option}" ]
+then
+	render_option="full"
+fi
+
+if [ -z "${export_option}" ]
+then
+	export_option="collada"
+fi
+
+if [ -z "${modify_option}" ]
+then
+	modify_option="color"
+fi
+
+if [ -z "${download_option}" ]
+then
+	download_option="official"
+fi
+
+if [ -z "${sort_option}" ]
+then
+	sort_option="description"
+fi
+
+if [[ $(command -v lpub3d) ]]
+then
+    lpub=lpub3d
+else
+    lpub=lpub3d24
+fi
+
+# functions ////////////////////////////////////////////////////////////////////
+
+l2cu_initialize () {
+
+	if [[ "${option}" = "export" ]]
+	then
+		optimize=$(mktemp /tmp/optimize.XXXXXX)
+
+		trap 'rm				\
+				--recursive		\
+				--force			 "${optimize}"' EXIT
+
+		# push blender conversion script to temporary file
+
+		cat <<- 'OPTIMIZE' > "${optimize}"
+		#!/usr/bin/env python3
+
+		import os
+		import bpy
+		from sys import argv
+
+		context = bpy.context
+
+		# arguments #
+		# [blender, --background, --python, script, 3ds]
+		# model_path = argv[4]
+
+		# prepare scene #
+
+		for obj in context.scene.objects:
+			obj.select = True
+
+		bpy.ops.object.delete()
+
+		# import #
+
+		export_model = argv[4]
+		bpy.ops.import_scene.autodesk_3ds(filepath=export_model)
+
+		# join objects #
+
+		context.scene.objects.active = context.selected_objects[0]
+		bpy.ops.object.join()
+
+		# normalize transforms #
+		bpy.ops.object.transform_apply(
+			location = True,
+			rotation = True,
+			scale = True
+		)
+
+		# add smooth shade and edge split modifiers #
+
+		bpy.ops.object.shade_smooth()
+		bpy.ops.object.modifier_add(
+			type = "EDGE_SPLIT"
+		)
+
+		# remove doubles #
+
+		bpy.ops.object.editmode_toggle()
+		bpy.ops.mesh.remove_doubles()
+
+		# remove loose vertices #
+
+		bpy.ops.mesh.select_loose()
+		bpy.ops.mesh.delete(type='VERT')
+
+		bpy.ops.mesh.normals_make_consistent(
+			inside = False
+		)
+		bpy.ops.object.editmode_toggle()
+
+		# save #
+
+		blend_file = export_model.replace(".3ds",".blend")
+		bpy.ops.wm.save_as_mainfile(
+			filepath = blend_file,
+			compress = True
+		)
+
+		# print output #
+
+		print("saved as:", blend_file)
+		bpy.ops.wm.quit_blender()
+		OPTIMIZE
+	fi
+
+	if [[ "${option}" = "modify" ]]
+	then
+		colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
+
+		trap 'rm				\
+				--recursive		\
+				--force			 "${colors}"' EXIT
+
+		# push ldraw colors descriptors to temporary file
+
+		cat <<- 'COLORS' > "${colors}"
+		Black                                   0          #05131D
+		Blue                                    1          #0055BF
+		Green                                   2          #257A3E
+		Dark_Turquoise                          3          #00838F
+		Red                                     4          #C91A09
+		Dark_Pink                               5          #C870A0
+		Brown                                   6          #583927
+		Light_Gray                              7          #9BA19D
+		Dark_Gray                               8          #6D6E5C
+		Light_Blue                              9          #B4D2E3
+		Bright_Green                            10         #4B9F4A
+		Light_Turquoise                         11         #55A5AF
+		Salmon                                  12         #F2705E
+		Pink                                    13         #FC97AC
+		Yellow                                  14         #F2CD37
+		White                                   15         #FFFFFF
+		Light_Green                             17         #C2DAB8
+		Light_Yellow                            18         #FBE696
+		Tan                                     19         #E4CD9E
+		Light_Violet                            20         #C9CAE2
+		Purple                                  22         #81007B
+		Dark_Blue_Violet                        23         #2032B0
+		Orange                                  25         #FE8A18
+		Magenta                                 26         #923978
+		Lime                                    27         #BBE90B
+		Dark_Tan                                28         #958A73
+		Bright_Pink                             29         #E4ADC8
+		Medium_Lavender                         30         #AC78BA
+		Lavender                                31         #E1D5ED
+		Very_Light_Orange                       68         #F3CF9B
+		Light_Purple                            69         #CD6298
+		Reddish_Brown                           70         #582A12
+		Light_Bluish_Gray                       71         #A0A5A9
+		Dark_Bluish_Gray                        72         #6C6E68
+		Medium_Blue                             73         #5C9DD1
+		Medium_Green                            74         #73DCA1
+		Light_Pink                              77         #FECCCF
+		Light_Flesh                             78         #F6D7B3
+		Medium_Dark_Flesh                       84         #CC702A
+		Dark_Purple                             85         #3F3691
+		Dark_Flesh                              86         #7C503A
+		Blue_Violet                             89         #4C61DB
+		Flesh                                   92         #D09168
+		Light_Salmon                            100        #FEBABD
+		Violet                                  110        #4354A3
+		Medium_Violet                           112        #6874CA
+		Medium_Lime                             115        #C7D23C
+		Aqua                                    118        #B3D7D1
+		Light_Lime                              120        #D9E4A7
+		Light_Orange                            125        #F9BA61
+		Very_Light_Bluish_Gray                  151        #E6E3E0
+		Bright_Light_Orange                     191        #F8BB3D
+		Bright_Light_Blue                       212        #86C1E1
+		Rust                                    216        #B31004
+		Bright_Light_Yellow                     226        #FFF03A
+		Sky_Blue                                232        #56BED6
+		Dark_Blue                               272        #0D325B
+		Dark_Green                              288        #184632
+		Dark_Brown                              308        #352100
+		Maersk_Blue                             313        #54A9C8
+		Dark_Red                                320        #720E0F
+		Dark_Azure                              321        #1498D7
+		Medium_Azure                            322        #3EC2DD
+		Light_Aqua                              323        #BDDCD8
+		Yellowish_Green                         326        #DFEEA5
+		Olive_Green                             330        #9B9A5A
+		Sand_Red                                335        #D67572
+		Medium_Dark_Pink                        351        #F785B1
+		Earth_Orange                            366        #FA9C1C
+		Sand_Purple                             373        #845E84
+		Sand_Green                              378        #A0BCAC
+		Sand_Blue                               379        #597184
+		Fabuland_Brown                          450        #B67B50
+		Medium_Orange                           462        #FFA70B
+		Dark_Orange                             484        #A95500
+		Very_Light_Gray                         503        #E6E3DA
+		Trans_Clear                             47         #FCFCFC
+		Trans_Black                             40         #635F52
+		Trans_Red                               36         #C91A09
+		Trans_Neon_Orange                       38         #FF800D
+		Trans_Orange                            57         #F08F1C
+		Trans_Neon_Yellow                       54         #DAB000
+		Trans_Yellow                            46         #F5CD2F
+		Trans_Neon_Green                        42         #C0FF00
+		Trans_Bright_Green                      35         #56E646
+		Trans_Green                             34         #237841
+		Trans_Dark_Blue                         33         #0020A0
+		Trans_Medium_Blue                       41         #559AB7
+		Trans_Light_Blue                        43         #AEE9EF
+		Trans_Very_Light_Blue                   39         #C1DFF0
+		Trans_Light_Purple                      44         #96709F
+		Trans_Purple                            52         #A5A5CB
+		Trans_Dark_Pink                         37         #DF6695
+		Trans_Pink                              45         #FC97AC
+		Chrome_Gold                             334        #BBA53D
+		Chrome_Silver                           383        #E0E0E0
+		Chrome_Antique_Brass                    60         #645A4C
+		Chrome_Black                            64         #1B2A34
+		Chrome_Blue                             61         #6C96BF
+		Chrome_Green                            62         #3CB371
+		Chrome_Pink                             63         #AA4D8E
+		Pearl_White                             183        #F2F3F2
+		Pearl_Very_Light_Gray                   150        #BBBDBC
+		Pearl_Light_Gray                        135        #9CA3A8
+		Flat_Silver                             179        #898788
+		Pearl_Dark_Gray                         148        #575857
+		Metal_Blue                              137        #5677BA
+		Pearl_Light_Gold                        142        #DCBE61
+		Pearl_Gold                              297        #CC9C2B
+		Flat_Dark_Gold                          178        #B4883E
+		Copper                                  134        #964A27
+		Metallic_Silver                         80         #A5A9B4
+		Metallic_Green                          81         #899B5F
+		Metallic_Gold                           82         #DBAC34
+		Metallic_Black                          83         #1A2831
+		Metallic_Dark_Gray                      87         #6D6E5C
+		Milky_White                             79         #FFFFFF
+		Glow_In_Dark_Opaque                     21         #E0FFB0
+		Glow_In_Dark_Trans                      294        #BDC6AD
+		Glitter_Trans_Dark_Pink                 114        #DF6695
+		Glitter_Trans_Clear                     117        #FFFFFF
+		Glitter_Trans_Purple                    129        #640061
+		Speckle_Black_Silver                    132        #000000
+		Speckle_Black_Gold                      133        #000000
+		Speckle_Black_Copper                    75         #000000
+		Speckle_Dark_Bluish_Gray_Silver         76         #635F61
+		Rubber_Yellow                           65         #F5CD2F
+		Rubber_Trans_Yellow                     66         #CAB000
+		Rubber_Trans_Clear                      67         #FFFFFF
+		Rubber_Black                            256        #212121
+		Rubber_Blue                             273        #0033B2
+		Rubber_Red                              324        #C40026
+		Rubber_Orange                           350        #D06610
+		Rubber_Light_Gray                       375        #C1C2C1
+		Rubber_Dark_Blue                        406        #001D68
+		Rubber_Purple                           449        #81007B
+		Rubber_Lime                             490        #D7F000
+		Rubber_Light_Bluish_Gra                 496        #A3A2A4
+		Rubber_Flat_Silver                      504        #898788
+		Rubber_White                            511        #FAFAFA
+		Main_Colour                             16         #7F7F7F
+		Edge_Colour                             24         #7F7F7F
+		Trans_Black_IR_Lens                     32         #000000
+		Magnet                                  493        #656761
+		Electric_Contact_Alloy                  494        #D0D0D0
+		Electric_Contact_Copper                 495        #AE7A59
+		COLORS
+	fi
+}
+
+l2cu_optimize () {
+
+	# optimize model mesh
+
+	frobulator.inf "Exporting" "[ ${model_file} ]"
+	echo
+
+	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
+	echo
+
+	blender								\
+		--background					\
+		--python		"${optimize}"	\
+										"${export_file_3ds}" > "${sink}" 2>&1 &
+
+	frobulator.progress "optimize"
+}
+
+l2cu_export () {
+
+	frobulator.inf "Exporting" "[ ${model_file} ]"
+	echo
+
+	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
+	echo
+
+	leocad											\
+		-"${export_extension}"	"${export_file}" 	\
+													"${model_path}" > "${sink}" 2>&1 &
+
+	frobulator.progress "generate"
+
+	if [[ "${export_option}" = "collada" ]]
+	then
+		sed																\
+			-i															\
+			-e		's/<transparent>/<transparent opaque="A_ONE">/g'	\
+																		"${export_file}"
+	fi
+}
+
+l2cu_export_size () {
+
+	# validate export file size
+
+	block_size=1024
+
+	# calculate model size in bytes
+
+	export_size=$(find "${export_directory}/${export_file}" -type f | du -B "${block_size}" | cut -f 1)
+
+	# set model size threshold in bytes : 25 * 1024
+
+	export_size_threshold="25600"
+
+	size_unit="Bytes"
+
+	# if lesser than threshold
+
+	if [ "${export_size}" -le "${export_size_threshold}" ]
+	then
+		frobulator.scs "File size" "[ ${size_unit} // ${export_size} ]"
+		echo
+	fi
+
+	# if greater than threshold
+
+	if [ "${export_size}" -gt "${export_size_threshold}" ]
+	then
+		frobulator.wrn "File size" "[ ${size_unit} // ${export_size} ]"
+		echo
+
+		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B!"
+		frobulator.nul "You may experience higher than average loading times."
+		echo
+	fi
+}
+
+l2cu_render () {
+
+	# render model
+
+	frobulator.inf "Rendering" "[ ${model_name} ]"
+	echo
+
+	frobulator.fwd "Output" "[ View Preset ${view[coordinates]} // ${render_file} ]"
+	echo
+
+	model_path="${1}"
+	coordinates="${2}"
+
+	if [[  -z "${height}" ]]
+	then
+		height="4096"
+	fi
+
+	if [[ -z "${width}" ]]
+	then
+		width="4096"
+	fi
+
+	antialias_samples="8"
+	extension="${export_extension}"
+
+	leocad																		\
+		--height		"${height}"												\
+		--width			"${width}"												\
+		--camera-angles	${latitude[$coordinates]} ${longitude[$coordinates]}	\
+		--shading		"${shading}"											\
+		--line-width	"${line_width}" 										\
+		--aa-samples	"${antialias_samples}" 									\
+		--image			"${model_name}-${view[$coordinates]}.${extension}"		\
+																				"${model_path}" > "${sink}" 2>&1 &
+
+	frobulator.progress "render"
+}
+
+l2cu_pieces () {
+
+	# define pieces output files
+
+	part_count_file="${model_directory}"/parts.csv
+
+	pieces_file="${model_directory}"/pieces
+
+	# generate total piece count
+
+	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
+	echo
+
+	if [ -f "${pieces_file}" ]
+	then
+		rm					\
+			--recursive		\
+			--force			 "${pieces_file}"
+	fi
+
+	leocad										\
+		--export-csv	"${part_count_file}"	\
+												"${model_path}" > "${sink}" 2>&1 &
+
+	frobulator.progress "parse"
+
+	# remove header
+
+	sed -i '1d' "${part_count_file}"
+
+	wait
+
+	# generate piece count per part file
+
+	while IFS=''
+	read -r line
+	do
+		# set IFS
+
+		IFS=','
+
+		read -r _ _ part_count _ _ <<< "${line}"
+
+		echo "${part_count}" >> "${pieces_file}"
+
+		# reset IFS
+
+		IFS=''
+
+	done < "${part_count_file}"
+
+	IFS=''
+
+	# calculate total piece count
+
+	total_pieces=0
+
+	while read piece_count
+	do
+		total_pieces=$(( total_pieces + piece_count ))
+
+	done < "${pieces_file}"
+
+	# write pieces count to pieces file
+
+	echo "${total_pieces}" > "${pieces_file}"
+
+	# cleanup
+
+	if [ -f "${part_count_file}" ]
+	then
+		rm					\
+			--recursive		\
+			--force			 "${part_count_file}"
+	fi
+
+	frobulator.stp "Pieces" "[ ${total_pieces} ]"
+	echo
+}
+
+l2cu_instructions_clean () {
+
+	# remove files
+
+	files_removal_list=(
+		"${instructions_directory}"/configuration
+		"${instructions_directory}"/instructions.mpd
+		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+	)
+
+	for file in ${files_removal_list[@]}
+	do
+		rm					\
+			--recursive		\
+			--force			"${file}"
+	done
+
+	files_removal_list=()
+
+}
+
+l2cu_instructions_prepare () {
+
+	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
+	echo
+
+	# enter model directory
+
+	cd "${model_directory}"
+
+	# generate instructions directory
+
+	if [[ -d "${instructions_directory}" ]]
+	then
+		rm					\
+			--recursive		\
+			--force			 "${instructions_directory}"
+	fi
+
+		frobulator.directory "${model_directory}" instructions
+
+		frobulator.directory "${instructions_directory}" samples
+}
+
+l2cu_instructions_configure () {
+
+	frobulator.inf "Configuring instructions" "[ ${model_name} ]"
+	echo
+
+	frobulator.inf "Validating configuration elements"
+	echo
+
+	configuration_files_list=(
+		"${model_path%/*}"/title
+		"${model_path%/*}"/pieces
+		"${model_path%/*/*}"/title
+	)
+
+	for configuration_file in ${configuration_files_list[@]}
+	do
+		if [[ -f "${configuration_file}" ]]
+		then
+			:
+		else
+			frobulator.err "Configuration element missing" "[ ${configuration_file} ]"
+			echo
+
+			frobulator.fwd "Aborting..."
+			echo
+
+			break
+
+			exit 1
+		fi
+	done
+
+	configuration_files_list=()
+
+	frobulator.fwd "Parsing..."
+	echo
+
+	# prepare instructions model file
+
+	while read -r line
+	do
+		# substitute variables
+
+		# title
+
+		if [[ $line =~ configuration_title_string ]]
+		then
+			configuration_title=$(cat "${model_path%/*}"/title)
+
+			configuration_title_string=${configuration_title//$'\n'/ }
+
+			configuration_title_string=${configuration_title_string//\<\/\br\>/}
+
+			line=${line/'${configuration_title_string}'/${configuration_title_string}}
+		fi
+
+		# pieces
+
+		if [[ $line =~ configuration_pieces ]]
+		then
+			configuration_pieces=$(cat "${model_path%/*}"/pieces)
+
+			line=${line/'${configuration_pieces}'/${configuration_pieces}}
+		fi
+
+		# category
+
+		if [[ $line =~ configuration_url_category ]]
+		then
+			configuration_url_category=$(cat "${model_path%/*/*}"/title)
+
+			configuration_url_category="${configuration_url_category// /-}"
+
+			line=${line/'${configuration_url_category}'/${configuration_url_category}}
+		fi
+
+		# url
+
+		if [[ $line =~ configuration_url_name ]]
+		then
+			configuration_url_name="${model_name^^}"
+
+			line=${line/'${configuration_url_name}'/${configuration_url_name}}
+		fi
+
+		# write line to instructions file
+
+		echo "${line}"
+
+	done < "${instructions_base_directory}"/configuration > "${instructions_directory}"/configuration
+
+	frobulator.fwd "Configuring..."
+	echo
+
+	# concatenate configuration from base instructions framework
+
+	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
+
+}
+
+l2cu_instructions_samples_placeholders () {
+
+	# generate placeholder
+
+	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
+	echo
+
+	for (( i=1; i<=6; ++i ))
+	do
+		pad="0"
+		instance="${pad}${i}"
+
+		sample_name="sample"
+		sample_file="${sample_name}-${instance}.${export_extension}"
+
+		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_samples_directory}"/"${sample_file}"
+	done
+
+}
+
+l2cu_instructions_samples () {
+
+	# generate samples
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	instructions_step_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
+
+	# generate sample page numbers
+
+	sample_page_first=$(( ( ${instructions_step_count} / ${instructions_step_count} ) ))
+
+	sample_page_second=$(( ( ${instructions_step_count} / 5 ) - 2 ))
+
+	sample_page_third=$(( ( ${instructions_step_count} / 4 ) - 3 ))
+
+	sample_page_fourth=$(( ( ${instructions_step_count} / 3 ) - 4 ))
+
+	sample_page_fifth=$((  ( ${instructions_step_count} / 2 )  - 5 ))
+
+	sample_page_last=$(( ${instructions_step_count} ))
+
+	# generate sample page range
+
+	sample_page_range+=(
+		"${sample_page_first},"
+		"${sample_page_second},"
+		"${sample_page_third},"
+		"${sample_page_fourth},"
+		"${sample_page_fifth},"
+		"${sample_page_last}"
+	)
+
+	# generate samples
+
+
+	renderer="native"
+	projection="perspective"
+
+	export_option="${export_extension}"
+
+	range=$(echo ${sample_page_range[@]})
+
+	frobulator.stp "Generating range" "[ ${range} ]"
+	echo
+
+	"${lpub}"										\
+		--clear-cache								\
+		--preferred-renderer	"${renderer}"		\
+		--projection			"${projection}"		\
+		--process-export							\
+		--export-option			"${export_option}"	\
+		--range					"${range}"			\
+													"${instructions_model_path}" > ${sink} 2>&1 &
+
+	frobulator.progress "generate"
+
+	# configuration cleanup
+
+	l2cu_instructions_clean
+
+	# rename sample files
+
+	instance_count=1
+
+	for extension in "${export_option}"
+	do
+		samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${export_option}" | sort -V) )
+
+		# set IFS
+
+		IFS=$'\n'
+
+		for sample_path in ${samples_list[@]}
+		do
+			pad="0"
+			instance="${pad}${instance_count}"
+
+			sample_name="sample"
+			sample_file="${sample_name}-${instance}.${export_extension}"
+
+			mv "${sample_path}" "${instructions_samples_directory}"/"${sample_file}"
+
+			(( instance_count ++ ))
+		done
+	done
+
+	# reset IFS
+
+	IFS=''
+
+	sample_page_range=()
+}
+
+l2cu_instructions () {
+
+	# generate model instructions
+
+	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	echo
+
+	renderer="native"
+	projection="perspective"
+
+	export_option="${export_extension}"
+
+	lpub3d24												\
+		--clear-cache										\
+		--preferred-renderer	"${renderer}"				\
+		--projection			"${projection}"				\
+		--process-export									\
+		--export-option			"${export_option}"			\
+		--pdf-output-file		"${instructions_file}"		\
+															"${instructions_model_path}" > "${sink}" 2>&1 &
+
+	frobulator.progress "generate"
+
+	# configuration cleanup
+
+	l2cu_instructions_clean
+}
+
+l2cu_parse_input () {
+
+	# read and parse user input
+
+	while true
+	do
+		frobulator.read input
+
+		if [ -z "${input}" ]
+		then
+			frobulator.ipt "Input cannot be empty - Try again."
+		else
+			break
+		fi
+	done
+}
+
+l2cu_help_colors () {
+
+	frobulator.fwd "Displaying official colors selections..."
+	echo
+
+	frobulator.timeout
+
+	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
+	echo
+
+	sed -e "s/^/${marker_idt}/g" -e "s/_/ /g" "${colors}" | cat
+
+	echo
+}
+
+l2cu_parse_colors () {
+
+	l2cu_parse_input
+
+	# set to lowercase for input match
+
+	color_input="${input,,}"
+
+	while IFS=$' '
+	read -r ldraw_color_name ldraw_color_value ldraw_color_hex_value
+	do
+		# color input entries cleanup
+
+		# color name
+
+		# remove underscores from name
+
+		ldraw_color_name="${ldraw_color_name//_/ }"
+
+		# set name to lowercase for input match
+
+		ldraw_color_name="${ldraw_color_name,,}"
+
+		# reattribute input variable to lowercase name value
+
+		ldraw_color_name="${ldraw_color_name}"
+
+		# color hex value
+
+		# remove pound from value
+
+		ldraw_color_hex_value="${ldraw_color_hex_value//#/}"
+
+		# set value to lowercase for input match
+
+		ldraw_color_hex_value="${ldraw_color_hex_value,,}"
+
+		# attribute input variable to lowercase name value
+
+		ldraw_color_hex_value="${ldraw_color_hex_value}"
+
+		if [[ "${color_input}" == "${ldraw_color_name}"      ]] || \
+		   [[ "${color_input}" == "${ldraw_color_value}"     ]] || \
+		   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
+		then
+			# confirmation
+
+			frobulator.fwd "Confirming input..."
+			echo
+
+			frobulator.timeout
+
+			frobulator.inf "Color name"              "[ ${ldraw_color_name} ]"
+			frobulator.inf "Color value"             "[ ${ldraw_color_value} ]"
+			frobulator.inf "Color hexadecimal value" "[ ${ldraw_color_hex_value} ]"
+			echo
+
+			return "${ldraw_color_value}"
+
+			frobulator.timeout
+		fi
+
+	done < "${colors}"
+
+	frobulator.timeout
+
+	frobulator.err "No match for input" "[ ${input} ]"
+	echo
+
+	frobulator.timeout
+
+	l2cu_help_colors
+
+	frobulator.timeout
+
+	frobulator.fwd "Exiting..."
+	echo
+
+	exit 1
+}
+
+l2cu_parse_parts () {
+
+	# read and parse part selection
+
+	l2cu_parse_input
+
+	part_input="${input}"
+
+	return "${part_input}"
+}
+
+l2cu_parse_modification () {
+
+	# read and parse modification input request
+
+	if [ "${modify_option}" = "color" ]
+	then
+		frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
+
+		l2cu_parse_colors
+
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		old_color="${ldraw_color_value}"
+
+		frobulator.ipt "Enter color to set" "[ name / number / hexadecimal ]"
+
+		l2cu_parse_colors
+
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		new_color="${ldraw_color_value}"
+	fi
+
+	if [ "${modify_option}" = "part" ]
+	then
+		frobulator.ipt "Enter part to modify" "[ number ]"
+
+		l2cu_parse_parts
+
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		old_part="${part_input}"
+
+		frobulator.ipt "Enter part to set" "[ number ]"
+
+		l2cu_parse_parts
+
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		new_part="${part_input}"
+	fi
+
+	if [ "${modify_option}" = "bind" ]
+	then
+		frobulator.ipt "Enter part to modify" "[ number ]"
+
+		l2cu_parse_parts
+
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		part_selection="${part_input}"
+
+		frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
+
+		l2cu_parse_colors
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		old_color="${ldraw_color_value}"
+
+		frobulator.ipt "Enter part color to set" "[ name / number / hexadecimal ]"
+
+		l2cu_parse_colors
+
+		# substitution:
+		# $? returning wrong arbitrary value
+
+		new_color="${ldraw_color_value}"
+	fi
+}
+
+l2cu_write () {
+
+	# manage model file overwrite
+
+	if [ "${overwrite_option}" = "overwrite" ]
+	then
+		frobulator.wrn "Writing to model file original" "[ ${model_name} ]"
+		echo
+
+		frobulator.timeout
+
+		mv "${model_buffer}" "${model_buffer%.tmp}"
+	else
+		frobulator.wrn "Writing to model file copy" "[ ${model_buffer} ]"
+		echo
+
+		frobulator.fwd "Writing..."
+		echo
+
+		mv "${model_buffer}" "${model_buffer%.tmp}-modified-${stamp}.${extension}"
+	fi
+}
+
+l2cu_download () {
+
+	# manage library dowload
+
+	if [ -z "${directory}" ]
+	then
+		frobulator.ask "Specify download location?"
+		echo
+
+		frobulator.read reply
+
+		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
+		then
+			# specify directory location or exit on 'cancel'
+
+			browse=$(frobulator.dialog "Save to")
+
+			directory="${browse}"
+		else
+			frobulator.wrn "No directory location specified."
+			echo
+
+			frobulator.wrn "Defaulting to current directory" "[ ${PWD} ]"
+			echo
+
+			directory="${PWD}"
+		fi
+	fi
+
+	# download
+
+	frobulator.download "${base_url}"/"${parts_url_release}" "${directory}" "${parts_archive}"
+}
+
+# requirements /////////////////////////////////////////////////////////////////
+
+list=(
+	leocad
+)
+
+if [ "${option}" = "3ds" ]
+then
+	list+=(
+		blender
+	)
+fi
+
+if [ "${option}" = "instructions" ]
+then
+	list+=(
+		lpub3d24
+	)
+fi
+
+if [ "${option}" = "download" ]
+then
+	list+=(
+		zip
+		unzip
+	)
+fi
+
+if [[ $(id -u -n) = "root" ]]
+then
+	frobulator.require ${list[@]}
+
+	frobulator.msg "${script} requirements installed."
+	echo
+
+	frobulator.inf "Run ${script} as 'user' to proceed."
+	echo
+
+	exit
+else
+	for requirement in ${list[@]}
+	do
+		if [[ -z $(command -v "${requirement}") ]]
+		then
+			frobulator.err "Missing" "[ '${requirement}' ]"
+			echo
+
+			frobulator.wrn "Start ${script} as 'root' to install requirements."
+			echo
+
+			exit 1
+		fi
+	done
+fi
+
+list=()
+
+# generate necessary process files
+
+l2cu_initialize
+
+# confirmation /////////////////////////////////////////////////////////////////
+
+frobulator.fwd "Confirming settings..."
+echo
+
+if [ "${option}" = "export" ]       || \
+   [ "${option}" = "render" ]       || \
+   [ "${option}" = "instructions" ] || \
+   [ "${option}" = "modify" ]
+then
+	frobulator.stp "Extension option" "[ ${extension_option} ]"
+	echo
+
+	frobulator.inf "Option" "[ ${option} ]"
+	echo
+fi
+
+if [ "${option}" = "download" ]
+then
+	frobulator.inf "Download option" "[ ${download_option} ]"
+	echo
+fi
+
+if [ "${option}" = "list" ]
+then
+	frobulator.inf "Sort option" "[ ${sort_option} ]"
+	echo
+fi
+
+if [ "${option}" = "export" ]
+then
+	frobulator.inf "Export option" "[ ${export_name} ]"
+	echo
+fi
+
+if [ "${option}" = "render" ]
+then
+	frobulator.inf "Render option" "[ ${render_option} ]"
+	echo
+fi
+
+if [ "${option}" = "instructions" ]
+then
+	if [ -z "${instructions_option}" ]
+	then
+		:
+	else
+		frobulator.inf "Instructions option" "[ ${instructions_option} ]"
+		echo
+	fi
+fi
+
+if [ "${option}" = "modify" ]
+then
+	frobulator.inf "Modify option" "[ ${modify_option} ]"
+	echo
+fi
+
+if [ "${overwrite_option}" = "overwrite" ]
+then
+	frobulator.wrn "WARNING"
+	echo
+
+	frobulator.wrn "Overwrite option selected:"
+	frobulator.nul "Modifications will be written to model file directly!"
+	echo
+fi
+
+frobulator.countdown 3
+
+frobulator.fwd "Proceeding..."
+echo
+
+# export ///////////////////////////////////////////////////////////////////////
+
+if [ "${option}" = "export" ]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*" | sort) )
+
+		# set IFS
+
+		IFS=$'\n'
+
+		for model_path in ${models_list[@]}
+		do
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# use model directory as root
+
+			model_directory="${model_path%/*}"
+
+			# define export output directories
+
+			export_directory="${model_directory}"/exports
+
+			# explicit export file types for optimization
+
+			export_file="${model_name}"."${export_extension}"
+
+			export_file_3ds="${model_name}.3ds"
+			export_file_blend="${model_name}.blend"
+			export_file_csv="${model_name}.csv"
+			export_file_collada="${model_name}.dae"
+			export_file_object="${model_name}.obj"
+			export_file_material="${model_name}.mtl"
+			export_file_archive="${model_name}.zip"
+
+			# export
+
+# 			if [[ -d "${export_directory}" ]]
+# 			then
+# 				rm					\
+# 					--recursive		\
+# 					--force			"${export_directory}"
+# 			fi
+
+			frobulator.directory "${model_directory}" exports
+
+			cd "${export_directory}"
+
+			l2cu_export
+
+			# 3ds
+
+			if [[ "${export_option}" = "blender" ]]
+			then
+				# import 3ds file into blender
+				# generate optimized blend file
+
+				frobulator.fwd "Optimizing..."
+				echo
+
+				l2cu_optimize
+
+				# cleanup
+
+				rm					\
+					--recursive		\
+					--force			 "${export_file_3ds}"
+			fi
+
+			# verify export size threshold
+
+			l2cu_export_size
+
+			echo
+		done
+
+		# reset IFS
+
+		IFS=''
+
+	done
+
+	frobulator.cpt "Complete" "[ ${script} // Export ]"
+	echo
+
+fi
+
+# render ///////////////////////////////////////////////////////////////////////
+
+if [ "${option}" = "render" ]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*" | sort) )
+
+		# set IFS
+
+		IFS=$'\n'
+
+		for model_path in ${models_list[@]}
+		do
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# use model directory as root
+
+			model_directory="${model_path%/*}"
+
+			# define render output directories
+
+			render_directory="${model_directory}"/renders
+
+			full_directory="${render_directory}"/full
+
+			flat_directory="${render_directory}"/flat
+
+			wireframe_directory="${render_directory}"/wireframe
+
+			overlay_directory="${render_directory}"/overlay
+
+			social_directory="${render_directory}"/social
+
+			thumbnail_directory="${render_directory}"/thumbnail
+
+			# define coordinate values and labels
+
+			# camera latitude
+
+			latitude=(
+				30
+				30
+				30
+				30
+				30
+				30
+				30
+				30
+			)
+
+			# camera longitude
+
+			longitude=(
+				0
+				45
+				90
+				135
+				180
+				225
+				270
+				315
+			)
+
+			# view labels
+
+			view=(
+				"00"
+				"01"
+				"02"
+				"03"
+				"04"
+				"05"
+				"06"
+				"07"
+			)
+
+			# define camera position presets
+
+			if [[ "${render_preset}" = "0" ]]
+			then
+				position=(0)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "1" ]]
+			then
+				position=(1)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "2" ]]
+			then
+				position=(2)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "3" ]]
+			then
+				position=(3)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "4" ]]
+			then
+				position=(4)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "5" ]]
+			then
+				position=(5)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "6" ]]
+			then
+				position=(6)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "7" ]]
+			then
+				position=(7)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "full" ]]
+			then
+				position=(0 1 2 3 4 5 6 7)
+				shading=full
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "flat" ]]
+			then
+				position=(1)
+				shading=flat
+				line_width=0
+			fi
+
+			if [[ "${render_preset}" = "wireframe" ]]
+			then
+				position=(1)
+				shading=wireframe
+				line_width=1
+			fi
+
+			if [[ "${render_preset}" = "overlay" ]]
+			then
+				position=(1)
+				shading=full
+				line_width=2
+			fi
+
+			if [[ "${render_preset}" = "social" ]]
+			then
+				height=600
+				width=1200
+
+				position=(1)
+				shading=flat
+				line_width=2
+			fi
+
+			if [[ "${render_preset}" = "thumbnail" ]]
+			then
+				height=512
+				width=512
+
+				position=(1)
+				shading=flat
+				line_width=2
+			fi
+
+			# render
+
+			# prepare base render directory:
+			# generate if does not exist
+
+			frobulator.directory "${model_directory}" renders
+
+			cd "${render_directory}"
+
+			# prepare render option directory:
+			# purge and regenerate if exists
+
+			if [[ "${render_preset}" = "full" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${full_directory}"
+
+				frobulator.directory "${render_directory}" full
+
+				cd "${full_directory}"
+			fi
+
+			if [[ "${render_preset}" = "flat" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${flat_directory}"
+
+				frobulator.directory "${render_directory}" flat
+
+				cd "${flat_directory}"
+			fi
+
+			if [[ "${render_preset}" = "wireframe" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${wireframe_directory}"
+
+				frobulator.directory "${render_directory}" flat
+
+				cd "${wireframe_directory}"
+			fi
+
+			if [[ "${render_preset}" = "overlay" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${overlay_directory}"
+
+				frobulator.directory "${render_directory}" overlay
+
+				cd "${flat_directory}"
+			fi
+
+			if [[ "${render_preset}" = "social" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${social_directory}"
+
+				frobulator.directory "${render_directory}" social
+
+				cd "${social_directory}"
+			fi
+
+			if [[ "${render_preset}" = "thumbnail" ]]
+			then
+				rm					\
+					--recursive		\
+					--force			 "${thumbnail_directory}"
+
+				frobulator.directory "${render_directory}" thumbnail
+
+				cd "${thumbnail_directory}"
+			fi
+
+			for coordinates in ${position[@]}
+			do
+				render_file="${model_name}-${view[$coordinates]}.${extension}"
+
+				l2cu_render "${model_path}" "${coordinates}"
+			done
+
+			# post rendering
+
+			if [[ "${render_option}" = "flat" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${flat_directory}"/flat."${extension}"
+			fi
+
+			if [[ "${render_option}" = "social" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${social_directory}"/social."${extension}"
+			fi
+
+			if [[ "${render_option}" = "thumbnail" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${thumbnail_directory}"/thumbnail."${extension}"
+			fi
+
+			if [[ "${render_option}" = "overlay" ]]
+			then
+				# rename renders to designated splash images
+
+				mv												\
+					"${model_name}-${view[1]}.${extension}"		\
+					"${overlay_directory}"/overlay."${extension}"
+			fi
+		done
+			# reset IFS
+
+			IFS=''
+	done
+
+	frobulator.cpt "Complete" "[ ${script} // Render ]"
+	echo
+
+fi
+
+# instructions /////////////////////////////////////////////////////////////////
+
+if [[ "${option}" = "instructions" ]]
+then
+	for extension in ${extensions_list[@]}
+	do
+		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort) )
+
+		# set IFS
+
+		IFS=$'\n'
+
+		for model_path in ${models_list[@]}
+		do
+			# get model base directory from path
+
+			model_directory="${model_path%/*}"
+
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# use model directory as root
+
+			model_directory="${model_path%/*}"
+
+			# define instruction output directories
+
+			instructions_directory="${model_directory}"/instructions
+
+			instructions_samples_directory="${instructions_directory}"/samples
+
+			instructions_model_path="${instructions_directory}"/instructions."${extension}"
+
+			instructions_file="${model_name}".pdf
+
+			instructions_file_path="${instructions_directory}"/"${instructions_file}"
+
+			instructions_base_directory=/media/internal/Lego/lpub3d/instructions
+
+			# define instructions configuration / recipe
+
+			instructions_configuration_file="${instructions_base_directory}"/configuration
+
+			# reset IFS
+
+			IFS=''
+
+			# configuration check
+
+			if [[ -f "${instructions_configuration_file}" ]]
+			then
+				frobulator.inf "configuration file available"
+				echo
+
+				frobulator.fwd "Proceeding..."
+				echo
+			else
+				# no configuration or model instructions setup
+
+				frobulator.err "Missing instructions configuration file"
+				echo
+
+				frobulator.inf "Instructions configuration file required to proceed"
+				echo
+
+				exit 1
+			fi
+
+			# pieces ///////////////////////////////////////////////////////////
+
+			if [[ "${instructions_option}" = "pieces" ]]
+			then
+				# generate pieces count file
+
+				l2cu_pieces
+
+				frobulator.cpt "Complete" "[ ${script} // Pieces ]"
+				echo
+
+			# samples //////////////////////////////////////////////////////////
+
+			elif [[ "${instructions_option}" = "samples" ]]
+			then
+
+			# samples: model work in progress //////////////////////////////
+
+				if [[ -f "${model_directory}"/work-in-progress ]]
+				then
+					frobulator.wrn "Model work in progress" "[ Samples ]"
+					echo
+
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# prepare instructions setup
+
+					l2cu_instructions_prepare
+
+					# generate samples:
+					# placeholder
+
+					l2cu_instructions_samples_placeholders
+				else
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# prepare instructions setup
+
+					l2cu_instructions_prepare
+
+					# configure instructions
+
+					l2cu_instructions_configure
+
+					# generate instructions
+
+					l2cu_instructions_samples
+				fi
+
+				frobulator.cpt "Complete" "[ ${script} // Samples ]"
+				echo
+
+			else
+				# instructions /////////////////////////////////////////////////
+
+				if [[ -f "${model_directory}"/work-in-progress ]]
+				then
+					frobulator.wrn "Model work in progress" "[ Instructions ]"
+					echo
+
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# prepare instructions setup
+
+					l2cu_instructions_prepare
+
+					# generate samples:
+					# placeholder
+
+					l2cu_instructions_samples_placeholders
+				else
+					# generate pieces count file
+
+					l2cu_pieces
+
+					# prepare instructions setup
+
+					l2cu_instructions_prepare
+
+					# configure instructions
+
+					l2cu_instructions_configure
+
+					# generate instructions
+
+					l2cu_instructions
+
+				fi
+
+			fi
+
+		done
+
+	done
+
+	frobulator.cpt "Complete" "[ ${script} // Instructions ]"
+	echo
+
+fi
+
+# modify ///////////////////////////////////////////////////////////////////////
+
+if [[ "${option}" = "modify" ]]
+then
+	# get input
+
+	l2cu_parse_modification
+
+	# substitution
+
+	IFS=' '
+
+	for extension in ${extensions_list[@]}
+	do
+		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}" | sort) | while read -r model_path
+		do
+			# get model base directory from path
+
+			model_directory="${model_path%/*}"
+
+			# get model file name from path
+
+			model_file="${model_path##*/}"
+
+			# strip extension from model file name
+
+			model_name="${model_file%.*}"
+
+			# use model directory as root
+
+			model_directory="${model_path%/*}"
+
+			# set model buffer file
+
+			model_buffer="${model_path}.tmp"
+
+			# parse model file
+
+			while IFS=''
+			read -r line
+			do
+
+			# modify: lint /////////////////////////////////////////////////////
+
+				if [[ "${modify_option}" = "lint" ]]
+				then
+					frobulator.stp "Model"      "[ ${model_file} ]"
+					echo
+
+					frobulator.fwd "Linting..."
+					echo
+
+					# substitute windows carriage return for unix newline
+					# substitute lines containing empty parsing string
+					# substitute multiple whitespace characters to single whitespace
+					# substitute author tag to uppercase author tag
+
+					# delete lines beginning with whitespace character
+					# delete lines beginning with dot character
+					# delete lines containing BACKGROUND meta
+					# delete lines containing PIVOT meta
+					# delete lines containing HIDDEN meta
+
+					# strip '(' character from model entries
+					# strip ')' character from model entries
+
+					sed									\
+						-e 's/\r//g' 					\
+						-e 's/0 STEP .* *\./0 STEP/g'	\
+						-e 's/  */ /g'					\
+						-e 's/Author/AUTHOR/g'			\
+						-e '/Name/d'					\
+						-e '/  *\./d'					\
+						-e '/^0\ $/d'					\
+						-e '/^1\ $/d'					\
+						-e '/^ /d'						\
+						-e '/^\./d'						\
+						-e '/BACKGROUND/d'				\
+						-e '/PIVOT/d'					\
+						-e '/HIDDEN/d'					\
+						-e 's/(//g'						\
+						-e 's/)//g'						\
+						-e '/^$/d'						\
+														"${model}" > "${model_buffer}"
+
+					break
+				fi
+
+				# line breakdown
+
+				# skip header and footer lines containing matching patterns:
+				# prevents model file syntax modification
+
+				if [[ "${line}" == *!LEOCAD* ]] || \
+				   [[ "${line}" == *FILE*    ]] || \
+				   [[ "${line}" == *NOFILE*  ]] || \
+				   [[ "${line}" == *AUTHOR*  ]] || \
+				   [[ "${line}" == *STEP*    ]]
+				then
+					echo "${line}" >> "${model_buffer}"
+
+					continue
+				fi
+
+				# component is either part or submodel:
+				# part:     [number].dat
+				# submodel: [name].ldr
+
+				IFS=' '
+
+				read -r flag color x y z a b c d e f g h i component <<< "${line}"
+
+				# split component into part and descriptor
+
+				# set IFS
+
+				IFS='.'
+
+				read part descriptor <<< "${component}"
+
+				# revert IFS
+
+				IFS=' '
+
+				# modify: color ////////////////////////////////////////////////
+
+				# color substitution
+
+				if [[ "${modify_option}" = "color" ]]
+				then
+					if [[ "${color}" = "${old_color}" ]]
+					then
+						color="${new_color}"
+
+						frobulator.stp "Model"      "[ ${model_file} ]"
+						echo
+
+						frobulator.inf "Modifying " "[ ${old_color} ]"
+						frobulator.inf "Setting"    "[ ${new_color} ]"
+						echo
+					fi
+				fi
+
+				# modify: part /////////////////////////////////////////////////
+
+				# part substitution
+
+				if [[ "${modify_option}" = "part" ]]
+				then
+					if [[ "${part}" = "${old_part}" ]]
+					then
+						part="${new_part}"
+
+						frobulator.stp "Model"     "[ ${model_file} ]"
+						echo
+
+						frobulator.inf "Modifying" "[ ${old_part} ]"
+						frobulator.inf "Setting"   "[ ${new_part} ]"
+						echo
+					fi
+				fi
+
+				# modify: bind /////////////////////////////////////////////////
+
+				# bind [ part + color ] color substitution
+
+				if [[ "${modify_option}" = "bind" ]]
+				then
+					if [[ "${part}" == "${part_selection}" ]]
+					then
+						if [[ "${color}" = "${old_color}" ]]
+						then
+							color="${new_color}"
+
+							frobulator.stp "Model"     "[ ${model_file} ]"
+							echo
+
+							frobulator.inf "Part"      "[ ${part} ]"
+							echo
+
+							frobulator.inf "Modifying" "[ ${old_color} ]"
+							frobulator.inf "Setting"   "[ ${new_color} ]"
+							echo
+						fi
+					fi
+				fi
+
+				# modify: step /////////////////////////////////////////////////
+
+				# step submodel [ldr] separation
+
+				if [[ "${modify_option}" = "step" ]]
+				then
+					if [[ "${line}" == *ldr* ]]
+					then
+						if [[ "${descriptor}" == *ldr* ]]
+						then
+							flag="0 STEP\n1"
+							color="0"
+							descriptor="ldr\n0 STEP\n"
+
+							frobulator.stp "Model"     "[ ${model_file} ]"
+							echo
+
+							frobulator.inf "Stepping"  "[ ${model_file} ]"
+							echo
+						fi
+					fi
+				fi
+
+				# reset IFS
+
+				IFS=''
+
+				# rebuild component from part and descriptor
+
+				component="${part}.${descriptor}"
+
+				# write changes to buffer
+
+				echo "$flag" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${component}" >> "${model_buffer}"
+
+			done < "${model_path}" # feed model file into loop for parsing
+
+			# modify: overwrite ////////////////////////////////////////////////
+
+			# ammend modifications
+
+			l2cu_write
+		done
+	done
+
+	frobulator.cpt "Complete" "[ ${script} // Modify ]"
+	echo
+
+fi
+
+# download /////////////////////////////////////////////////////////////////////
+
+if [[ "${option}" = "download" ]]
+then
+	base_url="https://www.ldraw.org/library"
+
+	if [[ "${download_option}" = "official" ]]
+	then
+		parts_url_release="updates"
+		parts_archive="complete.zip"
+	fi
+
+	if [[ "${download_option}" = "unofficial" ]]
+	then
+		parts_url_release="unofficial"
+		parts_archive="ldrawunf.zip"
+	fi
+
+	parts_url="${base_url}/${parts_url_release}/${parts_archive}"
+
+	# download
+
+	l2cu_download
+
+	# rename archive:
+	# substitiude 'complete' for 'ldraw'
+	# leocad can read and access the parts archive without extraction
+
+	if [[ "${download_option}" = "official" ]]
+	then
+		mv 										\
+			"${directory}"/"${parts_archive}"	\
+			"${directory}"/ldraw.zip
+	fi
+
+	frobulator.cpt "Complete" "[ ${script} // Download ]"
+	echo
+fi
+
+# list /////////////////////////////////////////////////////////////////////////
+
+if [[ "${option}" = "list" ]]
+then
+	# ldraw parts directory verification
+
+	if [ ! -d [lL][dD][rR][aA][wW] ]
+	then
+		frobulator.err "No LDraw directory found."
+		echo
+	fi
+
+	# parts list verification and backup
+
+	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
+	then
+		frobulator.wrn "Parts list file found."
+		echo
+
+		frobulator.fwd "Backing up..."
+		echo
+
+		mv parts.lst parts.lst.bak
+	fi
+
+	# parse parts list
+
+	frobulator.fwd "Processing..."
+	echo
+
+	# initialize counter
+
+	count=1
+
+	for extension in ${extensions_list[@]}
+	do
+		parts_list=( $(find ${directory} -type f -iname "*.${extension}") )
+
+		for part_path in ${parts_list[@]}
+		do
+			part_file="${part_path##*/}"
+			part_file_header="$(head -n 1 "${part_path}")"
+			part_file_description="${part_file_header:2}"
+
+			if [[ "${part_file_description}" == *~Moved* ]]
+			then
+				: # pass
+			else
+				if [[ "${part_file_description}" == *_* ]]
+				then
+					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
+
+				elif [[ "${part_file_description}" == *~* ]]
+				then
+					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
+
+				else
+					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
+				fi
+
+				frobulator.inf "Part count" "$((count++))\c"
+				echo
+			fi
+		done
+	done
+
+	# keep counter visible while looping
+
+	echo
+
+	# set separator
+
+	separator=' '
+
+	# apply sorting method
+
+	for list in "._.lst" ".~.lst" parts.lst
+	do
+		if [[ "${sort_option}" = "description" ]]
+		then
+			sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
+		fi
+
+		if [[ "${sort_option}" = "number" ]]
+		then
+			sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
+		fi
+	done
+
+	# unset separator
+
+	separator=''
+
+	# merge
+
+	cat "._.lst" ".~.lst" >> parts.lst
+
+	# cleanup
+
+	rm					\
+		--recursive		\
+		--force			 "._.lst" ".~.lst"
+
+	frobulator.cpt "Complete" "[ ${script} // List ]"
+	echo
+fi
+
+# complete /////////////////////////////////////////////////////////////////////
+
+frobulator.scs "Done" "[ ${script} ]"
+echo
+
