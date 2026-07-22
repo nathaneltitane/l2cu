@@ -43,7 +43,7 @@ script=$(basename -- "${BASH_SOURCE[0]}")
 
 # version //////////////////////////////////////////////////////////////////////
 
-version="06-03-2026"
+version="07-22-2026"
 
 # usage ////////////////////////////////////////////////////////////////////////
 
@@ -732,6 +732,7 @@ l2cu_initialize () {
 		Electric_Contact_Copper                 495        #AE7A59
 		COLORS
 	fi
+
 }
 
 l2cu_optimize () {
@@ -750,6 +751,7 @@ l2cu_optimize () {
 										"${export_file_3ds}" > "${sink}" 2>&1 &
 
 	frobulator.progress "optimize"
+
 }
 
 l2cu_export () {
@@ -773,6 +775,7 @@ l2cu_export () {
 			-e		's/<transparent>/<transparent opaque="A_ONE">/g'	\
 																		"${export_file}"
 	fi
+
 }
 
 l2cu_export_size () {
@@ -789,7 +792,7 @@ l2cu_export_size () {
 
 	export_size_threshold="25600"
 
-	size_unit="Bytes"
+	size_unit="bytes"
 
 	# if lesser than threshold
 
@@ -810,6 +813,7 @@ l2cu_export_size () {
 		frobulator.nul "You may experience higher than average loading times."
 		echo
 	fi
+
 }
 
 l2cu_render () {
@@ -819,7 +823,7 @@ l2cu_render () {
 	frobulator.inf "Rendering" "[ ${model_name} ]"
 	echo
 
-	frobulator.fwd "Output" "[ View Preset ${view[coordinates]} // ${render_file} ]"
+	frobulator.fwd "Output" "[ view preset ${view[coordinates]} // ${render_file} ]"
 	echo
 
 	model_path="${1}"
@@ -849,6 +853,7 @@ l2cu_render () {
 																				"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "render"
+
 }
 
 l2cu_pieces () {
@@ -929,6 +934,7 @@ l2cu_pieces () {
 
 	frobulator.stp "Pieces" "[ ${total_pieces} ]"
 	echo
+
 }
 
 l2cu_instructions_clean () {
@@ -973,6 +979,7 @@ l2cu_instructions_prepare () {
 		frobulator.directory "${model_directory}" instructions
 
 		frobulator.directory "${instructions_directory}" samples
+
 }
 
 l2cu_instructions_configure () {
@@ -1188,6 +1195,7 @@ l2cu_instructions_samples () {
 	IFS=''
 
 	sample_page_range=()
+
 }
 
 l2cu_instructions () {
@@ -1216,6 +1224,7 @@ l2cu_instructions () {
 	# configuration cleanup
 
 	l2cu_instructions_clean
+
 }
 
 l2cu_parse_input () {
@@ -1233,6 +1242,7 @@ l2cu_parse_input () {
 			break
 		fi
 	done
+
 }
 
 l2cu_help_colors () {
@@ -1248,6 +1258,7 @@ l2cu_help_colors () {
 	sed -e "s/^/${marker_idt}/g" -e "s/_/ /g" "${colors}" | cat
 
 	echo
+
 }
 
 l2cu_parse_colors () {
@@ -1329,6 +1340,7 @@ l2cu_parse_colors () {
 	echo
 
 	exit 1
+
 }
 
 l2cu_parse_parts () {
@@ -1416,6 +1428,7 @@ l2cu_parse_modification () {
 
 		new_color="${ldraw_color_value}"
 	fi
+
 }
 
 l2cu_write () {
@@ -1439,6 +1452,7 @@ l2cu_write () {
 
 		mv "${model_buffer}" "${model_buffer%.tmp}-modified-${stamp}.${extension}"
 	fi
+
 }
 
 l2cu_download () {
@@ -1473,6 +1487,7 @@ l2cu_download () {
 	# download
 
 	frobulator.download "${base_url}"/"${parts_url_release}" "${directory}" "${parts_archive}"
+
 }
 
 # requirements /////////////////////////////////////////////////////////////////
@@ -1698,7 +1713,7 @@ then
 
 	done
 
-	frobulator.cpt "Complete" "[ ${script} // Export ]"
+	frobulator.cpt "Complete" "[ ${script} // export ]"
 	echo
 
 fi
@@ -2020,7 +2035,7 @@ then
 			IFS=''
 	done
 
-	frobulator.cpt "Complete" "[ ${script} // Render ]"
+	frobulator.cpt "Complete" "[ ${script} // render ]"
 	echo
 
 fi
@@ -2106,7 +2121,7 @@ then
 
 				l2cu_pieces
 
-				frobulator.cpt "Complete" "[ ${script} // Pieces ]"
+				frobulator.cpt "Complete" "[ ${script} // pieces ]"
 				echo
 
 			# samples //////////////////////////////////////////////////////////
@@ -2118,7 +2133,7 @@ then
 
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
-					frobulator.wrn "Model work in progress" "[ Samples ]"
+					frobulator.wrn "Model work in progress" "[ samples ]"
 					echo
 
 					# generate pieces count file
@@ -2151,7 +2166,7 @@ then
 					l2cu_instructions_samples
 				fi
 
-				frobulator.cpt "Complete" "[ ${script} // Samples ]"
+				frobulator.cpt "Complete" "[ ${script} // samples ]"
 				echo
 
 			else
@@ -2159,7 +2174,7 @@ then
 
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
-					frobulator.wrn "Model work in progress" "[ Instructions ]"
+					frobulator.wrn "Model work in progress" "[ instructions ]"
 					echo
 
 					# generate pieces count file
@@ -2199,7 +2214,7 @@ then
 
 	done
 
-	frobulator.cpt "Complete" "[ ${script} // Instructions ]"
+	frobulator.cpt "Complete" "[ ${script} // instructions ]"
 	echo
 
 fi
@@ -2436,7 +2451,7 @@ then
 		done
 	done
 
-	frobulator.cpt "Complete" "[ ${script} // Modify ]"
+	frobulator.cpt "Complete" "[ ${script} // modify ]"
 	echo
 
 fi
@@ -2476,7 +2491,7 @@ then
 			"${directory}"/ldraw.zip
 	fi
 
-	frobulator.cpt "Complete" "[ ${script} // Download ]"
+	frobulator.cpt "Complete" "[ ${script} // download ]"
 	echo
 fi
 
