@@ -2,54 +2,90 @@
 
 # dependencies /////////////////////////////////////////////////////////////////
 
+ticker () {
+
+	echo
+
+	for ticker in '>  ' '>> ' '>>>'
+	do
+		echo -n -e "\r[  ${ticker}  ] ${1^}..."
+
+		sleep 0.5
+	done
+
+	echo
+
+	echo
+
+}
+
 if [[ $(id -u -n) = "root" ]]
 then
-	SUDO_HOME=/root
+	USER="${SUDO_USER:-root}"
 
-	USER="${SUDO_USER}"
-
-	HOME=/home/"${USER}"
+	if [ "${USER}" = "root" ]
+	then
+		HOME=/root
+	else
+		HOME="/home/${USER}"
+	fi
 fi
 
-if [[ -z $(command -v curl) ]]
+ticker checking
+
+package_managers_list=(
+	"apt-get --quiet --quiet update > /dev/null 2>&1; apt-get --quiet --quiet install --yes"
+	"dnf --quiet install --assumeyes"
+	"yum --quiet install --assumeyes"
+	"apk add --quiet"
+	"pacman --sync --refresh --noconfirm --noprogressbar"
+	"zypper --quiet --non-interactive install"
+)
+
+package="curl"
+
+if [[ -z $(command -v "${package}") ]]
 then
-	yes | apt-get install curl
+	for package_manager in "${package_managers_list[@]}"
+	do
+		entry="${package_manager%% *}"
+
+		if [[ -n $(command -v "${entry}") ]]
+		then
+			eval "${package_manager} ${package} > /dev/null 2>&1"
+
+			break
+		fi
+	done
+
+	if [[ -z $(command -v "${package}") ]]
+	then
+		echo "[  !  ] Unable to install or binary not found /////////////////////// [ '${package}' ]"
+		echo
+
+		exit 1
+	fi
 fi
 
-if [ ! -d "${HOME}"/.local/bin ]
-then
-	mkdir -p "${HOME}"/.local/bin
-fi
+mkdir -p "${HOME}"/.local/bin
 
 frobulator="${HOME}"/.local/bin/frobulator
 
-version_online=$(curl -s -L get.frbltr.app | grep 'version=' | cut -d '"' -f 2)
+version_online=$(curl -s -L get.frbltr.app | grep -m 1 '^# version=' | cut -d '"' -f 2)
+version_local=$(grep -m 1 '^# version=' "${frobulator}" 2>/dev/null | cut -d '"' -f 2)
 
-version_local=$(cat "${frobulator}" | grep 'version=' | cut -d '"' -f 2)
+version_local="${version_local:-1970-01-01}"
 
-version_local="${version_local:-01-01-1970}"
-
-date_online=$(date -d "${version_online:6:4}-${version_online:0:2}-${version_online:3:2}" +%s)
-
-date_local=$(date -d "${version_local:6:4}-${version_local:0:2}-${version_local:3:2}" +%s)
-
-if [ -f "${frobulator}" ] && [ "${date_online}" -gt "${date_local}" ]
+if [ ! -f "${frobulator}" ] || [[ "${version_online}" > "${version_local}" ]]
 then
-	rm -r -f "${HOME}"/.local/bin/frobulator
+	curl -s -L get.frbltr.app > "${frobulator}"
 
-	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
-
-	chmod +x "${HOME}"/.local/bin/frobulator
+	chmod +x "${frobulator}"
 fi
 
-if [ ! -f "${frobulator}" ]
-then
-	curl -s -L get.frbltr.app > "${HOME}"/.local/bin/frobulator
+ticker initializing
 
-	chmod +x "${HOME}"/.local/bin/frobulator
-fi
-
-. "${frobulator}"
+source "${frobulator}"
 
 # superuser ////////////////////////////////////////////////////////////////////
 
@@ -59,7 +95,7 @@ export self_arguments="${@}"
 
 # script ///////////////////////////////////////////////////////////////////////
 
-script=$(basename -- "${BASH_SOURCE[0]}")
+script="$(basename -- ${BASH_SOURCE[0]})"
 
 # version //////////////////////////////////////////////////////////////////////
 
