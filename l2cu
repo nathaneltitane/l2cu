@@ -114,7 +114,8 @@ version="2026-09-29"
 
 while (($#))
 do
-	case "${1}" in
+	case "${1}"
+	in
 		-d|--directory)
 			directory="${2}"
 
@@ -336,66 +337,72 @@ do
 			echo
 			echo -e "Usage: ./${script} [EXTENSION] | [OPTION] [PARAMETER]"
 			echo
-			echo -e "Utility options:"
+			echo -e "Options:"
 			echo
-			echo -e "-d, --directory        Specify directory to load models from."
+			echo -e "-d, --directory      Specify [d]irectory to load models from."
 			echo
-			echo -e "-f, --file             Specify model file extension to work on."
+			echo -e "-f, --file           Specify model [f]ile extension to work on."
 			echo
-			echo -e "all                    Selects ldr and mpd file formats as target."
-			echo -e "dat                    Selects dat file format as target."
-			echo -e "ldr                    Selects ldr file format as target."
-			echo -e "mpd                    Selects mpd file format as target."
+			echo -e "                     all   Selects ldr and mpd file formats as target."
+			echo -e "                     dat   Selects dat file format as target."
+			echo -e "                     ldr   Selects ldr file format as target."
+			echo -e "                     mpd   Selects mpd file format as target."
 			echo
-			echo -e "-e, --export           Exports model files using the following parameters:"
+			echo -e "-e, --export         Run model file [e]xport using the following parameters:"
 			echo
-			echo -e "3dstudio               Export 3dstudio file format.                            [ 3ds]"
-			echo -e "collada                Export collada file format.                             [ dae ]"
-			echo -e "blender                Optimize 3dstudio and export to blender file format.    [ 3ds >>> blend ]"
-			echo -e "wavefront              Generate wavefront files and archive.                   [ obj + mtl ]"
+			echo -e "                     3dstudio    Export 3dstudio file format. [ 3ds ]"
+			echo -e "                     collada     Export collada file format. [ dae ]"
+			echo -e "                     blender     Optimize 3dstudio and export to blender file format. [ 3ds >>> blend ]"
+			echo -e "                     wavefront   Generate wavefront files and archive. [ obj + mtl ]"
 			echo
-			echo -e "-r, --render           Renders model files using the following parameters:"
+			echo -e "-r, --render         Run model file [r]endering using the following parameters:"
 			echo
-			echo -e "full                   Render series of images using options 0 to 7."
-			echo -e "flat                   Render image using option 0 without edges or shading."
-			echo -e "wireframe              Render image using option 0 without faces or shading."
-			echo -e "social                 Render image using option 0 with edges with a size of 1200 x 600 pixels"
-			echo -e "thumbnail              Render image using option 0 without edges or shading at 12.5% of the original size."
+			echo -e "                     full        Render series of images using options 0 to 7."
+			echo -e "                     flat        Render image using option 0 without edges or shading."
+			echo -e "                     wireframe   Render image using option 0 without faces or shading."
+			echo -e "                     social      Render image using option 0 with edges with a size of 1200 x 600 pixels."
+			echo -e "                     thumbnail   Render image using option 0 without edges or shading at 12.5% of the original size."
 			echo
-			echo -e "0                      Render image using view preset 00.                      [ 0 ] [ Lat.:30, Lon.: 0 ]"
-			echo -e "1                      Render image using view preset 01.                      [ 1 ] [ Lat.:30, Lon.: 45 ]"
-			echo -e "2                      Render image using view preset 02.                      [ 2 ] [ Lat.:30, Lon.: 90 ]"
-			echo -e "3                      Render image using view preset 03.                      [ 3 ] [ Lat.:30, Lon.: 135 ]"
-			echo -e "4                      Render image using view preset 04.                      [ 4 ] [ Lat.:30, Lon.: 180 ]"
-			echo -e "5                      Render image using view preset 05.                      [ 5 ] [ Lat.:30, Lon.: 225 ]"
-			echo -e "6                      Render image using view preset 06.                      [ 6 ] [ Lat.:30, Lon.: 270 ]"
-			echo -e "7                      Render image using view preset 07.                      [ 7 ] [ Lat.:30, Lon.: 315 ]"
+			echo -e "                     0           Render image using view preset 00. [ 0 ] [ Lat.:30, Lon.: 0 ]"
+			echo -e "                     1           Render image using view preset 01. [ 1 ] [ Lat.:30, Lon.: 45 ]"
+			echo -e "                     2           Render image using view preset 02. [ 2 ] [ Lat.:30, Lon.: 90 ]"
+			echo -e "                     3           Render image using view preset 03. [ 3 ] [ Lat.:30, Lon.: 135 ]"
+			echo -e "                     4           Render image using view preset 04. [ 4 ] [ Lat.:30, Lon.: 180 ]"
+			echo -e "                     5           Render image using view preset 05. [ 5 ] [ Lat.:30, Lon.: 225 ]"
+			echo -e "                     6           Render image using view preset 06. [ 6 ] [ Lat.:30, Lon.: 270 ]"
+			echo -e "                     7           Render image using view preset 07. [ 7 ] [ Lat.:30, Lon.: 315 ]"
 			echo
-			echo -e "-i, --instructions     Generate model instruction file.                        [ pdf ]"
+			echo -e "-i, --instructions   Generate model [i]nstruction file."
 			echo
-			echo -e "pieces                 Display and generate pieces count file."
-			echo -e "samples                Generate instructions sample preview files.             [ png ] [ Default count: 3 ]"
+			echo -e "                     [ pdf ]"
 			echo
-			echo -e "-m, --modify           Modifies model files using the following parameters:"
+			echo -e "                     pieces    Display and generate pieces count file."
+			echo -e "                     samples   Generate instructions sample preview files. [ png ] [ Default count: 3 ]"
 			echo
-			echo -e "lint                   Standardize and format model files for parsing."
-			echo -e "color                  Modify a part's color attribute only."
-			echo -e "part                   Modify a part for another by number attribute only."
-			echo -e "bind                   Match a part to a specific color and modify the color for that selection."
-			echo -e "step                   Separate ldr based submodels using step meta tags."
-			echo -e "overwrite              Overwrite the original model file after modification."
+			echo -e "-m, --modify         Run model file [m]odification using the following parameters:"
 			echo
-			echo -e "-d, --download         Download the LDraw parts library. [official | unofficlal]"
+			echo -e "                     lint        Standardize and format model files for parsing."
+			echo -e "                     color       Modify a part's color attribute only."
+			echo -e "                     part        Modify a part for another by number attribute only."
+			echo -e "                     bind        Match a part to a specific color and modify the color for that selection."
+			echo -e "                     step        Separate ldr based submodels using step meta tags."
+			echo -e "                     overwrite   Overwrite the original model file after modification."
 			echo
-			echo -e "official               Download the LDraw parts library - complete official archive."
-			echo -e "unofficial             Download the LDraw parts library - complete unofficial archive."
+			echo -e "-d, --download       Run [d]ownload of the LDraw parts library."
 			echo
-			echo -e "-l, --list             Generate the LDraw parts list for use with legacy editors."
+			echo -e "                     [ official | unofficlal ]"
 			echo
-			echo -e "description            Sort list by part description."
-			echo -e "number                 Sort list by part number."
+			echo -e "                     official     Download the LDraw parts library - complete official archive."
+			echo -e "                     unofficial   Download the LDraw parts library - complete unofficial archive."
 			echo
-			echo -e "'${script}'            [ Version ${version} ]"
+			echo -e "-l, --list           Generate the LDraw parts [l]ist for use with legacy editors."
+			echo
+			echo -e "                     description   Sort list by part description."
+			echo -e "                     number        Sort list by part number."
+			echo
+			echo -e "-h, --help           Show [h]elp and usage information."
+			echo
+			echo -e "'${script}'          [ Version // ${version} ]"
 			echo
 
 			exit
@@ -412,15 +419,15 @@ do
 			echo
 			echo -e "Usage: ./${script} [EXTENSION] | [OPTION] [PARAMETER]"
 			echo
-			echo -e "${script}: Unknown option '${1}'"
-			echo -e "Type './${script} --help' for help and usage information."
+			echo -e "Unknown option: '${script} ${1}':"
+			echo -e "Type './${script} -h' for help and usage information."
 			echo
 
 			exit 1
 
 		;;
 
-	esac
+		esac
 
 	shift
 
