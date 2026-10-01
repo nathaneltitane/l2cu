@@ -451,10 +451,8 @@ then
 		directory=$(frobulator.dialog "Directory")
 	else
 		frobulator.err "No directory specified."
-		echo
 
 		frobulator.fwd "Assuming defaults..."
-		echo
 
 		directory="${PWD}"
 	fi
@@ -480,7 +478,6 @@ then
 			then
 				frobulator.wrn "Unrecognized model file extension."
 				frobulator.wrn "Try again."
-				echo
 			else
 				if [[ "${extension_option}" = "all" ]]
 				then
@@ -503,10 +500,8 @@ then
 		# mpd file extension officially deprecated in favor of ldr
 
 		frobulator.err "No file type specified."
-		echo
 
 		frobulator.fwd "Assuming defaults..."
-		echo
 
 		extension_option="mpd"
 
@@ -803,10 +798,8 @@ l2cu_optimize () {
 	# optimize model mesh
 
 	frobulator.inf "Exporting" "[ ${model_file} ]"
-	echo
 
 	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
-	echo
 
 	blender								\
 		--background					\
@@ -820,10 +813,8 @@ l2cu_optimize () {
 l2cu_export () {
 
 	frobulator.inf "Exporting" "[ ${model_file} ]"
-	echo
 
 	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
-	echo
 
 	leocad											\
 		-"${export_extension}"	"${export_file}" 	\
@@ -862,7 +853,6 @@ l2cu_export_size () {
 	if [ "${export_size}" -le "${export_size_threshold}" ]
 	then
 		frobulator.scs "File size" "[ ${size_unit} // ${export_size} ]"
-		echo
 	fi
 
 	# if greater than threshold
@@ -870,11 +860,9 @@ l2cu_export_size () {
 	if [ "${export_size}" -gt "${export_size_threshold}" ]
 	then
 		frobulator.wrn "File size" "[ ${size_unit} // ${export_size} ]"
-		echo
 
 		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B!"
 		frobulator.nul "You may experience higher than average loading times."
-		echo
 	fi
 
 }
@@ -884,10 +872,8 @@ l2cu_render () {
 	# render model
 
 	frobulator.inf "Rendering" "[ ${model_name} ]"
-	echo
 
 	frobulator.fwd "Output" "[ view preset ${view[coordinates]} // ${render_file} ]"
-	echo
 
 	model_path="${1}"
 	coordinates="${2}"
@@ -930,7 +916,6 @@ l2cu_pieces () {
 	# generate total piece count
 
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
-	echo
 
 	if [ -f "${pieces_file}" ]
 	then
@@ -996,7 +981,6 @@ l2cu_pieces () {
 	fi
 
 	frobulator.stp "Pieces" "[ ${total_pieces} ]"
-	echo
 
 }
 
@@ -1024,7 +1008,6 @@ l2cu_instructions_clean () {
 l2cu_instructions_prepare () {
 
 	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
-	echo
 
 	# enter model directory
 
@@ -1048,10 +1031,8 @@ l2cu_instructions_prepare () {
 l2cu_instructions_configure () {
 
 	frobulator.inf "Configuring instructions" "[ ${model_name} ]"
-	echo
 
 	frobulator.inf "Validating configuration elements"
-	echo
 
 	configuration_files_list=(
 		"${model_path%/*}"/title
@@ -1066,10 +1047,8 @@ l2cu_instructions_configure () {
 			:
 		else
 			frobulator.err "Configuration element missing" "[ ${configuration_file} ]"
-			echo
 
 			frobulator.fwd "Aborting..."
-			echo
 
 			break
 
@@ -1080,7 +1059,6 @@ l2cu_instructions_configure () {
 	configuration_files_list=()
 
 	frobulator.fwd "Parsing..."
-	echo
 
 	# prepare instructions model file
 
@@ -1137,7 +1115,6 @@ l2cu_instructions_configure () {
 	done < "${instructions_base_directory}"/configuration > "${instructions_directory}"/configuration
 
 	frobulator.fwd "Configuring..."
-	echo
 
 	# concatenate configuration from base instructions framework
 
@@ -1150,7 +1127,6 @@ l2cu_instructions_samples_placeholders () {
 	# generate placeholder
 
 	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
-	echo
 
 	for (( i=1; i<=6; ++i ))
 	do
@@ -1170,7 +1146,6 @@ l2cu_instructions_samples () {
 	# generate samples
 
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
-	echo
 
 	instructions_step_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
 
@@ -1210,7 +1185,6 @@ l2cu_instructions_samples () {
 	range=$(echo ${sample_page_range[@]})
 
 	frobulator.stp "Generating range" "[ ${range} ]"
-	echo
 
 	"${lpub}"										\
 		--clear-cache								\
@@ -1266,7 +1240,6 @@ l2cu_instructions () {
 	# generate model instructions
 
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
-	echo
 
 	renderer="native"
 	projection="perspective"
@@ -1311,12 +1284,10 @@ l2cu_parse_input () {
 l2cu_help_colors () {
 
 	frobulator.fwd "Displaying official colors selections..."
-	echo
 
 	frobulator.timeout
 
 	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
-	echo
 
 	sed -e "s/^/${marker_idt}/g" -e "s/_/ /g" "${colors}" | cat
 
@@ -1372,14 +1343,12 @@ l2cu_parse_colors () {
 			# confirmation
 
 			frobulator.fwd "Confirming input..."
-			echo
 
 			frobulator.timeout
 
 			frobulator.inf "Color name"              "[ ${ldraw_color_name} ]"
 			frobulator.inf "Color value"             "[ ${ldraw_color_value} ]"
 			frobulator.inf "Color hexadecimal value" "[ ${ldraw_color_hex_value} ]"
-			echo
 
 			return "${ldraw_color_value}"
 
@@ -1391,7 +1360,6 @@ l2cu_parse_colors () {
 	frobulator.timeout
 
 	frobulator.err "No match for input" "[ ${input} ]"
-	echo
 
 	frobulator.timeout
 
@@ -1400,7 +1368,6 @@ l2cu_parse_colors () {
 	frobulator.timeout
 
 	frobulator.fwd "Exiting..."
-	echo
 
 	exit 1
 
@@ -1501,17 +1468,14 @@ l2cu_write () {
 	if [ "${overwrite_option}" = "overwrite" ]
 	then
 		frobulator.wrn "Writing to model file original" "[ ${model_name} ]"
-		echo
 
 		frobulator.timeout
 
 		mv "${model_buffer}" "${model_buffer%.tmp}"
 	else
 		frobulator.wrn "Writing to model file copy" "[ ${model_buffer} ]"
-		echo
 
 		frobulator.fwd "Writing..."
-		echo
 
 		mv "${model_buffer}" "${model_buffer%.tmp}-modified-${stamp}.${extension}"
 	fi
@@ -1538,10 +1502,8 @@ l2cu_download () {
 			directory="${browse}"
 		else
 			frobulator.wrn "No directory location specified."
-			echo
 
 			frobulator.wrn "Defaulting to current directory" "[ ${PWD} ]"
-			echo
 
 			directory="${PWD}"
 		fi
@@ -1592,10 +1554,8 @@ then
 	frobulator.require ${list[@]}
 
 	frobulator.msg "${script} requirements installed."
-	echo
 
 	frobulator.inf "Run ${script} as 'user' to proceed."
-	echo
 
 	exit
 else
@@ -1604,10 +1564,8 @@ else
 		if [[ -z $(command -v "${requirement}") ]]
 		then
 			frobulator.err "Missing" "[ '${requirement}' ]"
-			echo
 
 			frobulator.wrn "Start ${script} as 'root' to install requirements."
-			echo
 
 			exit 1
 		fi
@@ -1625,7 +1583,6 @@ l2cu_initialize
 # confirmation /////////////////////////////////////////////////////////////////
 
 frobulator.fwd "Confirming settings..."
-echo
 
 if [ "${option}" = "export" ]       || \
    [ "${option}" = "render" ]       || \
@@ -1633,34 +1590,28 @@ if [ "${option}" = "export" ]       || \
    [ "${option}" = "modify" ]
 then
 	frobulator.stp "Extension option" "[ ${extension_option} ]"
-	echo
 
 	frobulator.inf "Option" "[ ${option} ]"
-	echo
 fi
 
 if [ "${option}" = "download" ]
 then
 	frobulator.inf "Download option" "[ ${download_option} ]"
-	echo
 fi
 
 if [ "${option}" = "list" ]
 then
 	frobulator.inf "Sort option" "[ ${sort_option} ]"
-	echo
 fi
 
 if [ "${option}" = "export" ]
 then
 	frobulator.inf "Export option" "[ ${export_name} ]"
-	echo
 fi
 
 if [ "${option}" = "render" ]
 then
 	frobulator.inf "Render option" "[ ${render_option} ]"
-	echo
 fi
 
 if [ "${option}" = "instructions" ]
@@ -1670,30 +1621,25 @@ then
 		:
 	else
 		frobulator.inf "Instructions option" "[ ${instructions_option} ]"
-		echo
 	fi
 fi
 
 if [ "${option}" = "modify" ]
 then
 	frobulator.inf "Modify option" "[ ${modify_option} ]"
-	echo
 fi
 
 if [ "${overwrite_option}" = "overwrite" ]
 then
 	frobulator.wrn "WARNING"
-	echo
 
 	frobulator.wrn "Overwrite option selected:"
 	frobulator.nul "Modifications will be written to model file directly!"
-	echo
 fi
 
 frobulator.countdown 3
 
 frobulator.fwd "Proceeding..."
-echo
 
 # export ///////////////////////////////////////////////////////////////////////
 
@@ -1760,7 +1706,6 @@ then
 				# generate optimized blend file
 
 				frobulator.fwd "Optimizing..."
-				echo
 
 				l2cu_optimize
 
@@ -1785,7 +1730,6 @@ then
 	done
 
 	frobulator.cpt "Complete" "[ ${script} // export ]"
-	echo
 
 fi
 
@@ -2107,7 +2051,6 @@ then
 	done
 
 	frobulator.cpt "Complete" "[ ${script} // render ]"
-	echo
 
 fi
 
@@ -2168,18 +2111,14 @@ then
 			if [[ -f "${instructions_configuration_file}" ]]
 			then
 				frobulator.inf "configuration file available"
-				echo
 
 				frobulator.fwd "Proceeding..."
-				echo
 			else
 				# no configuration or model instructions setup
 
 				frobulator.err "Missing instructions configuration file"
-				echo
 
 				frobulator.inf "Instructions configuration file required to proceed"
-				echo
 
 				exit 1
 			fi
@@ -2193,7 +2132,6 @@ then
 				l2cu_pieces
 
 				frobulator.cpt "Complete" "[ ${script} // pieces ]"
-				echo
 
 			# samples //////////////////////////////////////////////////////////
 
@@ -2205,7 +2143,6 @@ then
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
 					frobulator.wrn "Model work in progress" "[ samples ]"
-					echo
 
 					# generate pieces count file
 
@@ -2238,7 +2175,6 @@ then
 				fi
 
 				frobulator.cpt "Complete" "[ ${script} // samples ]"
-				echo
 
 			else
 				# instructions /////////////////////////////////////////////////
@@ -2246,7 +2182,6 @@ then
 				if [[ -f "${model_directory}"/work-in-progress ]]
 				then
 					frobulator.wrn "Model work in progress" "[ instructions ]"
-					echo
 
 					# generate pieces count file
 
@@ -2286,7 +2221,6 @@ then
 	done
 
 	frobulator.cpt "Complete" "[ ${script} // instructions ]"
-	echo
 
 fi
 
@@ -2337,10 +2271,8 @@ then
 				if [[ "${modify_option}" = "lint" ]]
 				then
 					frobulator.stp "Model"      "[ ${model_file} ]"
-					echo
 
 					frobulator.fwd "Linting..."
-					echo
 
 					# substitute windows carriage return for unix newline
 					# substitute lines containing empty parsing string
@@ -2425,11 +2357,9 @@ then
 						color="${new_color}"
 
 						frobulator.stp "Model"      "[ ${model_file} ]"
-						echo
 
 						frobulator.inf "Modifying " "[ ${old_color} ]"
 						frobulator.inf "Setting"    "[ ${new_color} ]"
-						echo
 					fi
 				fi
 
@@ -2444,11 +2374,9 @@ then
 						part="${new_part}"
 
 						frobulator.stp "Model"     "[ ${model_file} ]"
-						echo
 
 						frobulator.inf "Modifying" "[ ${old_part} ]"
 						frobulator.inf "Setting"   "[ ${new_part} ]"
-						echo
 					fi
 				fi
 
@@ -2465,14 +2393,11 @@ then
 							color="${new_color}"
 
 							frobulator.stp "Model"     "[ ${model_file} ]"
-							echo
 
 							frobulator.inf "Part"      "[ ${part} ]"
-							echo
 
 							frobulator.inf "Modifying" "[ ${old_color} ]"
 							frobulator.inf "Setting"   "[ ${new_color} ]"
-							echo
 						fi
 					fi
 				fi
@@ -2492,10 +2417,8 @@ then
 							descriptor="ldr\n0 STEP\n"
 
 							frobulator.stp "Model"     "[ ${model_file} ]"
-							echo
 
 							frobulator.inf "Stepping"  "[ ${model_file} ]"
-							echo
 						fi
 					fi
 				fi
@@ -2523,7 +2446,6 @@ then
 	done
 
 	frobulator.cpt "Complete" "[ ${script} // modify ]"
-	echo
 
 fi
 
@@ -2563,7 +2485,6 @@ then
 	fi
 
 	frobulator.cpt "Complete" "[ ${script} // download ]"
-	echo
 fi
 
 # list /////////////////////////////////////////////////////////////////////////
@@ -2575,7 +2496,6 @@ then
 	if [ ! -d [lL][dD][rR][aA][wW] ]
 	then
 		frobulator.err "No LDraw directory found."
-		echo
 	fi
 
 	# parts list verification and backup
@@ -2583,10 +2503,8 @@ then
 	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
 	then
 		frobulator.wrn "Parts list file found."
-		echo
 
 		frobulator.fwd "Backing up..."
-		echo
 
 		mv parts.lst parts.lst.bak
 	fi
@@ -2594,7 +2512,6 @@ then
 	# parse parts list
 
 	frobulator.fwd "Processing..."
-	echo
 
 	# initialize counter
 
@@ -2627,7 +2544,6 @@ then
 				fi
 
 				frobulator.inf "Part count" "$((count++))\c"
-				echo
 			fi
 		done
 	done
@@ -2670,11 +2586,9 @@ then
 		--force			 "._.lst" ".~.lst"
 
 	frobulator.cpt "Complete" "[ ${script} // List ]"
-	echo
 fi
 
 # complete /////////////////////////////////////////////////////////////////////
 
 frobulator.scs "Done" "[ ${script} ]"
-echo
 
