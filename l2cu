@@ -440,7 +440,7 @@ stamp=$(date +"%m-%d-%Y-%H-%M-%S")
 
 if [ -z "${directory}" ]
 then
-	frobulator.ask "Specify directory?"
+	frobulator.qst "Specify directory?"
 
 	frobulator.read reply
 
@@ -460,7 +460,7 @@ fi
 
 if [ -z "${file}" ]
 then
-	frobulator.ask "Specify model file type? [ simple / multipart ]"
+	frobulator.qst "Specify model file type? [ simple / multipart ]"
 
 	frobulator.read reply
 
@@ -1488,7 +1488,7 @@ l2cu_download () {
 
 	if [ -z "${directory}" ]
 	then
-		frobulator.ask "Specify download location?"
+		frobulator.qst "Specify download location?"
 		echo
 
 		frobulator.read reply
