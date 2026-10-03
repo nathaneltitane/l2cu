@@ -1336,8 +1336,8 @@ l2cu_parse_colors () {
 
 		ldraw_color_hex_value="${ldraw_color_hex_value}"
 
-		if [[ "${color_input}" == "${ldraw_color_name}"      ]] || \
-		   [[ "${color_input}" == "${ldraw_color_value}"     ]] || \
+		if [[ "${color_input}" == "${ldraw_color_name}"      ]] ||
+		   [[ "${color_input}" == "${ldraw_color_value}"     ]] ||
 		   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
 		then
 			# confirmation
@@ -1584,9 +1584,9 @@ l2cu_initialize
 
 frobulator.fwd "Confirming settings..."
 
-if [ "${option}" = "export" ]       || \
-   [ "${option}" = "render" ]       || \
-   [ "${option}" = "instructions" ] || \
+if [ "${option}" = "export" ]       ||
+   [ "${option}" = "render" ]       ||
+   [ "${option}" = "instructions" ] ||
    [ "${option}" = "modify" ]
 then
 	frobulator.stp "Extension option" "[ ${extension_option} ]"
@@ -2315,10 +2315,10 @@ then
 				# skip header and footer lines containing matching patterns:
 				# prevents model file syntax modification
 
-				if [[ "${line}" == *!LEOCAD* ]] || \
-				   [[ "${line}" == *FILE*    ]] || \
-				   [[ "${line}" == *NOFILE*  ]] || \
-				   [[ "${line}" == *AUTHOR*  ]] || \
+				if [[ "${line}" == *!LEOCAD* ]] ||
+				   [[ "${line}" == *FILE*    ]] ||
+				   [[ "${line}" == *NOFILE*  ]] ||
+				   [[ "${line}" == *AUTHOR*  ]] ||
 				   [[ "${line}" == *STEP*    ]]
 				then
 					echo "${line}" >> "${model_buffer}"
