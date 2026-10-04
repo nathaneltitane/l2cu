@@ -536,7 +536,11 @@ then
 	sort_option="description"
 fi
 
-if [[ $(command -v lpub3d) ]]
+# path of 'lpub3d', empty when not installed
+
+command_lpub3d="$(command -v lpub3d)"
+
+if [ -n "${command_lpub3d}" ]
 then
     lpub=lpub3d
 else
@@ -1549,7 +1553,11 @@ then
 	)
 fi
 
-if [[ $(id -u -n) = "root" ]]
+# name of the user running the script
+
+user_name="$(id -u -n)"
+
+if [ "${user_name}" = "root" ]
 then
 	frobulator.require ${list[@]}
 
@@ -1561,7 +1569,11 @@ then
 else
 	for requirement in ${list[@]}
 	do
-		if [[ -z $(command -v "${requirement}") ]]
+		# path of the command named in ${requirement}, empty when not installed
+
+		command_path="$(command -v "${requirement}")"
+
+		if [ -z "${command_path}" ]
 		then
 			frobulator.err "Missing" "[ '${requirement}' ]"
 
