@@ -536,7 +536,7 @@ then
 	sort_option="description"
 fi
 
-# path of 'lpub3d', empty when not installed
+# 'lpub3d' path - empty if not installed
 
 command_lpub3d="$(command -v lpub3d)"
 
@@ -1553,7 +1553,7 @@ then
 	)
 fi
 
-# name of the user running the script
+# user running the script
 
 user_name="$(id -u -n)"
 
@@ -1569,7 +1569,7 @@ then
 else
 	for requirement in ${list[@]}
 	do
-		# path of the command named in ${requirement}, empty when not installed
+		# ${requirement} command path - empty if not installed
 
 		command_path="$(command -v "${requirement}")"
 
