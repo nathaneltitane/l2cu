@@ -1303,12 +1303,12 @@ l2cu_lint () {
 	frobulator.fwd "Linting..."
 
 	# substitute windows carriage return for unix newline
+	# strip ' . . .' tails left by earlier l2cu versions
 	# substitute lines containing empty parsing string
 	# substitute multiple whitespace characters to single whitespace
 	# substitute author tag to uppercase author tag
 
 	# delete lines containing name meta
-	# delete lines containing whitespace followed by dot character
 	# delete lines with lone line type
 	# delete lines beginning with whitespace character
 	# delete lines beginning with dot character
@@ -1321,24 +1321,24 @@ l2cu_lint () {
 
 	# delete empty lines
 
-	sed									\
-		-e 's/\r//g' 					\
-		-e 's/0 STEP .* *\./0 STEP/g'	\
-		-e 's/  */ /g'					\
-		-e 's/Author/AUTHOR/g'			\
-		-e '/Name/d'					\
-		-e '/  *\./d'					\
-		-e '/^0\ $/d'					\
-		-e '/^1\ $/d'					\
-		-e '/^ /d'						\
-		-e '/^\./d'						\
-		-e '/BACKGROUND/d'				\
-		-e '/PIVOT/d'					\
-		-e '/HIDDEN/d'					\
-		-e 's/(//g'						\
-		-e 's/)//g'						\
-		-e '/^$/d'						\
-										"${model_path}" > "${model_buffer}"
+	sed										\
+		-e 's/\r//g' 						\
+		-e 's/\( \{1,\}\.\)\{1,\} *$//'		\
+		-e 's/0 STEP .* *\./0 STEP/g'		\
+		-e 's/  */ /g'						\
+		-e 's/Author/AUTHOR/g'				\
+		-e '/Name/d'						\
+		-e '/^0 *$/d'						\
+		-e '/^1\ $/d'						\
+		-e '/^ /d'							\
+		-e '/^\./d'							\
+		-e '/BACKGROUND/d'					\
+		-e '/PIVOT/d'						\
+		-e '/HIDDEN/d'						\
+		-e 's/(//g'							\
+		-e 's/)//g'							\
+		-e '/^$/d'							\
+											"${model_path}" > "${model_buffer}"
 
 	frobulator.track
 
@@ -1348,10 +1348,15 @@ l2cu_lint () {
 l2cu_modify () {
 
 	# modify part references - other lines kept as is
+	# line ending set aside before parsing - fields never carry it
 
 	local status=0
+	local pattern_tail='^(0.*[^ ])( +\.)+ *$'
+	local lines_repaired=0
 
 	local line
+	local line_ending
+	local line_inner
 	local line_modified
 	local flag
 	local color
@@ -1374,15 +1379,45 @@ l2cu_modify () {
 
 	frobulator.track || return "${status}"
 
-	while IFS='' read -r line
+	# last line kept if it has no trailing newline
+
+	while IFS='' read -r line || [ -n "${line}" ]
 	do
+		unset line_ending
+
+		if [[ "${line}" = *$'\r' ]]
+		then
+			line_ending=$'\r'
+			line="${line%$'\r'}"
+		fi
+
+		# meta lines - ' . . .' tails left by earlier l2cu versions removed
+
+		if [[ "${line}" = 0* ]]
+		then
+			line_inner="${line#*$'\r'}"
+
+			if [ "${line_inner}" != "${line}" ] && [[ "${line_inner}" =~ ^[\ .]*$ ]]
+			then
+				line="${line%%$'\r'*}"
+
+				lines_repaired=$(( lines_repaired + 1 ))
+
+			elif [[ "${line}" =~ ${pattern_tail} ]]
+			then
+				line="${BASH_REMATCH[1]}"
+
+				lines_repaired=$(( lines_repaired + 1 ))
+			fi
+		fi
+
 		read -r flag color x y z a b c d e f g h i component <<< "${line}"
 
-		# part / submodel references only - line type 1
+		# part / submodel references only - line type 1 with all fields
 
 		if [ "${flag}" != "1" ] || [ -z "${component}" ]
 		then
-			echo "${line}" >> "${model_buffer}"
+			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
 
 			continue
 		fi
@@ -1431,9 +1466,9 @@ l2cu_modify () {
 			;;
 
 			step)
-				# ldr submodel wrapped in its own step - windows line ending ignored
+				# ldr submodel wrapped in its own step
 
-				if [[ "${component%$'\r'}" = *.[lL][dD][rR] ]]
+				if [[ "${component}" = *.[lL][dD][rR] ]]
 				then
 					# submodel color reset - applications use incompatible color schemes
 
@@ -1447,25 +1482,32 @@ l2cu_modify () {
 
 		if [ "${line_modified}" != "true" ]
 		then
-			echo "${line}" >> "${model_buffer}"
+			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
 
 			continue
 		fi
 
+		# rebuilt lines and added steps share the original line ending
+
 		if [ "${modify_option}" = "step" ]
 		then
-			echo "0 STEP" >> "${model_buffer}"
+			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
 		fi
 
-		echo "${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" >> "${model_buffer}"
+		printf '%s%s\n' "${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${line_ending}" >> "${model_buffer}"
 
 		if [ "${modify_option}" = "step" ]
 		then
-			echo "0 STEP" >> "${model_buffer}"
+			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
 		fi
 	done < "${model_path}"
 
 	frobulator.track
+
+	if [ "${lines_repaired}" -gt 0 ]
+	then
+		frobulator.inf "Repaired meta lines" "[ ${lines_repaired} ]"
+	fi
 
 	return "${status}"
 }
