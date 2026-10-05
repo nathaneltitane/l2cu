@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/Paypal-2f343f.svg?style=for-the-badge&logo=paypal&label=Donate)](https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ)
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2023-01-21 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-05 ]
 
 ---
 
@@ -16,14 +16,15 @@ Most older and even more modern editors miss that mark to provide such features 
 
 ### What can it do?
 
-L²CU supports the standard LDraw model file extension ([ldr](https://www.ldraw.org/article/218.html)) and the multi-part document (model assembly) file extension ([mpd](https://www.ldraw.org/article/47.html)).
+L²CU supports the standard LDraw model file extension ([ldr](https://www.ldraw.org/article/218.html)), the multi-part document (model assembly) file extension ([mpd](https://www.ldraw.org/article/47.html)) and the LDraw part file extension (dat).
 
 In short, with L²CU you can:
 - render your models
 - export your models (to various 3D standard formats)
+- generate building instructions, sample pages and piece counts for your models
 - modify your models (color, part or part with a specific color)
-- format your models in bulk (meta tags, steps, linting, etc.)
-- download and unpack the LDraw parts library
+- format your models in bulk (steps, linting, etc.)
+- download the LDraw parts library
 - create the legacy 'parts.lst' file
 
 You can also tweak or rework the utility's functions to match your preferences.
@@ -35,63 +36,86 @@ LDraw model files (ldr, mpd and even dat) are plain text files, thus making them
 L²CU is a shell script (BASH) that parses and modifies the text in the model file to get the job done.
 It is optimized for portability and uses a very minimal set of dependencies to get the job done.
 
+Every model found in the selected directory (and its subdirectories) is processed - paths containing spaces included.
+
 ### What does it need?
 
-On startup, L²CU verifies the presence of necessary dependencies before proceeding and pocessing the user's change request(s).
+On startup, L²CU verifies the presence of necessary dependencies before proceeding and processing the user's change request(s).
+Missing dependencies are installed on request - privilege escalation is only asked for when something is missing.
 
 You will need:
 
-Common utilities either already set up on your Linux-based system or that you can easily install using your distribution's package manager:
-
-- curl
+- [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor - all options
+- [Blender](https://www.blender.org) - The free and open source 3D creation suite - 'blender' export
+- [LPub3D](https://github.com/trevorsandy/lpub3d) - LDraw building instructions editor - 'instructions' option
+- curl - 'download' option
 - sed
-- zip
-- unzip
 
-The 'render' and 'export' features depend on the following. Install them before processing:
+### Usage
 
-- [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor
-- [Blender](https://www.blender.org) - The free and open source 3D creation suite
+```
+Usage: ./l2cu [EXTENSION] | [OPTION] [PARAMETER]
+
+-d, --directory       Specify [d]irectory to load models from.
+-f, --file            Specify model [f]ile extension to work on.              [ all | dat | ldr | mpd ]
+-e, --export          Run model file [e]xport.                                [ 3dstudio | collada | blender | wavefront ]
+-r, --render          Run model file [r]endering.                             [ full | flat | wireframe | overlay | social | thumbnail | 0 - 7 ]
+-i, --instructions    Generate model [i]nstruction file.                      [ pieces | samples ]
+-m, --modify          Run model file [m]odification.                          [ lint | color | part | bind | step ]
+-o, --overwrite       Overwrite the original model file after modification.
+-w, --download        Run do[w]nload of the LDraw parts library.              [ official | unofficial ]
+-l, --list            Generate the LDraw parts [l]ist for use with legacy editors.    [ description | number ]
+-h, --help            Show [h]elp and usage information.
+```
+
+Examples ↴
+
+```
+bash l2cu --file mpd --render full --directory ~/models
+bash l2cu --file ldr --export collada --directory ~/models
+bash l2cu --file mpd --modify step --directory ~/models/work-in-progress
+```
+
+Without a directory or file extension, L²CU asks for them - defaults are the current directory and mpd files.
 
 ### 'render'
 
-The render function generates preset, high defintion renders, of the selected LDraw model files or projects (using [LeoCAD](https://github.com/leozide/leocad) to process the renders).
+The render function generates preset, high definition renders of the selected LDraw model files or projects (using [LeoCAD](https://github.com/leozide/leocad) to process the renders).
 
-The user can choose from set defaults or specify the latitude and longitude parameters of the camera, as well as a file saving suffix to register the coordinates as a viewing angle string to the file name:
+Renders are saved under each model's 'renders' directory:
 
-Defaults (as arrays):
+- full: eight 4096 x 4096 views around the model (presets 0 to 7) - saved under 'renders/full'
+- flat / wireframe / overlay: single view with the matching shading - saved under 'renders/[option]'
+- social: single 1200 x 600 view - saved under 'renders/social'
+- thumbnail: single 512 x 512 view - saved under 'renders/thumbnail'
+- 0 to 7: single view preset - saved under 'renders'
 
-latitude=(
-	30
-	30
-	30
-	30
-)
+View presets (latitude / longitude):
 
-longitude=(
-	225
-	45
-	180
-	0
-)
-
-view=(
-	"quarter-back"
-	"quarter-front"
-	"back"
-	"front"
-)
+| preset | latitude | longitude |
+|---|---|---|
+| 0 | 30 | 0 |
+| 1 | 30 | 45 |
+| 2 | 30 | 90 |
+| 3 | 30 | 135 |
+| 4 | 30 | 180 |
+| 5 | 30 | 225 |
+| 6 | 30 | 270 |
+| 7 | 30 | 315 |
 
 You can refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences.
 
 ### 'export'
 
 This function serves as a 3D standard file exporter.
-It can generate (with the use of Leocad and/or Blender) the following formats:
+It can generate (with the use of LeoCAD and/or Blender) the following formats:
 
-- 3ds
-- wavefront (as obj and mtl within a zip archive)
-- blender compatible and optimized 3D files
+- collada (dae) - default
+- 3dstudio (3ds)
+- wavefront (obj and mtl)
+- blender compatible and optimized 3D files (blend - exported through wavefront, then joined, smoothed and cleaned up in Blender)
+
+Exports are saved under each model's 'exports' directory - files above 25 MB are flagged for their loading times.
 
 The model exports can be used for showcase purposes, displaying them online in personal or commercial galleries (uses WebGL: [Three.JS](https://threejs.org/))
 
@@ -100,42 +124,62 @@ Examples:
 - [mechablocks](https://mechablocks.com)
 - [Sketchfab](https://sketchfab.com)
 
+### 'instructions'
+
+This function generates building instructions with [LPub3D](https://github.com/trevorsandy/lpub3d), based on a configuration framework (title, piece count, category and url are filled in for each model):
+
+- default: full instructions document (pdf)
+- pieces: piece count written to the model's 'pieces' file
+- samples: six sample pages spread over the instructions (png) - saved under 'instructions/samples'
+
+Models flagged with a 'work-in-progress' file receive placeholder samples instead.
+
 ### 'modify'
 
 Here is where the batch editing happens: this feature is extremely helpful when processing massive model updates and color or part adjustments that would normally be done manually through an editor.
 
-The script uses stream editing to find and replace the desired elements, using the LDraw file specification syntax as reference.
+The script parses the model files, using the LDraw file specification syntax as reference.
 
-The user can modify any ldr or mpd file in one of four ways:
+The user can modify any ldr or mpd file in one of five ways:
 
 - modify any specific color for another (color option)
 - modify any specific part for another (part option)
 - modify the color of a specific part to any other color for that same part (bind option)
-- modify or eliminate unwanted or extraneous meta tags
-- strip special characters from model and submodel assemblies
-- condense the model or project file by removing unneded blank or extraneous lines that could otherwise corrupt the file
+- wrap each ldr submodel reference in its own step (step option)
+- standardize the model file for parsing (lint option):
+  - eliminate unwanted or extraneous meta tags
+  - strip special characters from model and submodel assemblies
+  - condense the model or project file by removing unneeded blank or extraneous lines that could otherwise corrupt the file
 
-### 'get'
+Colors can be entered by name, number or hexadecimal value - the official LDraw colors are listed when no match is found.
 
-The 'get' function lets you download and extract the LDraw parts library. This is especially useful for quick updates or if you're getting started.
+Only the part and submodel lines that match the request are rewritten - every other line is kept as is, line endings included.
+Stray ' . . .' tails left on meta lines by earlier versions of L²CU are repaired along the way.
 
-You can:
+Modifications are written to a timestamped copy of the model file ('[model]-modified-[timestamp].[extension]') unless the overwrite option is selected.
 
-- download the LDraw parts library using the -complete, -update, or -unofficlal parameters.
-- download the 'complete' official LDraw parts library archive
-- download the 'update' officialLDraw parts library archive
-- download the complete 'unofficial' LDraw parts library archive
+### 'download'
 
-### 'make-list'
+The 'download' function lets you download the LDraw parts library. This is especially useful for quick updates or if you're getting started.
 
-The 'make-list' option was the initial project script that started L²CU over 6 years ago.
+You can download:
+
+- the complete 'official' LDraw parts library archive - saved as 'ldraw.zip'
+- the complete 'unofficial' LDraw parts library archive - saved as 'ldrawunf.zip'
+
+LeoCAD reads the parts library archive directly - no extraction needed.
+
+### 'list'
+
+The 'list' option was the initial project script that started L²CU over 6 years ago.
 
 This (now) function was built as a need to replace the 'mklist.exe' utility that is found and packaged with the base LDraw parts library archive.
 It serves the exact same purpose: parse and generate an updated list of all the parts located under the main 'LDraw' directory (within ./LDraw/parts).
 
-The user can create a list that sorts the parts in that directory either by part [n]umber or by part [d]escription.
+The user can create a list that sorts the parts in that directory either by part number or by part description.
+Moved parts are skipped - parts with descriptions starting with '_' or '~' are listed last.
 
-This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on the oldtext based index (parts.lst) to load parts into the editor (i.e.: [MLCAD](http://mlcad.lm-software.com/), which can be run using [Wine](https://www.winehq.org/) when using Linux-based distributions).
+This utility comes in handy with the use of editors or other LDraw related application that do not have the ability to generate their own parts index or that rely on the old text based index (parts.lst) to load parts into the editor (i.e.: [MLCAD](http://mlcad.lm-software.com/), which can be run using [Wine](https://www.winehq.org/) when using Linux-based distributions).
 
 More modern or cutting-edge editors now generate a cached dynamic index or database on startup and do not require the list generated by this function anymore.
 
@@ -190,7 +234,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ---
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2023-01-21 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-05 ]
 
 ### Enjoying L²CU? Buy me a coffee to show your appreciation!
 
