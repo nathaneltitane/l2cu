@@ -65,7 +65,7 @@ frobulator.script
 
 # version ──────────────────────────────────────────────────────────────────────
 
-version="2026-10-04"
+version="2026-10-05"
 
 # usage ────────────────────────────────────────────────────────────────────────
 
@@ -80,7 +80,9 @@ do
 		;;
 
 		-f|--file)
-			file="file"
+			# model file extension follows as parameter
+
+			:
 		;;
 
 			all)
@@ -91,29 +93,13 @@ do
 					ldr
 					mpd
 				)
-				;;
-
-			dat)
-				extension_option="dat"
-
-				extensions_list=(
-					dat
-				)
 			;;
 
-			ldr)
-				extension_option="ldr"
+			dat|ldr|mpd)
+				extension_option="${1}"
 
 				extensions_list=(
-					ldr
-				)
-			;;
-
-			mpd)
-				extension_option="mpd"
-
-				extensions_list=(
-					mpd
+					"${1}"
 				)
 			;;
 
@@ -140,8 +126,10 @@ do
 			;;
 
 			blender)
-				export_option="3dstudio"
-				export_extension="blend"
+				# exported as obj - optimized into blend
+
+				export_option="blender"
+				export_extension="obj"
 				export_name="Blender"
 			;;
 
@@ -153,141 +141,51 @@ do
 
 		-r|--render)
 			option="render"
-			export_extension="png"
 		;;
 
-			full)
-				render_option="full"
-				render_preset="full"
-			;;
-
-			flat)
-				render_option="flat"
-				render_preset="flat"
-			;;
-
-			wireframe)
-				render_option="wireframe"
-				render_preset="wireframe"
-			;;
-
-			overlay)
-				render_option="overlay"
-				render_preset="overlay"
-			;;
-
-			social)
-				render_option="social"
-				render_preset="social"
-			;;
-
-			thumbnail)
-				render_option="thumbnail"
-				render_preset="thumbnail"
-			;;
-
-			1)
-				render_option="1"
-				render_preset="1"
-			;;
-
-			2)
-				render_option="2"
-				render_preset="2"
-			;;
-
-			3)
-				render_option="3"
-				render_preset="3"
-			;;
-
-			4)
-				render_option="4"
-				render_preset="4"
-			;;
-
-			5)
-				render_option="5"
-				render_preset="5"
-			;;
-
-			6)
-				render_option="6"
-				render_preset="6"
-			;;
-
-			7)
-				render_option="7"
-				render_preset="7"
+			full|flat|wireframe|overlay|social|thumbnail|[0-7])
+				render_option="${1}"
 			;;
 
 		-i|--instructions)
 			option="instructions"
-			export_extension="pdf"
 		;;
-			pieces)
-				instructions_option="pieces"
-			;;
 
-			samples)
-				instructions_option="samples"
-				export_extension="png"
+			pieces|samples)
+				instructions_option="${1}"
 			;;
 
 		-m|--modify)
 			option="modify"
 		;;
 
-			color)
-				modify_option="color"
-			;;
-
-			part)
-				modify_option="part"
-			;;
-
-			bind)
-				modify_option="bind"
-			;;
-
-			lint)
-				modify_option="lint"
-			;;
-
-			step)
-				modify_option="step"
+			color|part|bind|lint|step)
+				modify_option="${1}"
 			;;
 
 		-o|--overwrite)
 			overwrite_option="overwrite"
 		;;
 
-		-d|--download)
+		-w|--download)
 			option="download"
 		;;
 
-			official)
-				download_option="official"
-			;;
-
-			unofficial)
-				download_option="unofficial"
+			official|unofficial)
+				download_option="${1}"
 			;;
 
 		-l|--list)
-			option="make-list"
+			option="list"
+			extension_option="dat"
 
 			extensions_list=(
 				dat
 			)
 		;;
 
-			description)
-				sort_option="description"
-			;;
-
-			number)
-				sort_option="number"
+			description|number)
+				sort_option="${1}"
 			;;
 
 		-h|--help)
@@ -309,7 +207,7 @@ do
 			echo
 			echo -e "                      3dstudio     Export 3dstudio file format. [ 3ds ]"
 			echo -e "                      collada      Export collada file format. [ dae ]"
-			echo -e "                      blender      Optimize 3dstudio and export to blender file format. [ 3ds >>> blend ]"
+			echo -e "                      blender      Optimize wavefront and export to blender file format. [ obj >>> blend ]"
 			echo -e "                      wavefront    Generate wavefront files and archive. [ obj + mtl ]"
 			echo
 			echo -e "-r, --render          Run model file [r]endering using the following parameters:"
@@ -345,9 +243,9 @@ do
 			echo -e "                      step         Separate ldr based submodels using step meta tags."
 			echo -e "                      overwrite    Overwrite the original model file after modification."
 			echo
-			echo -e "-d, --download        Run [d]ownload of the LDraw parts library."
+			echo -e "-w, --download        Run do[w]nload of the LDraw parts library."
 			echo
-			echo -e "                      [ official | unofficlal ]"
+			echo -e "                      [ official | unofficial ]"
 			echo
 			echo -e "                      official      Download the LDraw parts library - complete official archive."
 			echo -e "                      unofficial    Download the LDraw parts library - complete unofficial archive."
@@ -392,7 +290,63 @@ done
 
 # variables ────────────────────────────────────────────────────────────────────
 
-stamp=$(date +"%m-%d-%Y-%H-%M-%S")
+# modified model copies timestamp
+
+stamp="$(date +"%m-%d-%Y-%H-%M-%S")"
+
+# ldraw parts library
+
+url_library="${marker_hts}www.ldraw.org/library"
+
+# lpub3d instructions framework - configuration / placeholders
+
+instructions_base_directory="/media/internal/Lego/lpub3d/instructions"
+
+# render camera presets - latitude / longitude / view label
+
+latitude=(
+	30
+	30
+	30
+	30
+	30
+	30
+	30
+	30
+)
+
+longitude=(
+	0
+	45
+	90
+	135
+	180
+	225
+	270
+	315
+)
+
+view=(
+	"00"
+	"01"
+	"02"
+	"03"
+	"04"
+	"05"
+	"06"
+	"07"
+)
+
+# 'lpub3d' path - empty if not installed
+
+command_lpub3d="$(command -v lpub3d)"
+
+if [ -n "${command_lpub3d}" ]
+then
+	lpub="lpub3d"
+else
+	lpub="lpub3d24"
+fi
 
 # defaults ─────────────────────────────────────────────────────────────────────
 
@@ -406,7 +360,7 @@ then
 	then
 		# specify directory location or exit on 'cancel'
 
-		directory=$(frobulator.dialog "Directory")
+		directory="$(frobulator.dialog "Directory")"
 	else
 		frobulator.err "No directory specified."
 
@@ -416,7 +370,7 @@ then
 	fi
 fi
 
-if [ -z "${file}" ]
+if [ -z "${extension_option}" ]
 then
 	frobulator.qst "Specify model file type? [ simple / multipart ]"
 
@@ -424,38 +378,35 @@ then
 
 	if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
 	then
-		# specify directory location or exit on 'cancel'
-
-		frobulator.ipt "Specify model file extension [ dat / ldr / mpd ]"
+		frobulator.ipt "Specify model file extension [ all / dat / ldr / mpd ]"
 
 		while true
 		do
 			frobulator.read extension_option
 
-			if [ -z "${extension_option}" ] || [[ ! "${extension_option}" =~ [all|dat|ldr|mpd] ]]
+			if [[ "${extension_option}" =~ ^(all|dat|ldr|mpd)$ ]]
 			then
-				frobulator.wrn "Unrecognized model file extension."
-				frobulator.wrn "Try again."
-			else
-				if [[ "${extension_option}" = "all" ]]
-				then
-					extensions_list=(
-						dat
-						ldr
-						mpd
-					)
-				else
-					extensions_list=(
-						${extension_option}
-					)
-				fi
-
 				break
 			fi
+
+			frobulator.wrn "Unrecognized model file extension."
+			frobulator.wrn "Try again."
 		done
+
+		if [ "${extension_option}" = "all" ]
+		then
+			extensions_list=(
+				dat
+				ldr
+				mpd
+			)
+		else
+			extensions_list=(
+				"${extension_option}"
+			)
+		fi
 	else
-		# set default to ldr file extension:
-		# mpd file extension officially deprecated in favor of ldr
+		# default - multipart model files
 
 		frobulator.err "No file type specified."
 
@@ -469,14 +420,31 @@ then
 	fi
 fi
 
+if [ "${option}" = "export" ] && [ -z "${export_option}" ]
+then
+	export_option="collada"
+	export_extension="dae"
+	export_name="Collada"
+fi
+
+if [ "${option}" = "render" ]
+then
+	export_extension="png"
+fi
+
+if [ "${option}" = "instructions" ]
+then
+	if [ "${instructions_option}" = "samples" ]
+	then
+		export_extension="png"
+	else
+		export_extension="pdf"
+	fi
+fi
+
 if [ -z "${render_option}" ]
 then
 	render_option="full"
-fi
-
-if [ -z "${export_option}" ]
-then
-	export_option="collada"
 fi
 
 if [ -z "${modify_option}" ]
@@ -494,116 +462,114 @@ then
 	sort_option="description"
 fi
 
-# 'lpub3d' path - empty if not installed
-
-command_lpub3d="$(command -v lpub3d)"
-
-if [ -n "${command_lpub3d}" ]
-then
-    lpub=lpub3d
-else
-    lpub=lpub3d24
-fi
-
 # functions ────────────────────────────────────────────────────────────────────
 
 l2cu_initialize () {
 
-	if [[ "${option}" = "export" ]]
+	local status=0
+
+	# blender conversion script - temporary - removed on exit
+
+	if [ "${option}" = "export" ] && [ "${export_option}" = "blender" ]
 	then
-		optimize=$(mktemp /tmp/optimize.XXXXXX)
+		frobulator.temporary directory_temporary
 
-		trap 'rm				\
-				--recursive		\
-				--force			 "${optimize}"' EXIT
+		frobulator.track || return "${status}"
 
-		# push blender conversion script to temporary file
+		frobulator.trap "${directory_temporary}"
 
-		cat <<- 'OPTIMIZE' > "${optimize}"
+		file_optimize="${directory_temporary}/optimize.py"
+
+		# python indentation uses spaces - heredoc strips leading tabs only
+
+		cat <<- 'OPTIMIZE' > "${file_optimize}"
 		#!/usr/bin/env python3
 
 		import os
+		import sys
 		import bpy
-		from sys import argv
 
-		context = bpy.context
+		# arguments - blender --background --python [script] -- [obj]
 
-		# arguments #
-		# [blender, --background, --python, script, 3ds]
-		# model_path = argv[4]
+		export_model = os.path.abspath(sys.argv[sys.argv.index("--") + 1])
 
-		# prepare scene #
+		# prepare scene
 
-		for obj in context.scene.objects:
-			obj.select = True
-
+		bpy.ops.object.select_all(action = "SELECT")
 		bpy.ops.object.delete()
 
-		# import #
+		# import
 
-		export_model = argv[4]
-		bpy.ops.import_scene.autodesk_3ds(filepath=export_model)
+		bpy.ops.wm.obj_import(filepath = export_model)
 
-		# join objects #
+		# join objects
 
-		context.scene.objects.active = context.selected_objects[0]
+		meshes = [obj for obj in bpy.context.scene.objects if obj.type == "MESH"]
+
+		for obj in meshes:
+		    obj.select_set(True)
+
+		bpy.context.view_layer.objects.active = meshes[0]
 		bpy.ops.object.join()
 
-		# normalize transforms #
+		# normalize transforms
+
 		bpy.ops.object.transform_apply(
-			location = True,
-			rotation = True,
-			scale = True
+		    location = True,
+		    rotation = True,
+		    scale = True
 		)
 
-		# add smooth shade and edge split modifiers #
+		# add smooth shade and edge split modifiers
 
 		bpy.ops.object.shade_smooth()
 		bpy.ops.object.modifier_add(
-			type = "EDGE_SPLIT"
+		    type = "EDGE_SPLIT"
 		)
 
-		# remove doubles #
+		# remove doubles - loose vertices - fix normals
 
-		bpy.ops.object.editmode_toggle()
+		bpy.ops.object.mode_set(mode = "EDIT")
+		bpy.ops.mesh.select_all(action = "SELECT")
 		bpy.ops.mesh.remove_doubles()
-
-		# remove loose vertices #
-
+		bpy.ops.mesh.select_all(action = "DESELECT")
 		bpy.ops.mesh.select_loose()
-		bpy.ops.mesh.delete(type='VERT')
-
+		bpy.ops.mesh.delete(type = "VERT")
+		bpy.ops.mesh.select_all(action = "SELECT")
 		bpy.ops.mesh.normals_make_consistent(
-			inside = False
+		    inside = False
 		)
-		bpy.ops.object.editmode_toggle()
+		bpy.ops.object.mode_set(mode = "OBJECT")
 
-		# save #
+		# save
 
-		blend_file = export_model.replace(".3ds",".blend")
+		blend_file = os.path.splitext(export_model)[0] + ".blend"
 		bpy.ops.wm.save_as_mainfile(
-			filepath = blend_file,
-			compress = True
+		    filepath = blend_file,
+		    compress = True
 		)
-
-		# print output #
 
 		print("saved as:", blend_file)
-		bpy.ops.wm.quit_blender()
 		OPTIMIZE
+
+		frobulator.track
 	fi
 
-	if [[ "${option}" = "modify" ]]
+	# ldraw colors - temporary - removed on exit
+
+	if [ "${option}" = "modify" ]
 	then
-		colors=$(mktemp /tmp/ldraw-colors.XXXXXX)
+		frobulator.temporary directory_temporary
 
-		trap 'rm				\
-				--recursive		\
-				--force			 "${colors}"' EXIT
+		frobulator.track || return "${status}"
 
-		# push ldraw colors descriptors to temporary file
+		frobulator.trap "${directory_temporary}"
 
-		cat <<- 'COLORS' > "${colors}"
+		file_colors="${directory_temporary}/colors"
+
+		# name / number / hexadecimal
+
+		cat <<- 'COLORS' > "${file_colors}"
 		Black                                   0          #05131D
 		Blue                                    1          #0055BF
 		Green                                   2          #257A3E
@@ -751,28 +717,30 @@ l2cu_initialize () {
 		Electric_Contact_Alloy                  494        #D0D0D0
 		Electric_Contact_Copper                 495        #AE7A59
 		COLORS
+
+		frobulator.track
 	fi
 
+	return "${status}"
 }
 
-l2cu_optimize () {
+l2cu_model () {
 
-	# optimize model mesh
+	# model path elements - shared by all options
 
-	frobulator.inf "Exporting" "[ ${model_file} ]"
+	local status=0
 
-	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
+	model_path="${1}"
+	model_file="${model_path##*/}"
+	model_name="${model_file%.*}"
+	model_directory="${model_path%/*}"
 
-	blender								\
-		--background					\
-		--python		"${optimize}"	\
-										"${export_file_3ds}" > "${sink}" 2>&1 &
-
-	frobulator.progress "optimize"
-
+	return "${status}"
 }
 
 l2cu_export () {
+
+	local status=0
 
 	frobulator.inf "Exporting" "[ ${model_file} ]"
 
@@ -784,107 +752,129 @@ l2cu_export () {
 
 	frobulator.progress "generate"
 
-	if [[ "${export_option}" = "collada" ]]
+	frobulator.track || return "${status}"
+
+	# collada transparency read as opaque by viewers
+
+	if [ "${export_option}" = "collada" ]
 	then
 		sed																\
 			-i															\
 			-e		's/<transparent>/<transparent opaque="A_ONE">/g'	\
 																		"${export_file}"
+
+		frobulator.track
 	fi
 
+	return "${status}"
+}
+
+l2cu_optimize () {
+
+	# import obj into blender - save optimized blend - obj and mtl removed
+
+	local status=0
+	local export_file_blend="${model_name}.blend"
+
+	frobulator.fwd "Optimizing..."
+
+	frobulator.fwd "Output" "[ ${export_name} // ${export_file_blend} ]"
+
+	blender									\
+		--background						\
+		--python		"${file_optimize}"	\
+		--									\
+											"${export_file}" > "${sink}" 2>&1 &
+
+	frobulator.progress "optimize"
+
+	frobulator.track || return "${status}"
+
+	# blender exits without error when saving fails
+
+	if [ ! -f "${export_file_blend}" ]
+	then
+		status=1
+
+		return "${status}"
+	fi
+
+	rm --force "${export_file}" "${model_name}.mtl"
+
+	export_file="${export_file_blend}"
+
+	return "${status}"
 }
 
 l2cu_export_size () {
 
-	# validate export file size
+	# export file size in kilobytes - threshold 25 * 1024
 
-	block_size=1024
+	local status=0
+	local size_threshold=25600
+	local size_unit="kilobytes"
 
-	# calculate model size in bytes
+	local export_size
 
-	export_size=$(find "${export_directory}/${export_file}" -type f | du -B "${block_size}" | cut -f 1)
+	export_size="$(du -k "${export_file}" | cut -f 1)"
 
-	# set model size threshold in bytes : 25 * 1024
+	frobulator.track || return "${status}"
 
-	export_size_threshold="25600"
-
-	size_unit="bytes"
-
-	# if lesser than threshold
-
-	if [ "${export_size}" -le "${export_size_threshold}" ]
+	if [ "${export_size}" -le "${size_threshold}" ]
 	then
 		frobulator.scs "File size" "[ ${size_unit} // ${export_size} ]"
-	fi
-
-	# if greater than threshold
-
-	if [ "${export_size}" -gt "${export_size_threshold}" ]
-	then
+	else
 		frobulator.wrn "File size" "[ ${size_unit} // ${export_size} ]"
 
-		frobulator.wrn "Model file size is above recommended threshold of ${export_size_threshold}B!"
+		frobulator.wrn "Model file size is above recommended threshold of ${size_threshold} ${size_unit}!"
 		frobulator.nul "You may experience higher than average loading times."
 	fi
 
+	return "${status}"
 }
 
 l2cu_render () {
 
-	# render model
+	local status=0
+	local coordinates="${1}"
+	local antialias_samples=8
+	local render_file="${model_name}-${view[coordinates]}.${export_extension}"
 
 	frobulator.inf "Rendering" "[ ${model_name} ]"
 
 	frobulator.fwd "Output" "[ view preset ${view[coordinates]} // ${render_file} ]"
 
-	model_path="${1}"
-	coordinates="${2}"
-
-	if [[  -z "${height}" ]]
-	then
-		height="4096"
-	fi
-
-	if [[ -z "${width}" ]]
-	then
-		width="4096"
-	fi
-
-	antialias_samples="8"
-	extension="${export_extension}"
-
-	leocad																		\
-		--height		"${height}"												\
-		--width			"${width}"												\
-		--camera-angles	${latitude[$coordinates]} ${longitude[$coordinates]}	\
-		--shading		"${shading}"											\
-		--line-width	"${line_width}" 										\
-		--aa-samples	"${antialias_samples}" 									\
-		--image			"${model_name}-${view[$coordinates]}.${extension}"		\
-																				"${model_path}" > "${sink}" 2>&1 &
+	leocad																			\
+		--height		"${height}"													\
+		--width			"${width}"													\
+		--camera-angles	"${latitude[coordinates]}" "${longitude[coordinates]}"		\
+		--shading		"${shading}"												\
+		--line-width	"${line_width}"												\
+		--aa-samples	"${antialias_samples}"										\
+		--image			"${render_file}"											\
+																					"${model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "render"
 
+	frobulator.track
+
+	return "${status}"
 }
 
 l2cu_pieces () {
 
-	# define pieces output files
+	# total piece count written to model pieces file
 
-	part_count_file="${model_directory}"/parts.csv
+	local status=0
+	local part_count_file="${model_directory}/parts.csv"
+	local pieces_file="${model_directory}/pieces"
+	local total_pieces=0
 
-	pieces_file="${model_directory}"/pieces
+	local part_quantity
 
-	# generate total piece count
+	local -a part_fields=()
 
 	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
-
-	if [ -f "${pieces_file}" ]
-	then
-		rm					\
-			--recursive		\
-			--force			 "${pieces_file}"
-	fi
 
 	leocad										\
 		--export-csv	"${part_count_file}"	\
@@ -892,358 +882,294 @@ l2cu_pieces () {
 
 	frobulator.progress "parse"
 
-	# remove header
+	frobulator.track || return "${status}"
 
-	sed -i '1d' "${part_count_file}"
+	# quantity is the third field from the end - part names may contain commas - header skipped
 
-	wait
-
-	# generate piece count per part file
-
-	while IFS=''
-	read -r line
+	while IFS=',' read -r -a part_fields
 	do
-		# set IFS
+		part_quantity="${part_fields[-3]//\"/}"
 
-		IFS=','
-
-		read -r _ _ part_count _ _ <<< "${line}"
-
-		echo "${part_count}" >> "${pieces_file}"
-
-		# reset IFS
-
-		IFS=''
-
-	done < "${part_count_file}"
-
-	IFS=''
-
-	# calculate total piece count
-
-	total_pieces=0
-
-	while read piece_count
-	do
-		total_pieces=$(( total_pieces + piece_count ))
-
-	done < "${pieces_file}"
-
-	# write pieces count to pieces file
+		total_pieces=$(( total_pieces + part_quantity ))
+	done < <(tail -n +2 "${part_count_file}")
 
 	echo "${total_pieces}" > "${pieces_file}"
 
-	# cleanup
+	frobulator.track
 
-	if [ -f "${part_count_file}" ]
-	then
-		rm					\
-			--recursive		\
-			--force			 "${part_count_file}"
-	fi
+	rm --force "${part_count_file}"
 
 	frobulator.stp "Pieces" "[ ${total_pieces} ]"
 
+	return "${status}"
 }
 
 l2cu_instructions_clean () {
 
-	# remove files
+	# lpub3d configuration and cache files
 
-	files_removal_list=(
-		"${instructions_directory}"/configuration
-		"${instructions_directory}"/instructions.mpd
-		"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
-	)
+	local status=0
 
-	for file in ${files_removal_list[@]}
-	do
-		rm					\
-			--recursive		\
-			--force			"${file}"
-	done
+	rm																		\
+		--recursive															\
+		--force																\
+			"${instructions_directory}/configuration"						\
+			"${instructions_model_path}"									\
+			"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
 
-	files_removal_list=()
+	frobulator.track
 
+	return "${status}"
 }
 
 l2cu_instructions_prepare () {
 
-	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
+	# fresh instructions directory
 
-	# enter model directory
+	local status=0
+
+	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
 
 	cd "${model_directory}"
 
-	# generate instructions directory
+	frobulator.track || return "${status}"
 
-	if [[ -d "${instructions_directory}" ]]
-	then
-		rm					\
-			--recursive		\
-			--force			 "${instructions_directory}"
-	fi
+	rm --recursive --force "${instructions_directory}"
 
-		frobulator.directory "${model_directory}" instructions
+	frobulator.directory "${model_directory}" instructions
 
-		frobulator.directory "${instructions_directory}" samples
+	frobulator.track || return "${status}"
 
+	frobulator.directory "${instructions_directory}" samples
+
+	frobulator.track
+
+	return "${status}"
 }
 
 l2cu_instructions_configure () {
+
+	local status=0
+
+	local configuration_file
+	local configuration_title
+	local configuration_pieces
+	local configuration_url_category
+	local configuration_url_name
+	local line
+
+	local -a configuration_files_list=(
+		"${model_directory}/title"
+		"${model_directory}/pieces"
+		"${model_directory%/*}/title"
+	)
 
 	frobulator.inf "Configuring instructions" "[ ${model_name} ]"
 
 	frobulator.inf "Validating configuration elements"
 
-	configuration_files_list=(
-		"${model_path%/*}"/title
-		"${model_path%/*}"/pieces
-		"${model_path%/*/*}"/title
-	)
-
-	for configuration_file in ${configuration_files_list[@]}
+	for configuration_file in "${configuration_files_list[@]}"
 	do
-		if [[ -f "${configuration_file}" ]]
+		if [ ! -f "${configuration_file}" ]
 		then
-			:
-		else
 			frobulator.err "Configuration element missing" "[ ${configuration_file} ]"
 
-			frobulator.fwd "Aborting..."
-
-			break
-
-			exit 1
+			status=1
 		fi
 	done
 
-	configuration_files_list=()
+	if [ "${status}" -ne 0 ]
+	then
+		return "${status}"
+	fi
 
 	frobulator.fwd "Parsing..."
 
-	# prepare instructions model file
+	# title on one line - line breaks removed
 
-	while read -r line
+	configuration_title="$(< "${model_directory}/title")"
+	configuration_title="${configuration_title//$'\n'/ }"
+	configuration_title="${configuration_title//<\/br>/}"
+
+	configuration_pieces="$(< "${model_directory}/pieces")"
+
+	# category from parent directory title - url form
+
+	configuration_url_category="$(< "${model_directory%/*}/title")"
+	configuration_url_category="${configuration_url_category// /-}"
+
+	configuration_url_name="${model_name^^}"
+
+	# substitute configuration variables - write instructions configuration
+
+	while IFS='' read -r line
 	do
-		# substitute variables
-
-		# title
-
-		if [[ $line =~ configuration_title_string ]]
-		then
-			configuration_title=$(cat "${model_path%/*}"/title)
-
-			configuration_title_string=${configuration_title//$'\n'/ }
-
-			configuration_title_string=${configuration_title_string//\<\/\br\>/}
-
-			line=${line/'${configuration_title_string}'/${configuration_title_string}}
-		fi
-
-		# pieces
-
-		if [[ $line =~ configuration_pieces ]]
-		then
-			configuration_pieces=$(cat "${model_path%/*}"/pieces)
-
-			line=${line/'${configuration_pieces}'/${configuration_pieces}}
-		fi
-
-		# category
-
-		if [[ $line =~ configuration_url_category ]]
-		then
-			configuration_url_category=$(cat "${model_path%/*/*}"/title)
-
-			configuration_url_category="${configuration_url_category// /-}"
-
-			line=${line/'${configuration_url_category}'/${configuration_url_category}}
-		fi
-
-		# url
-
-		if [[ $line =~ configuration_url_name ]]
-		then
-			configuration_url_name="${model_name^^}"
-
-			line=${line/'${configuration_url_name}'/${configuration_url_name}}
-		fi
-
-		# write line to instructions file
+		line="${line//'${configuration_title_string}'/"${configuration_title}"}"
+		line="${line//'${configuration_pieces}'/"${configuration_pieces}"}"
+		line="${line//'${configuration_url_category}'/"${configuration_url_category}"}"
+		line="${line//'${configuration_url_name}'/"${configuration_url_name}"}"
 
 		echo "${line}"
+	done < "${instructions_base_directory}/configuration" > "${instructions_directory}/configuration"
 
-	done < "${instructions_base_directory}"/configuration > "${instructions_directory}"/configuration
+	frobulator.track || return "${status}"
 
 	frobulator.fwd "Configuring..."
 
-	# concatenate configuration from base instructions framework
+	# configuration from base instructions framework followed by model
 
-	cat "${instructions_directory}"/configuration "${model_path}" > "${instructions_model_path}"
+	cat "${instructions_directory}/configuration" "${model_path}" > "${instructions_model_path}"
 
+	frobulator.track
+
+	return "${status}"
 }
 
 l2cu_instructions_samples_placeholders () {
 
-	# generate placeholder
+	local status=0
+
+	local sample_index
 
 	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
 
-	for (( i=1; i<=6; ++i ))
+	for (( sample_index = 1; sample_index <= 6; sample_index++ ))
 	do
-		pad="0"
-		instance="${pad}${i}"
+		cp "${instructions_base_directory}/work-in-progress.png" "${instructions_samples_directory}/sample-0${sample_index}.png"
 
-		sample_name="sample"
-		sample_file="${sample_name}-${instance}.${export_extension}"
-
-		cp "${instructions_base_directory}"/work-in-progress.png "${instructions_samples_directory}"/"${sample_file}"
+		frobulator.track
 	done
 
+	return "${status}"
 }
 
 l2cu_instructions_samples () {
 
-	# generate samples
+	local status=0
+	local renderer="native"
+	local projection="perspective"
+	local sample_number=1
+
+	local step_count
+	local sample_index
+	local sample_range
+	local sample_path
+
+	local -a sample_pages=()
+	local -a samples_list=()
 
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 
-	instructions_step_count=$(sort -V "${instructions_model_path}" | uniq -c -d | grep " STEP" | grep -E -o "[0-9]+" | sort -V | tail -n 1)
+	# step count of the instructions model
 
-	# generate sample page numbers
+	step_count="$(grep -c -E '^0 STEP' "${instructions_model_path}")"
 
-	sample_page_first=$(( ( ${instructions_step_count} / ${instructions_step_count} ) ))
+	# six sample pages spread over the instructions - first page minimum
 
-	sample_page_second=$(( ( ${instructions_step_count} / 5 ) - 2 ))
-
-	sample_page_third=$(( ( ${instructions_step_count} / 4 ) - 3 ))
-
-	sample_page_fourth=$(( ( ${instructions_step_count} / 3 ) - 4 ))
-
-	sample_page_fifth=$((  ( ${instructions_step_count} / 2 )  - 5 ))
-
-	sample_page_last=$(( ${instructions_step_count} ))
-
-	# generate sample page range
-
-	sample_page_range+=(
-		"${sample_page_first},"
-		"${sample_page_second},"
-		"${sample_page_third},"
-		"${sample_page_fourth},"
-		"${sample_page_fifth},"
-		"${sample_page_last}"
+	sample_pages=(
+		1
+		$(( step_count / 5 - 2 ))
+		$(( step_count / 4 - 3 ))
+		$(( step_count / 3 - 4 ))
+		$(( step_count / 2 - 5 ))
+		"${step_count}"
 	)
 
-	# generate samples
+	for sample_index in "${!sample_pages[@]}"
+	do
+		if [ "${sample_pages[sample_index]}" -lt 1 ]
+		then
+			sample_pages[sample_index]=1
+		fi
+	done
 
+	printf -v sample_range '%s,' "${sample_pages[@]}"
 
-	renderer="native"
-	projection="perspective"
+	sample_range="${sample_range%,}"
 
-	export_option="${export_extension}"
+	frobulator.stp "Generating range" "[ ${sample_range} ]"
 
-	range=$(echo ${sample_page_range[@]})
-
-	frobulator.stp "Generating range" "[ ${range} ]"
-
-	"${lpub}"										\
-		--clear-cache								\
-		--preferred-renderer	"${renderer}"		\
-		--projection			"${projection}"		\
-		--process-export							\
-		--export-option			"${export_option}"	\
-		--range					"${range}"			\
-													"${instructions_model_path}" > ${sink} 2>&1 &
+	"${lpub}"											\
+		--clear-cache									\
+		--preferred-renderer	"${renderer}"			\
+		--projection			"${projection}"			\
+		--process-export								\
+		--export-option			"${export_extension}"	\
+		--range					"${sample_range}"		\
+														"${instructions_model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
 
-	# configuration cleanup
+	frobulator.track
 
 	l2cu_instructions_clean
 
-	# rename sample files
+	# sample pages renamed in page order
 
-	instance_count=1
+	mapfile -t samples_list < <(find "${instructions_directory}" -type f -iname "*page*.${export_extension}" | sort -V)
 
-	for extension in "${export_option}"
+	for sample_path in "${samples_list[@]}"
 	do
-		samples_list=( $(find "${instructions_directory}" -type f -iname "*page*.${export_option}" | sort -V) )
+		mv "${sample_path}" "${instructions_samples_directory}/sample-0${sample_number}.${export_extension}"
 
-		# set IFS
+		frobulator.track
 
-		IFS=$'\n'
-
-		for sample_path in ${samples_list[@]}
-		do
-			pad="0"
-			instance="${pad}${instance_count}"
-
-			sample_name="sample"
-			sample_file="${sample_name}-${instance}.${export_extension}"
-
-			mv "${sample_path}" "${instructions_samples_directory}"/"${sample_file}"
-
-			(( instance_count ++ ))
-		done
+		sample_number=$(( sample_number + 1 ))
 	done
 
-	# reset IFS
-
-	IFS=''
-
-	sample_page_range=()
-
+	return "${status}"
 }
 
 l2cu_instructions () {
 
-	# generate model instructions
+	local status=0
+	local renderer="native"
+	local projection="perspective"
 
 	frobulator.inf "Generating instructions" "[ ${model_name} ]"
 
-	renderer="native"
-	projection="perspective"
-
-	export_option="${export_extension}"
-
-	lpub3d24												\
-		--clear-cache										\
-		--preferred-renderer	"${renderer}"				\
-		--projection			"${projection}"				\
-		--process-export									\
-		--export-option			"${export_option}"			\
-		--pdf-output-file		"${instructions_file}"		\
-															"${instructions_model_path}" > "${sink}" 2>&1 &
+	"${lpub}"																\
+		--clear-cache														\
+		--preferred-renderer	"${renderer}"								\
+		--projection			"${projection}"								\
+		--process-export													\
+		--export-option			"${export_extension}"						\
+		--pdf-output-file		"${instructions_directory}/${model_name}.pdf"	\
+																			"${instructions_model_path}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
 
-	# configuration cleanup
+	frobulator.track
 
 	l2cu_instructions_clean
 
+	return "${status}"
 }
 
 l2cu_parse_input () {
 
-	# read and parse user input
+	# read user input - empty input refused
+
+	local status=0
 
 	while true
 	do
 		frobulator.read input
 
-		if [ -z "${input}" ]
+		if [ -n "${input}" ]
 		then
-			frobulator.ipt "Input cannot be empty - Try again."
-		else
 			break
 		fi
+
+		frobulator.ipt "Input cannot be empty - Try again."
 	done
 
+	return "${status}"
 }
 
 l2cu_help_colors () {
+
+	local status=0
 
 	frobulator.fwd "Displaying official colors selections..."
 
@@ -1251,75 +1177,51 @@ l2cu_help_colors () {
 
 	frobulator.inf "Official LDraw colors" "[ name / number / hexadecimal ]"
 
-	sed -e "s/^/${marker_idt}/g" -e "s/_/ /g" "${colors}" | cat
+	sed -e "s/^/${marker_idt}/g" -e "s/_/ /g" "${file_colors}"
 
 	echo
 
+	return "${status}"
 }
 
 l2cu_parse_colors () {
 
+	# match input to an ldraw color - name / number / hexadecimal - lowercase
+
+	local status=0
+
+	local color_input
+	local color_name
+	local color_value
+	local color_hex
+
 	l2cu_parse_input
 
-	# set to lowercase for input match
-
 	color_input="${input,,}"
+	color_input="${color_input#\#}"
 
-	while IFS=$' '
-	read -r ldraw_color_name ldraw_color_value ldraw_color_hex_value
+	while read -r color_name color_value color_hex
 	do
-		# color input entries cleanup
+		color_name="${color_name//_/ }"
+		color_hex="${color_hex#\#}"
 
-		# color name
-
-		# remove underscores from name
-
-		ldraw_color_name="${ldraw_color_name//_/ }"
-
-		# set name to lowercase for input match
-
-		ldraw_color_name="${ldraw_color_name,,}"
-
-		# reattribute input variable to lowercase name value
-
-		ldraw_color_name="${ldraw_color_name}"
-
-		# color hex value
-
-		# remove pound from value
-
-		ldraw_color_hex_value="${ldraw_color_hex_value//#/}"
-
-		# set value to lowercase for input match
-
-		ldraw_color_hex_value="${ldraw_color_hex_value,,}"
-
-		# attribute input variable to lowercase name value
-
-		ldraw_color_hex_value="${ldraw_color_hex_value}"
-
-		if [[ "${color_input}" == "${ldraw_color_name}"      ]] ||
-		   [[ "${color_input}" == "${ldraw_color_value}"     ]] ||
-		   [[ "${color_input}" == "${ldraw_color_hex_value}" ]]
+		if [ "${color_input}" = "${color_name,,}" ] ||
+		   [ "${color_input}" = "${color_value}" ] ||
+		   [ "${color_input}" = "${color_hex,,}" ]
 		then
-			# confirmation
+			ldraw_color_value="${color_value}"
 
 			frobulator.fwd "Confirming input..."
 
 			frobulator.timeout
 
-			frobulator.inf "Color name"              "[ ${ldraw_color_name} ]"
-			frobulator.inf "Color value"             "[ ${ldraw_color_value} ]"
-			frobulator.inf "Color hexadecimal value" "[ ${ldraw_color_hex_value} ]"
+			frobulator.inf "Color name"              "[ ${color_name} ]"
+			frobulator.inf "Color value"             "[ ${color_value} ]"
+			frobulator.inf "Color hexadecimal value" "[ ${color_hex} ]"
 
-			return "${ldraw_color_value}"
-
-			frobulator.timeout
+			return "${status}"
 		fi
-
-	done < "${colors}"
-
-	frobulator.timeout
+	done < "${file_colors}"
 
 	frobulator.err "No match for input" "[ ${input} ]"
 
@@ -1327,154 +1229,344 @@ l2cu_parse_colors () {
 
 	l2cu_help_colors
 
-	frobulator.timeout
-
 	frobulator.fwd "Exiting..."
 
 	exit 1
-
-}
-
-l2cu_parse_parts () {
-
-	# read and parse part selection
-
-	l2cu_parse_input
-
-	part_input="${input}"
-
-	return "${part_input}"
 }
 
 l2cu_parse_modification () {
 
-	# read and parse modification input request
+	# read modification request
 
-	if [ "${modify_option}" = "color" ]
-	then
-		frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
+	local status=0
 
-		l2cu_parse_colors
+	case "${modify_option}"
+	in
+		color)
+			frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
 
-		# substitution:
-		# $? returning wrong arbitrary value
+			l2cu_parse_colors
 
-		old_color="${ldraw_color_value}"
+			old_color="${ldraw_color_value}"
 
-		frobulator.ipt "Enter color to set" "[ name / number / hexadecimal ]"
+			frobulator.ipt "Enter color to set" "[ name / number / hexadecimal ]"
 
-		l2cu_parse_colors
+			l2cu_parse_colors
 
-		# substitution:
-		# $? returning wrong arbitrary value
+			new_color="${ldraw_color_value}"
+		;;
 
-		new_color="${ldraw_color_value}"
-	fi
+		part)
+			frobulator.ipt "Enter part to modify" "[ number ]"
 
-	if [ "${modify_option}" = "part" ]
-	then
-		frobulator.ipt "Enter part to modify" "[ number ]"
+			l2cu_parse_input
 
-		l2cu_parse_parts
+			old_part="${input}"
 
-		# substitution:
-		# $? returning wrong arbitrary value
+			frobulator.ipt "Enter part to set" "[ number ]"
 
-		old_part="${part_input}"
+			l2cu_parse_input
 
-		frobulator.ipt "Enter part to set" "[ number ]"
+			new_part="${input}"
+		;;
 
-		l2cu_parse_parts
+		bind)
+			frobulator.ipt "Enter part to modify" "[ number ]"
 
-		# substitution:
-		# $? returning wrong arbitrary value
+			l2cu_parse_input
 
-		new_part="${part_input}"
-	fi
+			part_selection="${input}"
 
-	if [ "${modify_option}" = "bind" ]
-	then
-		frobulator.ipt "Enter part to modify" "[ number ]"
+			frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
 
-		l2cu_parse_parts
+			l2cu_parse_colors
 
-		# substitution:
-		# $? returning wrong arbitrary value
+			old_color="${ldraw_color_value}"
 
-		part_selection="${part_input}"
+			frobulator.ipt "Enter part color to set" "[ name / number / hexadecimal ]"
 
-		frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
+			l2cu_parse_colors
 
-		l2cu_parse_colors
-		# substitution:
-		# $? returning wrong arbitrary value
+			new_color="${ldraw_color_value}"
+		;;
+	esac
 
-		old_color="${ldraw_color_value}"
+	return "${status}"
+}
 
-		frobulator.ipt "Enter part color to set" "[ name / number / hexadecimal ]"
+l2cu_lint () {
 
-		l2cu_parse_colors
+	# standardize model file for parsing
 
-		# substitution:
-		# $? returning wrong arbitrary value
+	local status=0
 
-		new_color="${ldraw_color_value}"
-	fi
+	frobulator.fwd "Linting..."
 
+	# substitute windows carriage return for unix newline
+	# substitute lines containing empty parsing string
+	# substitute multiple whitespace characters to single whitespace
+	# substitute author tag to uppercase author tag
+
+	# delete lines containing name meta
+	# delete lines containing whitespace followed by dot character
+	# delete lines with lone line type
+	# delete lines beginning with whitespace character
+	# delete lines beginning with dot character
+	# delete lines containing BACKGROUND meta
+	# delete lines containing PIVOT meta
+	# delete lines containing HIDDEN meta
+
+	# strip '(' character from model entries
+	# strip ')' character from model entries
+
+	# delete empty lines
+
+	sed									\
+		-e 's/\r//g' 					\
+		-e 's/0 STEP .* *\./0 STEP/g'	\
+		-e 's/  */ /g'					\
+		-e 's/Author/AUTHOR/g'			\
+		-e '/Name/d'					\
+		-e '/  *\./d'					\
+		-e '/^0\ $/d'					\
+		-e '/^1\ $/d'					\
+		-e '/^ /d'						\
+		-e '/^\./d'						\
+		-e '/BACKGROUND/d'				\
+		-e '/PIVOT/d'					\
+		-e '/HIDDEN/d'					\
+		-e 's/(//g'						\
+		-e 's/)//g'						\
+		-e '/^$/d'						\
+										"${model_path}" > "${model_buffer}"
+
+	frobulator.track
+
+	return "${status}"
+}
+
+l2cu_modify () {
+
+	# modify part references - other lines kept as is
+
+	local status=0
+
+	local line
+	local line_modified
+	local flag
+	local color
+	local x
+	local y
+	local z
+	local a
+	local b
+	local c
+	local d
+	local e
+	local f
+	local g
+	local h
+	local i
+	local component
+	local part
+
+	: > "${model_buffer}"
+
+	frobulator.track || return "${status}"
+
+	while IFS='' read -r line
+	do
+		read -r flag color x y z a b c d e f g h i component <<< "${line}"
+
+		# part / submodel references only - line type 1
+
+		if [ "${flag}" != "1" ] || [ -z "${component}" ]
+		then
+			echo "${line}" >> "${model_buffer}"
+
+			continue
+		fi
+
+		# component is either part or submodel - [number].dat / [name].ldr
+
+		part="${component%.*}"
+
+		unset line_modified
+
+		case "${modify_option}"
+		in
+			color)
+				if [ "${color}" = "${old_color}" ]
+				then
+					color="${new_color}"
+					line_modified=true
+
+					frobulator.inf "Modifying" "[ ${old_color} ]"
+					frobulator.inf "Setting"   "[ ${new_color} ]"
+				fi
+			;;
+
+			part)
+				if [ "${part}" = "${old_part}" ]
+				then
+					component="${new_part}.${component##*.}"
+					line_modified=true
+
+					frobulator.inf "Modifying" "[ ${old_part} ]"
+					frobulator.inf "Setting"   "[ ${new_part} ]"
+				fi
+			;;
+
+			bind)
+				if [ "${part}" = "${part_selection}" ] && [ "${color}" = "${old_color}" ]
+				then
+					color="${new_color}"
+					line_modified=true
+
+					frobulator.inf "Part"      "[ ${part} ]"
+
+					frobulator.inf "Modifying" "[ ${old_color} ]"
+					frobulator.inf "Setting"   "[ ${new_color} ]"
+				fi
+			;;
+
+			step)
+				# ldr submodel wrapped in its own step - windows line ending ignored
+
+				if [[ "${component%$'\r'}" = *.[lL][dD][rR] ]]
+				then
+					# submodel color reset - applications use incompatible color schemes
+
+					color="0"
+					line_modified=true
+
+					frobulator.inf "Stepping" "[ ${component} ]"
+				fi
+			;;
+		esac
+
+		if [ "${line_modified}" != "true" ]
+		then
+			echo "${line}" >> "${model_buffer}"
+
+			continue
+		fi
+
+		if [ "${modify_option}" = "step" ]
+		then
+			echo "0 STEP" >> "${model_buffer}"
+		fi
+
+		echo "${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" >> "${model_buffer}"
+
+		if [ "${modify_option}" = "step" ]
+		then
+			echo "0 STEP" >> "${model_buffer}"
+		fi
+	done < "${model_path}"
+
+	frobulator.track
+
+	return "${status}"
 }
 
 l2cu_write () {
 
-	# manage model file overwrite
+	# modified model file - original overwritten or timestamped copy
+
+	local status=0
+	local model_copy="${model_directory}/${model_name}-modified-${stamp}.${extension}"
 
 	if [ "${overwrite_option}" = "overwrite" ]
 	then
-		frobulator.wrn "Writing to model file original" "[ ${model_name} ]"
+		frobulator.wrn "Writing to model file original" "[ ${model_file} ]"
 
 		frobulator.timeout
 
-		mv "${model_buffer}" "${model_buffer%.tmp}"
+		mv "${model_buffer}" "${model_path}"
 	else
-		frobulator.wrn "Writing to model file copy" "[ ${model_buffer} ]"
+		frobulator.wrn "Writing to model file copy" "[ ${model_copy##*/} ]"
 
 		frobulator.fwd "Writing..."
 
-		mv "${model_buffer}" "${model_buffer%.tmp}-modified-${stamp}.${extension}"
+		mv "${model_buffer}" "${model_copy}"
 	fi
 
+	frobulator.track
+
+	return "${status}"
 }
 
 l2cu_download () {
 
-	# manage library dowload
+	# ldraw parts library archive
 
-	if [ -z "${directory}" ]
+	local status=0
+
+	frobulator.download "${url_library}/${library_release}" "${directory}" "${library_archive}"
+
+	frobulator.track || return "${status}"
+
+	# leocad reads the parts archive without extraction - official archive renamed
+
+	if [ "${download_option}" = "official" ]
 	then
-		frobulator.qst "Specify download location?"
-		echo
+		mv 											\
+			"${directory}/${library_archive}"		\
+			"${directory}/ldraw.zip"
 
-		frobulator.read reply
-
-		if [[ "${reply}" = [yY] || "${reply}" = [yY][eE][sS] ]]
-		then
-			# specify directory location or exit on 'cancel'
-
-			browse=$(frobulator.dialog "Save to")
-
-			directory="${browse}"
-		else
-			frobulator.wrn "No directory location specified."
-
-			frobulator.wrn "Defaulting to current directory" "[ ${PWD} ]"
-
-			directory="${PWD}"
-		fi
+		frobulator.track
 	fi
 
-	# download
+	return "${status}"
+}
 
-	frobulator.download "${base_url}"/"${parts_url_release}" "${directory}" "${parts_archive}"
+l2cu_list () {
 
+	# ldraw parts list entries - moved parts skipped - '_' and '~' descriptions listed last
+
+	local status=0
+
+	local extension
+	local part_path
+	local part_file
+	local part_file_header
+	local part_file_description
+
+	local -a parts_list=()
+
+	for extension in "${extensions_list[@]}"
+	do
+		mapfile -t parts_list < <(find "${directory}" -type f -iname "*.${extension}")
+
+		for part_path in "${parts_list[@]}"
+		do
+			part_file="${part_path##*/}"
+
+			read -r part_file_header < "${part_path}"
+
+			part_file_description="${part_file_header:2}"
+			part_file_description="${part_file_description%$'\r'}"
+
+			if [[ "${part_file_description}" == *~Moved* ]]
+			then
+				continue
+			fi
+
+			if [[ "${part_file_description}" == *_* ]]
+			then
+				printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
+
+			elif [[ "${part_file_description}" == *~* ]]
+			then
+				printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
+			else
+				printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
+			fi
+		done
+	done
+
+	return "${status}"
 }
 
 # update ───────────────────────────────────────────────────────────────────────
@@ -1489,7 +1581,7 @@ list=(
 	leocad
 )
 
-if [ "${option}" = "3ds" ]
+if [ "${option}" = "export" ] && [ "${export_option}" = "blender" ]
 then
 	list+=(
 		blender
@@ -1499,56 +1591,37 @@ fi
 if [ "${option}" = "instructions" ]
 then
 	list+=(
-		lpub3d24
+		"${lpub}"
 	)
 fi
 
 if [ "${option}" = "download" ]
 then
 	list+=(
-		zip
-		unzip
+		curl
 	)
 fi
 
-# user running the script
+frobulator.assess ${list[@]}
 
-user_name="$(id -u -n)"
+frobulator.fail || exit 1
 
-if [ "${user_name}" = "root" ]
+unset list
+
+# root run only installs requirements
+
+if [ "${EUID}" -eq 0 ]
 then
-	frobulator.require ${list[@]}
-
-	frobulator.msg "${script} requirements installed."
-
-	frobulator.inf "Run ${script} as 'user' to proceed."
-
 	exit
-else
-	for requirement in ${list[@]}
-	do
-		# ${requirement} command path - empty if not installed
-
-		command_path="$(command -v "${requirement}")"
-
-		if [ -z "${command_path}" ]
-		then
-			frobulator.err "Missing" "[ '${requirement}' ]"
-
-			frobulator.wrn "Start ${script} as 'root' to install requirements."
-
-			exit 1
-		fi
-	done
 fi
-
-list=()
 
 # configuration ────────────────────────────────────────────────────────────────
 
 # generate necessary process files
 
 l2cu_initialize
+
+frobulator.fail "Configuration failure" "[ '${script}' ]" || exit 1
 
 # confirmation ─────────────────────────────────────────────────────────────────
 
@@ -1584,14 +1657,9 @@ then
 	frobulator.inf "Render option" "[ ${render_option} ]"
 fi
 
-if [ "${option}" = "instructions" ]
+if [ "${option}" = "instructions" ] && [ -n "${instructions_option}" ]
 then
-	if [ -z "${instructions_option}" ]
-	then
-		:
-	else
-		frobulator.inf "Instructions option" "[ ${instructions_option} ]"
-	fi
+	frobulator.inf "Instructions option" "[ ${instructions_option} ]"
 fi
 
 if [ "${option}" = "modify" ]
@@ -1615,862 +1683,293 @@ frobulator.fwd "Proceeding..."
 
 if [ "${option}" = "export" ]
 then
-	for extension in ${extensions_list[@]}
+	for extension in "${extensions_list[@]}"
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*" | sort) )
+		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions*" | sort)
 
-		# set IFS
-
-		IFS=$'\n'
-
-		for model_path in ${models_list[@]}
+		for model_path in "${models_list[@]}"
 		do
-			# get model file name from path
+			l2cu_model "${model_path}"
 
-			model_file="${model_path##*/}"
-
-			# strip extension from model file name
-
-			model_name="${model_file%.*}"
-
-			# use model directory as root
-
-			model_directory="${model_path%/*}"
-
-			# define export output directories
-
-			export_directory="${model_directory}"/exports
-
-			# explicit export file types for optimization
-
-			export_file="${model_name}"."${export_extension}"
-
-			export_file_3ds="${model_name}.3ds"
-			export_file_blend="${model_name}.blend"
-			export_file_csv="${model_name}.csv"
-			export_file_collada="${model_name}.dae"
-			export_file_object="${model_name}.obj"
-			export_file_material="${model_name}.mtl"
-			export_file_archive="${model_name}.zip"
-
-			# export
-
-# 			if [[ -d "${export_directory}" ]]
-# 			then
-# 				rm					\
-# 					--recursive		\
-# 					--force			"${export_directory}"
-# 			fi
+			export_directory="${model_directory}/exports"
+			export_file="${model_name}.${export_extension}"
 
 			frobulator.directory "${model_directory}" exports
 
 			cd "${export_directory}"
 
+			frobulator.fail "Export failure" "[ '${model_file}' ]" || continue
+
 			l2cu_export
 
-			# 3ds
+			frobulator.fail "Export failure" "[ '${model_file}' ]" || continue
 
-			if [[ "${export_option}" = "blender" ]]
+			if [ "${export_option}" = "blender" ]
 			then
-				# import 3ds file into blender
-				# generate optimized blend file
-
-				frobulator.fwd "Optimizing..."
-
 				l2cu_optimize
 
-				# cleanup
-
-				rm					\
-					--recursive		\
-					--force			 "${export_file_3ds}"
+				frobulator.fail "Optimization failure" "[ '${model_file}' ]" || continue
 			fi
 
-			# verify export size threshold
+			# export size threshold
 
 			l2cu_export_size
-
-			echo
 		done
-
-		# reset IFS
-
-		IFS=''
-
 	done
-
-	frobulator.cpt "Complete" "[ ${script} // export ]"
-
 fi
 
 # render ───────────────────────────────────────────────────────────────────────
 
 if [ "${option}" = "render" ]
 then
-	for extension in ${extensions_list[@]}
+	# camera positions / shading / edge width / image size per render option
+
+	height=4096
+	width=4096
+
+	case "${render_option}"
+	in
+		[0-7])
+			positions_list=("${render_option}")
+			shading="full"
+			line_width=1
+		;;
+
+		full)
+			positions_list=(0 1 2 3 4 5 6 7)
+			shading="full"
+			line_width=1
+		;;
+
+		flat)
+			positions_list=(1)
+			shading="flat"
+			line_width=0
+		;;
+
+		wireframe)
+			positions_list=(1)
+			shading="wireframe"
+			line_width=1
+		;;
+
+		overlay)
+			positions_list=(1)
+			shading="full"
+			line_width=2
+		;;
+
+		social)
+			height=600
+			width=1200
+
+			positions_list=(1)
+			shading="flat"
+			line_width=2
+		;;
+
+		thumbnail)
+			height=512
+			width=512
+
+			positions_list=(1)
+			shading="flat"
+			line_width=2
+		;;
+	esac
+
+	for extension in "${extensions_list[@]}"
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions*" | sort) )
+		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions*" | sort)
 
-		# set IFS
-
-		IFS=$'\n'
-
-		for model_path in ${models_list[@]}
+		for model_path in "${models_list[@]}"
 		do
-			# get model file name from path
+			l2cu_model "${model_path}"
 
-			model_file="${model_path##*/}"
+			# base render directory - generated if missing
 
-			# strip extension from model file name
-
-			model_name="${model_file%.*}"
-
-			# use model directory as root
-
-			model_directory="${model_path%/*}"
-
-			# define render output directories
-
-			render_directory="${model_directory}"/renders
-
-			full_directory="${render_directory}"/full
-
-			flat_directory="${render_directory}"/flat
-
-			wireframe_directory="${render_directory}"/wireframe
-
-			overlay_directory="${render_directory}"/overlay
-
-			social_directory="${render_directory}"/social
-
-			thumbnail_directory="${render_directory}"/thumbnail
-
-			# define coordinate values and labels
-
-			# camera latitude
-
-			latitude=(
-				30
-				30
-				30
-				30
-				30
-				30
-				30
-				30
-			)
-
-			# camera longitude
-
-			longitude=(
-				0
-				45
-				90
-				135
-				180
-				225
-				270
-				315
-			)
-
-			# view labels
-
-			view=(
-				"00"
-				"01"
-				"02"
-				"03"
-				"04"
-				"05"
-				"06"
-				"07"
-			)
-
-			# define camera position presets
-
-			if [[ "${render_preset}" = "0" ]]
-			then
-				position=(0)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "1" ]]
-			then
-				position=(1)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "2" ]]
-			then
-				position=(2)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "3" ]]
-			then
-				position=(3)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "4" ]]
-			then
-				position=(4)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "5" ]]
-			then
-				position=(5)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "6" ]]
-			then
-				position=(6)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "7" ]]
-			then
-				position=(7)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "full" ]]
-			then
-				position=(0 1 2 3 4 5 6 7)
-				shading=full
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "flat" ]]
-			then
-				position=(1)
-				shading=flat
-				line_width=0
-			fi
-
-			if [[ "${render_preset}" = "wireframe" ]]
-			then
-				position=(1)
-				shading=wireframe
-				line_width=1
-			fi
-
-			if [[ "${render_preset}" = "overlay" ]]
-			then
-				position=(1)
-				shading=full
-				line_width=2
-			fi
-
-			if [[ "${render_preset}" = "social" ]]
-			then
-				height=600
-				width=1200
-
-				position=(1)
-				shading=flat
-				line_width=2
-			fi
-
-			if [[ "${render_preset}" = "thumbnail" ]]
-			then
-				height=512
-				width=512
-
-				position=(1)
-				shading=flat
-				line_width=2
-			fi
-
-			# render
-
-			# prepare base render directory:
-			# generate if does not exist
+			render_directory="${model_directory}/renders"
 
 			frobulator.directory "${model_directory}" renders
 
+			# named render option directory - purged and regenerated
+
+			if [[ "${render_option}" != [0-7] ]]
+			then
+				rm --recursive --force "${render_directory}/${render_option}"
+
+				frobulator.directory "${render_directory}" "${render_option}"
+
+				render_directory="${render_directory}/${render_option}"
+			fi
+
 			cd "${render_directory}"
 
-			# prepare render option directory:
-			# purge and regenerate if exists
+			frobulator.fail "Render failure" "[ '${model_file}' ]" || continue
 
-			if [[ "${render_preset}" = "full" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${full_directory}"
-
-				frobulator.directory "${render_directory}" full
-
-				cd "${full_directory}"
-			fi
-
-			if [[ "${render_preset}" = "flat" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${flat_directory}"
-
-				frobulator.directory "${render_directory}" flat
-
-				cd "${flat_directory}"
-			fi
-
-			if [[ "${render_preset}" = "wireframe" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${wireframe_directory}"
-
-				frobulator.directory "${render_directory}" flat
-
-				cd "${wireframe_directory}"
-			fi
-
-			if [[ "${render_preset}" = "overlay" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${overlay_directory}"
-
-				frobulator.directory "${render_directory}" overlay
-
-				cd "${flat_directory}"
-			fi
-
-			if [[ "${render_preset}" = "social" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${social_directory}"
-
-				frobulator.directory "${render_directory}" social
-
-				cd "${social_directory}"
-			fi
-
-			if [[ "${render_preset}" = "thumbnail" ]]
-			then
-				rm					\
-					--recursive		\
-					--force			 "${thumbnail_directory}"
-
-				frobulator.directory "${render_directory}" thumbnail
-
-				cd "${thumbnail_directory}"
-			fi
-
-			for coordinates in ${position[@]}
+			for coordinates in "${positions_list[@]}"
 			do
-				render_file="${model_name}-${view[$coordinates]}.${extension}"
+				l2cu_render "${coordinates}"
 
-				l2cu_render "${model_path}" "${coordinates}"
+				frobulator.fail "Render failure" "[ '${model_file}' // view ${view[coordinates]} ]"
 			done
 
-			# post rendering
+			# single view renders renamed to designated splash images
 
-			if [[ "${render_option}" = "flat" ]]
-			then
-				# rename renders to designated splash images
-
-				mv												\
-					"${model_name}-${view[1]}.${extension}"		\
-					"${flat_directory}"/flat."${extension}"
-			fi
-
-			if [[ "${render_option}" = "social" ]]
-			then
-				# rename renders to designated splash images
-
-				mv												\
-					"${model_name}-${view[1]}.${extension}"		\
-					"${social_directory}"/social."${extension}"
-			fi
-
-			if [[ "${render_option}" = "thumbnail" ]]
-			then
-				# rename renders to designated splash images
-
-				mv												\
-					"${model_name}-${view[1]}.${extension}"		\
-					"${thumbnail_directory}"/thumbnail."${extension}"
-			fi
-
-			if [[ "${render_option}" = "overlay" ]]
-			then
-				# rename renders to designated splash images
-
-				mv												\
-					"${model_name}-${view[1]}.${extension}"		\
-					"${overlay_directory}"/overlay."${extension}"
-			fi
+			case "${render_option}"
+			in
+				flat|overlay|social|thumbnail)
+					if [ -f "${model_name}-${view[1]}.${export_extension}" ]
+					then
+						mv											\
+							"${model_name}-${view[1]}.${export_extension}"	\
+							"${render_option}.${export_extension}"
+					fi
+				;;
+			esac
 		done
-			# reset IFS
-
-			IFS=''
 	done
-
-	frobulator.cpt "Complete" "[ ${script} // render ]"
-
 fi
 
 # instructions ─────────────────────────────────────────────────────────────────
 
-if [[ "${option}" = "instructions" ]]
+if [ "${option}" = "instructions" ]
 then
-	for extension in ${extensions_list[@]}
+	# instructions configuration required
+
+	if [ ! -f "${instructions_base_directory}/configuration" ]
+	then
+		frobulator.err "Missing instructions configuration file" "[ ${instructions_base_directory}/configuration ]"
+
+		frobulator.inf "Instructions configuration file required to proceed"
+
+		exit 1
+	fi
+
+	for extension in "${extensions_list[@]}"
 	do
-		models_list=( $(find ${directory} -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort) )
+		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort)
 
-		# set IFS
-
-		IFS=$'\n'
-
-		for model_path in ${models_list[@]}
+		for model_path in "${models_list[@]}"
 		do
-			# get model base directory from path
+			l2cu_model "${model_path}"
 
-			model_directory="${model_path%/*}"
+			instructions_directory="${model_directory}/instructions"
+			instructions_samples_directory="${instructions_directory}/samples"
+			instructions_model_path="${instructions_directory}/instructions.${extension}"
 
-			# get model file name from path
+			# pieces count file - all instructions options
 
-			model_file="${model_path##*/}"
+			l2cu_pieces
 
-			# strip extension from model file name
+			frobulator.fail "Pieces failure" "[ '${model_file}' ]" || continue
 
-			model_name="${model_file%.*}"
-
-			# use model directory as root
-
-			model_directory="${model_path%/*}"
-
-			# define instruction output directories
-
-			instructions_directory="${model_directory}"/instructions
-
-			instructions_samples_directory="${instructions_directory}"/samples
-
-			instructions_model_path="${instructions_directory}"/instructions."${extension}"
-
-			instructions_file="${model_name}".pdf
-
-			instructions_file_path="${instructions_directory}"/"${instructions_file}"
-
-			instructions_base_directory=/media/internal/Lego/lpub3d/instructions
-
-			# define instructions configuration / recipe
-
-			instructions_configuration_file="${instructions_base_directory}"/configuration
-
-			# reset IFS
-
-			IFS=''
-
-			# configuration check
-
-			if [[ -f "${instructions_configuration_file}" ]]
+			if [ "${instructions_option}" = "pieces" ]
 			then
-				frobulator.inf "configuration file available"
-
-				frobulator.fwd "Proceeding..."
-			else
-				# no configuration or model instructions setup
-
-				frobulator.err "Missing instructions configuration file"
-
-				frobulator.inf "Instructions configuration file required to proceed"
-
-				exit 1
+				continue
 			fi
 
-			# pieces ───────────────────────────────────────────────────────────
+			l2cu_instructions_prepare
 
-			if [[ "${instructions_option}" = "pieces" ]]
+			frobulator.fail "Preparation failure" "[ '${model_file}' ]" || continue
+
+			# model work in progress - placeholder samples
+
+			if [ -f "${model_directory}/work-in-progress" ]
 			then
-				# generate pieces count file
+				frobulator.wrn "Model work in progress" "[ ${instructions_option:-instructions} ]"
 
-				l2cu_pieces
+				l2cu_instructions_samples_placeholders
 
-				frobulator.cpt "Complete" "[ ${script} // pieces ]"
+				frobulator.fail "Placeholders failure" "[ '${model_file}' ]"
 
-			# samples ──────────────────────────────────────────────────────────
-
-			elif [[ "${instructions_option}" = "samples" ]]
-			then
-
-			# samples: model work in progress ──────────────────────────────────
-
-				if [[ -f "${model_directory}"/work-in-progress ]]
-				then
-					frobulator.wrn "Model work in progress" "[ samples ]"
-
-					# generate pieces count file
-
-					l2cu_pieces
-
-					# prepare instructions setup
-
-					l2cu_instructions_prepare
-
-					# generate samples:
-					# placeholder
-
-					l2cu_instructions_samples_placeholders
-				else
-					# generate pieces count file
-
-					l2cu_pieces
-
-					# prepare instructions setup
-
-					l2cu_instructions_prepare
-
-					# configure instructions
-
-					l2cu_instructions_configure
-
-					# generate instructions
-
-					l2cu_instructions_samples
-				fi
-
-				frobulator.cpt "Complete" "[ ${script} // samples ]"
-
-			else
-				# instructions ─────────────────────────────────────────────────
-
-				if [[ -f "${model_directory}"/work-in-progress ]]
-				then
-					frobulator.wrn "Model work in progress" "[ instructions ]"
-
-					# generate pieces count file
-
-					l2cu_pieces
-
-					# prepare instructions setup
-
-					l2cu_instructions_prepare
-
-					# generate samples:
-					# placeholder
-
-					l2cu_instructions_samples_placeholders
-				else
-					# generate pieces count file
-
-					l2cu_pieces
-
-					# prepare instructions setup
-
-					l2cu_instructions_prepare
-
-					# configure instructions
-
-					l2cu_instructions_configure
-
-					# generate instructions
-
-					l2cu_instructions
-
-				fi
-
+				continue
 			fi
 
+			l2cu_instructions_configure
+
+			frobulator.fail "Configuration failure" "[ '${model_file}' ]" || continue
+
+			if [ "${instructions_option}" = "samples" ]
+			then
+				l2cu_instructions_samples
+
+				frobulator.fail "Samples failure" "[ '${model_file}' ]"
+			else
+				l2cu_instructions
+
+				frobulator.fail "Instructions failure" "[ '${model_file}' ]"
+			fi
 		done
-
 	done
-
-	frobulator.cpt "Complete" "[ ${script} // instructions ]"
-
 fi
 
 # modify ───────────────────────────────────────────────────────────────────────
 
-if [[ "${option}" = "modify" ]]
+if [ "${option}" = "modify" ]
 then
-	# get input
-
 	l2cu_parse_modification
 
-	# substitution
-
-	IFS=' '
-
-	for extension in ${extensions_list[@]}
+	for extension in "${extensions_list[@]}"
 	do
-		echo $(find ${directory} -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}" | sort) | while read -r model_path
+		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}" | sort)
+
+		for model_path in "${models_list[@]}"
 		do
-			# get model base directory from path
-
-			model_directory="${model_path%/*}"
-
-			# get model file name from path
-
-			model_file="${model_path##*/}"
-
-			# strip extension from model file name
-
-			model_name="${model_file%.*}"
-
-			# use model directory as root
-
-			model_directory="${model_path%/*}"
-
-			# set model buffer file
+			l2cu_model "${model_path}"
 
 			model_buffer="${model_path}.tmp"
 
-			# parse model file
+			frobulator.stp "Model" "[ ${model_file} ]"
 
-			while IFS=''
-			read -r line
-			do
+			if [ "${modify_option}" = "lint" ]
+			then
+				l2cu_lint
+			else
+				l2cu_modify
+			fi
 
-			# modify: lint ─────────────────────────────────────────────────────
-
-				if [[ "${modify_option}" = "lint" ]]
-				then
-					frobulator.stp "Model"      "[ ${model_file} ]"
-
-					frobulator.fwd "Linting..."
-
-					# substitute windows carriage return for unix newline
-					# substitute lines containing empty parsing string
-					# substitute multiple whitespace characters to single whitespace
-					# substitute author tag to uppercase author tag
-
-					# delete lines beginning with whitespace character
-					# delete lines beginning with dot character
-					# delete lines containing BACKGROUND meta
-					# delete lines containing PIVOT meta
-					# delete lines containing HIDDEN meta
-
-					# strip '(' character from model entries
-					# strip ')' character from model entries
-
-					sed									\
-						-e 's/\r//g' 					\
-						-e 's/0 STEP .* *\./0 STEP/g'	\
-						-e 's/  */ /g'					\
-						-e 's/Author/AUTHOR/g'			\
-						-e '/Name/d'					\
-						-e '/  *\./d'					\
-						-e '/^0\ $/d'					\
-						-e '/^1\ $/d'					\
-						-e '/^ /d'						\
-						-e '/^\./d'						\
-						-e '/BACKGROUND/d'				\
-						-e '/PIVOT/d'					\
-						-e '/HIDDEN/d'					\
-						-e 's/(//g'						\
-						-e 's/)//g'						\
-						-e '/^$/d'						\
-														"${model}" > "${model_buffer}"
-
-					break
-				fi
-
-				# line breakdown
-
-				# skip header and footer lines containing matching patterns:
-				# prevents model file syntax modification
-
-				if [[ "${line}" == *!LEOCAD* ]] ||
-				   [[ "${line}" == *FILE*    ]] ||
-				   [[ "${line}" == *NOFILE*  ]] ||
-				   [[ "${line}" == *AUTHOR*  ]] ||
-				   [[ "${line}" == *STEP*    ]]
-				then
-					echo "${line}" >> "${model_buffer}"
-
-					continue
-				fi
-
-				# component is either part or submodel:
-				# part:     [number].dat
-				# submodel: [name].ldr
-
-				IFS=' '
-
-				read -r flag color x y z a b c d e f g h i component <<< "${line}"
-
-				# split component into part and descriptor
-
-				# set IFS
-
-				IFS='.'
-
-				read part descriptor <<< "${component}"
-
-				# revert IFS
-
-				IFS=' '
-
-				# modify: color ────────────────────────────────────────────────
-
-				# color substitution
-
-				if [[ "${modify_option}" = "color" ]]
-				then
-					if [[ "${color}" = "${old_color}" ]]
-					then
-						color="${new_color}"
-
-						frobulator.stp "Model"      "[ ${model_file} ]"
-
-						frobulator.inf "Modifying " "[ ${old_color} ]"
-						frobulator.inf "Setting"    "[ ${new_color} ]"
-					fi
-				fi
-
-				# modify: part ─────────────────────────────────────────────────
-
-				# part substitution
-
-				if [[ "${modify_option}" = "part" ]]
-				then
-					if [[ "${part}" = "${old_part}" ]]
-					then
-						part="${new_part}"
-
-						frobulator.stp "Model"     "[ ${model_file} ]"
-
-						frobulator.inf "Modifying" "[ ${old_part} ]"
-						frobulator.inf "Setting"   "[ ${new_part} ]"
-					fi
-				fi
-
-				# modify: bind ─────────────────────────────────────────────────
-
-				# bind [ part + color ] color substitution
-
-				if [[ "${modify_option}" = "bind" ]]
-				then
-					if [[ "${part}" == "${part_selection}" ]]
-					then
-						if [[ "${color}" = "${old_color}" ]]
-						then
-							color="${new_color}"
-
-							frobulator.stp "Model"     "[ ${model_file} ]"
-
-							frobulator.inf "Part"      "[ ${part} ]"
-
-							frobulator.inf "Modifying" "[ ${old_color} ]"
-							frobulator.inf "Setting"   "[ ${new_color} ]"
-						fi
-					fi
-				fi
-
-				# modify: step ─────────────────────────────────────────────────
-
-				# step submodel [ldr] separation
-
-				if [[ "${modify_option}" = "step" ]]
-				then
-					if [[ "${line}" == *ldr* ]]
-					then
-						if [[ "${descriptor}" == *ldr* ]]
-						then
-							flag="0 STEP\n1"
-							color="0"
-							descriptor="ldr\n0 STEP\n"
-
-							frobulator.stp "Model"     "[ ${model_file} ]"
-
-							frobulator.inf "Stepping"  "[ ${model_file} ]"
-						fi
-					fi
-				fi
-
-				# reset IFS
-
-				IFS=''
-
-				# rebuild component from part and descriptor
-
-				component="${part}.${descriptor}"
-
-				# write changes to buffer
-
-				echo "$flag" "${color}" "${x}" "${y}" "${z}" "${a}" "${b}" "${c}" "${d}" "${e}" "${f}" "${g}" "${h}" "${i}" "${component}" >> "${model_buffer}"
-
-			done < "${model_path}" # feed model file into loop for parsing
-
-			# modify: overwrite ────────────────────────────────────────────────
-
-			# ammend modifications
+			frobulator.fail "Modification failure" "[ '${model_file}' ]" || continue
 
 			l2cu_write
+
+			frobulator.fail "Write failure" "[ '${model_file}' ]"
 		done
 	done
-
-	frobulator.cpt "Complete" "[ ${script} // modify ]"
-
 fi
 
 # download ─────────────────────────────────────────────────────────────────────
 
-if [[ "${option}" = "download" ]]
+if [ "${option}" = "download" ]
 then
-	base_url="https://www.ldraw.org/library"
-
-	if [[ "${download_option}" = "official" ]]
+	if [ "${download_option}" = "official" ]
 	then
-		parts_url_release="updates"
-		parts_archive="complete.zip"
+		library_release="updates"
+		library_archive="complete.zip"
+	else
+		library_release="unofficial"
+		library_archive="ldrawunf.zip"
 	fi
-
-	if [[ "${download_option}" = "unofficial" ]]
-	then
-		parts_url_release="unofficial"
-		parts_archive="ldrawunf.zip"
-	fi
-
-	parts_url="${base_url}/${parts_url_release}/${parts_archive}"
-
-	# download
 
 	l2cu_download
 
-	# rename archive:
-	# substitiude 'complete' for 'ldraw'
-	# leocad can read and access the parts archive without extraction
-
-	if [[ "${download_option}" = "official" ]]
-	then
-		mv 										\
-			"${directory}"/"${parts_archive}"	\
-			"${directory}"/ldraw.zip
-	fi
-
-	frobulator.cpt "Complete" "[ ${script} // download ]"
+	frobulator.fail "Download failure" "[ '${library_archive}' ]"
 fi
 
 # list ─────────────────────────────────────────────────────────────────────────
 
-if [[ "${option}" = "list" ]]
+if [ "${option}" = "list" ]
 then
 	# ldraw parts directory verification
 
-	if [ ! -d [lL][dD][rR][aA][wW] ]
+	if [ ! -d ldraw ] && [ ! -d LDraw ] && [ ! -d LDRAW ]
 	then
 		frobulator.err "No LDraw directory found."
 	fi
 
-	# parts list verification and backup
+	# parts list backup
 
-	if [[ -e [pP][aA][rR][tT][sS].[lL][sS][tT] ]]
+	if [ -e parts.lst ]
 	then
 		frobulator.wrn "Parts list file found."
 
@@ -2479,86 +1978,45 @@ then
 		mv parts.lst parts.lst.bak
 	fi
 
-	# parse parts list
-
 	frobulator.fwd "Processing..."
 
-	# initialize counter
+	l2cu_list &
 
-	count=1
+	frobulator.progress "parse"
 
-	for extension in ${extensions_list[@]}
+	frobulator.fail "List failure" "[ parts.lst ]"
+
+	# sort - merge - cleanup
+
+	for list_file in "._.lst" ".~.lst" parts.lst
 	do
-		parts_list=( $(find ${directory} -type f -iname "*.${extension}") )
-
-		for part_path in ${parts_list[@]}
-		do
-			part_file="${part_path##*/}"
-			part_file_header="$(head -n 1 "${part_path}")"
-			part_file_description="${part_file_header:2}"
-
-			if [[ "${part_file_description}" == *~Moved* ]]
-			then
-				: # pass
-			else
-				if [[ "${part_file_description}" == *_* ]]
-				then
-					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
-
-				elif [[ "${part_file_description}" == *~* ]]
-				then
-					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
-
-				else
-					printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
-				fi
-
-				frobulator.inf "Part count" "$((count++))\c"
-			fi
-		done
-	done
-
-	# keep counter visible while looping
-
-	echo
-
-	# set separator
-
-	separator=' '
-
-	# apply sorting method
-
-	for list in "._.lst" ".~.lst" parts.lst
-	do
-		if [[ "${sort_option}" = "description" ]]
+		if [ ! -f "${list_file}" ]
 		then
-			sort -b -d -k 2 -t "${separator}" -o "${list}" "${list}"
+			continue
 		fi
 
-		if [[ "${sort_option}" = "number" ]]
+		if [ "${sort_option}" = "description" ]
 		then
-			sort -b -n -k 1 -t "${separator}" -o "${list}" "${list}"
+			sort -b -d -k 2 -t ' ' -o "${list_file}" "${list_file}"
+		fi
+
+		if [ "${sort_option}" = "number" ]
+		then
+			sort -b -n -k 1 -t ' ' -o "${list_file}" "${list_file}"
 		fi
 	done
 
-	# unset separator
+	cat "._.lst" ".~.lst" >> parts.lst 2> "${sink}"
 
-	separator=''
+	rm --force "._.lst" ".~.lst"
 
-	# merge
+	# parts list line count
 
-	cat "._.lst" ".~.lst" >> parts.lst
+	part_count="$(wc -l < parts.lst)"
 
-	# cleanup
-
-	rm					\
-		--recursive		\
-		--force			 "._.lst" ".~.lst"
-
-	frobulator.cpt "Complete" "[ ${script} // List ]"
+	frobulator.inf "Part count" "[ ${part_count} ]"
 fi
 
 # complete ─────────────────────────────────────────────────────────────────────
 
-frobulator.scs "Done" "[ ${script} ]"
-
+frobulator.result "${script}"
