@@ -1345,22 +1345,50 @@ l2cu_lint () {
 	return "${status}"
 }
 
+l2cu_line_repair () {
+
+	# ' . . .' tails left on meta lines by earlier l2cu versions removed
+	# works on the caller's line - counted in the caller's lines_repaired
+
+	local status=0
+	local pattern_tail='^(0.*[^ ])( +\.)+ *$'
+
+	local line_inner
+
+	if [[ "${line}" != 0* ]]
+	then
+		return "${status}"
+	fi
+
+	line_inner="${line#*$'\r'}"
+
+	if [ "${line_inner}" != "${line}" ] && [[ "${line_inner}" =~ ^[\ .]*$ ]]
+	then
+		line="${line%%$'\r'*}"
+
+		lines_repaired=$(( lines_repaired + 1 ))
+
+	elif [[ "${line}" =~ ${pattern_tail} ]]
+	then
+		line="${BASH_REMATCH[1]}"
+
+		lines_repaired=$(( lines_repaired + 1 ))
+	fi
+
+	return "${status}"
+}
+
 l2cu_modify () {
 
 	# modify part references - other lines kept as is
 	# line ending set aside before parsing - fields never carry it
 
 	local status=0
-	local pattern_tail='^(0.*[^ ])( +\.)+ *$'
 	local lines_repaired=0
-	local steps_merged=0
 
 	local line
 	local line_ending
-	local line_inner
 	local line_modified
-	local line_previous
-	local step_added
 	local flag
 	local color
 	local x
@@ -1394,43 +1422,7 @@ l2cu_modify () {
 			line="${line%$'\r'}"
 		fi
 
-		# meta lines - ' . . .' tails left by earlier l2cu versions removed
-
-		if [[ "${line}" = 0* ]]
-		then
-			line_inner="${line#*$'\r'}"
-
-			if [ "${line_inner}" != "${line}" ] && [[ "${line_inner}" =~ ^[\ .]*$ ]]
-			then
-				line="${line%%$'\r'*}"
-
-				lines_repaired=$(( lines_repaired + 1 ))
-
-			elif [[ "${line}" =~ ${pattern_tail} ]]
-			then
-				line="${BASH_REMATCH[1]}"
-
-				lines_repaired=$(( lines_repaired + 1 ))
-			fi
-		fi
-
-		# consecutive steps merged - no empty steps
-
-		if [ "${modify_option}" = "step" ] && [ "${line}" = "0 STEP" ] && [ "${line_previous}" = "0 STEP" ]
-		then
-			# step following an added step is not counted - already in place
-
-			if [ "${step_added}" != "true" ]
-			then
-				steps_merged=$(( steps_merged + 1 ))
-			fi
-
-			unset step_added
-
-			continue
-		fi
-
-		unset step_added
+		l2cu_line_repair
 
 		read -r flag color x y z a b c d e f g h i component <<< "${line}"
 
@@ -1439,8 +1431,6 @@ l2cu_modify () {
 		if [ "${flag}" != "1" ] || [ -z "${component}" ]
 		then
 			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
-
-			line_previous="${line}"
 
 			continue
 		fi
@@ -1487,50 +1477,18 @@ l2cu_modify () {
 					frobulator.inf "Setting"   "[ ${new_color} ]"
 				fi
 			;;
-
-			step)
-				# ldr submodel wrapped in its own step
-
-				if [[ "${component}" = *.[lL][dD][rR] ]]
-				then
-					# submodel color reset - applications use incompatible color schemes
-
-					color="0"
-					line_modified=true
-
-					frobulator.inf "Stepping" "[ ${component} ]"
-				fi
-			;;
 		esac
 
 		if [ "${line_modified}" != "true" ]
 		then
 			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
 
-			line_previous="${line}"
-
 			continue
 		fi
 
-		# rebuilt lines and added steps share the original line ending
-		# step added before only if the previous line is not already a step
+		# rebuilt line shares the original line ending
 
-		if [ "${modify_option}" = "step" ] && [ "${line_previous}" != "0 STEP" ]
-		then
-			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
-		fi
-
-		line_previous="${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}"
-
-		printf '%s%s\n' "${line_previous}" "${line_ending}" >> "${model_buffer}"
-
-		if [ "${modify_option}" = "step" ]
-		then
-			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
-
-			line_previous="0 STEP"
-			step_added=true
-		fi
+		printf '%s%s\n' "${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${line_ending}" >> "${model_buffer}"
 	done < "${model_path}"
 
 	frobulator.track
@@ -1540,9 +1498,161 @@ l2cu_modify () {
 		frobulator.inf "Repaired meta lines" "[ ${lines_repaired} ]"
 	fi
 
-	if [ "${steps_merged}" -gt 0 ]
+	return "${status}"
+}
+
+l2cu_step () {
+
+	# each ldr submodel in its own step - a step is closed only if it holds parts
+	# piece meta lines kept with their piece - empty steps removed
+	# line ending set aside before parsing - fields never carry it
+
+	local status=0
+	local lines_repaired=0
+	local steps_removed=0
+	local step_content=false
+
+	local line
+	local line_ending
+	local line_pending
+	local step_added
+	local flag
+	local color
+	local x
+	local y
+	local z
+	local a
+	local b
+	local c
+	local d
+	local e
+	local f
+	local g
+	local h
+	local i
+	local component
+
+	local -a lines_pending=()
+
+	: > "${model_buffer}"
+
+	frobulator.track || return "${status}"
+
+	# last line kept if it has no trailing newline
+
+	while IFS='' read -r line || [ -n "${line}" ]
+	do
+		unset line_ending
+
+		if [[ "${line}" = *$'\r' ]]
+		then
+			line_ending=$'\r'
+			line="${line%$'\r'}"
+		fi
+
+		l2cu_line_repair
+
+		# piece meta lines held until their piece
+
+		if [[ "${line}" = "0 !LEOCAD PIECE "* ]]
+		then
+			lines_pending+=("${line}${line_ending}")
+
+			continue
+		fi
+
+		# step closed only if it holds parts - step following an added step not counted
+
+		if [ "${line}" = "0 STEP" ]
+		then
+			if [ "${step_content}" = "true" ]
+			then
+				printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+
+				step_content=false
+
+			elif [ "${step_added}" != "true" ]
+			then
+				steps_removed=$(( steps_removed + 1 ))
+			fi
+
+			unset step_added
+
+			continue
+		fi
+
+		unset step_added
+
+		read -r flag color x y z a b c d e f g h i component <<< "${line}"
+
+		# ldr submodel - previous step closed - own step
+
+		if [ "${flag}" = "1" ] && [[ "${component}" = *.[lL][dD][rR] ]]
+		then
+			if [ "${step_content}" = "true" ]
+			then
+				printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
+			fi
+
+			for line_pending in "${lines_pending[@]}"
+			do
+				printf '%s\n' "${line_pending}" >> "${model_buffer}"
+			done
+
+			lines_pending=()
+
+			# submodel color reset - applications use incompatible color schemes
+
+			printf '%s%s\n' "${flag} 0 ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${line_ending}" >> "${model_buffer}"
+			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
+
+			step_content=false
+			step_added=true
+
+			frobulator.inf "Stepping" "[ ${component} ]"
+
+			continue
+		fi
+
+		for line_pending in "${lines_pending[@]}"
+		do
+			printf '%s\n' "${line_pending}" >> "${model_buffer}"
+		done
+
+		lines_pending=()
+
+		printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+
+		# drawing lines fill the step - a new submodel starts empty
+
+		case "${flag}"
+		in
+			1|2|3|4|5)
+				step_content=true
+			;;
+		esac
+
+		if [[ "${line}" = "0 FILE "* ]]
+		then
+			step_content=false
+		fi
+	done < "${model_path}"
+
+	frobulator.track
+
+	for line_pending in "${lines_pending[@]}"
+	do
+		printf '%s\n' "${line_pending}" >> "${model_buffer}"
+	done
+
+	if [ "${lines_repaired}" -gt 0 ]
 	then
-		frobulator.inf "Merged empty steps" "[ ${steps_merged} ]"
+		frobulator.inf "Repaired meta lines" "[ ${lines_repaired} ]"
+	fi
+
+	if [ "${steps_removed}" -gt 0 ]
+	then
+		frobulator.inf "Removed empty steps" "[ ${steps_removed} ]"
 	fi
 
 	return "${status}"
@@ -2000,12 +2110,20 @@ then
 
 			frobulator.stp "Model" "[ ${model_file} ]"
 
-			if [ "${modify_option}" = "lint" ]
-			then
-				l2cu_lint
-			else
-				l2cu_modify
-			fi
+			case "${modify_option}"
+			in
+				lint)
+					l2cu_lint
+				;;
+
+				step)
+					l2cu_step
+				;;
+
+				*)
+					l2cu_modify
+				;;
+			esac
 
 			frobulator.fail "Modification failure" "[ '${model_file}' ]" || continue
 
