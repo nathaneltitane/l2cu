@@ -1353,6 +1353,7 @@ l2cu_modify () {
 	local status=0
 	local pattern_tail='^(0.*[^ ])( +\.)+ *$'
 	local lines_repaired=0
+	local steps_merged=0
 
 	local line
 	local line_ending
@@ -1413,10 +1414,17 @@ l2cu_modify () {
 			fi
 		fi
 
-		# step already following an added step dropped - no empty steps
+		# consecutive steps merged - no empty steps
 
-		if [ "${step_added}" = "true" ] && [ "${line}" = "0 STEP" ]
+		if [ "${modify_option}" = "step" ] && [ "${line}" = "0 STEP" ] && [ "${line_previous}" = "0 STEP" ]
 		then
+			# step following an added step is not counted - already in place
+
+			if [ "${step_added}" != "true" ]
+			then
+				steps_merged=$(( steps_merged + 1 ))
+			fi
+
 			unset step_added
 
 			continue
@@ -1530,6 +1538,11 @@ l2cu_modify () {
 	if [ "${lines_repaired}" -gt 0 ]
 	then
 		frobulator.inf "Repaired meta lines" "[ ${lines_repaired} ]"
+	fi
+
+	if [ "${steps_merged}" -gt 0 ]
+	then
+		frobulator.inf "Merged empty steps" "[ ${steps_merged} ]"
 	fi
 
 	return "${status}"
