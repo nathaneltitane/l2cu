@@ -1358,6 +1358,8 @@ l2cu_modify () {
 	local line_ending
 	local line_inner
 	local line_modified
+	local line_previous
+	local step_added
 	local flag
 	local color
 	local x
@@ -1411,6 +1413,17 @@ l2cu_modify () {
 			fi
 		fi
 
+		# step already following an added step dropped - no empty steps
+
+		if [ "${step_added}" = "true" ] && [ "${line}" = "0 STEP" ]
+		then
+			unset step_added
+
+			continue
+		fi
+
+		unset step_added
+
 		read -r flag color x y z a b c d e f g h i component <<< "${line}"
 
 		# part / submodel references only - line type 1 with all fields
@@ -1418,6 +1431,8 @@ l2cu_modify () {
 		if [ "${flag}" != "1" ] || [ -z "${component}" ]
 		then
 			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+
+			line_previous="${line}"
 
 			continue
 		fi
@@ -1484,21 +1499,29 @@ l2cu_modify () {
 		then
 			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
 
+			line_previous="${line}"
+
 			continue
 		fi
 
 		# rebuilt lines and added steps share the original line ending
+		# step added before only if the previous line is not already a step
 
-		if [ "${modify_option}" = "step" ]
+		if [ "${modify_option}" = "step" ] && [ "${line_previous}" != "0 STEP" ]
 		then
 			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
 		fi
 
-		printf '%s%s\n' "${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${line_ending}" >> "${model_buffer}"
+		line_previous="${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}"
+
+		printf '%s%s\n' "${line_previous}" "${line_ending}" >> "${model_buffer}"
 
 		if [ "${modify_option}" = "step" ]
 		then
 			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
+
+			line_previous="0 STEP"
+			step_added=true
 		fi
 	done < "${model_path}"
 
