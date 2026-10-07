@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/Paypal-2f343f.svg?style=for-the-badge&logo=paypal&label=Donate)](https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ)
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-05 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-06 ]
 
 ---
 
@@ -57,13 +57,13 @@ You will need:
 Usage: ./l2cu [EXTENSION] | [OPTION] [PARAMETER]
 
 -d, --directory       Specify [d]irectory to load models from.
--f, --file            Specify model [f]ile extension to work on.              [ all | dat | ldr | mpd ]
--e, --export          Run model file [e]xport.                                [ 3dstudio | collada | blender | wavefront ]
--r, --render          Run model file [r]endering.                             [ full | flat | wireframe | overlay | social | thumbnail | 0 - 7 ]
--i, --instructions    Generate model [i]nstruction file.                      [ pieces | samples ]
--m, --modify          Run model file [m]odification.                          [ lint | color | part | bind | step ]
--o, --overwrite       Overwrite the original model file after modification.
--w, --download        Run do[w]nload of the LDraw parts library.              [ official | unofficial ]
+-f, --file            Specify model [f]ile extension to work on.                      [ all | dat | ldr | mpd ]
+-e, --export          Run model file [e]xport.                                        [ csv | 3dstudio | collada | blender | wavefront ]
+-r, --render          Run model file [r]endering.                                     [ full | flat | wireframe | overlay | social | thumbnail | 0 - 7 ]
+-i, --instructions    Generate model [i]nstruction file.                              [ pieces | samples ]
+-m, --modify          Run model file [m]odification.                                  [ lint | color | part | bind | step ]
+-o, --overwrite       Write modifications to the [o]riginal model file.
+-w, --download        Run do[w]nload of the LDraw parts library.                      [ official | unofficial ]
 -l, --list            Generate the LDraw parts [l]ist for use with legacy editors.    [ description | number ]
 -h, --help            Show [h]elp and usage information.
 ```
@@ -85,9 +85,9 @@ The render function generates preset, high definition renders of the selected LD
 Renders are saved under each model's 'renders' directory:
 
 - full: eight 4096 x 4096 views around the model (presets 0 to 7) - saved under 'renders/full'
-- flat / wireframe / overlay: single view with the matching shading - saved under 'renders/[option]'
-- social: single 1200 x 600 view - saved under 'renders/social'
-- thumbnail: single 512 x 512 view - saved under 'renders/thumbnail'
+- flat / wireframe / overlay: single view (preset 1) with the matching shading - saved under 'renders/[option]'
+- social: single 1200 x 600 view (preset 1) with edges - saved under 'renders/social'
+- thumbnail: single 512 x 512 view (preset 1) with edges - saved under 'renders/thumbnail'
 - 0 to 7: single view preset - saved under 'renders'
 
 View presets (latitude / longitude):
@@ -111,6 +111,7 @@ This function serves as a 3D standard file exporter.
 It can generate (with the use of LeoCAD and/or Blender) the following formats:
 
 - collada (dae) - default
+- csv (parts list)
 - 3dstudio (3ds)
 - wavefront (obj and mtl)
 - blender compatible and optimized 3D files (blend - exported through wavefront, then joined, smoothed and cleaned up in Blender)
@@ -234,7 +235,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ---
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-05 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-06 ]
 
 ### Enjoying L²CU? Buy me a coffee to show your appreciation!
 
