@@ -65,7 +65,7 @@ frobulator.script
 
 # version ──────────────────────────────────────────────────────────────────────
 
-version="2026-10-05"
+version="2026-10-06"
 
 # usage ────────────────────────────────────────────────────────────────────────
 
@@ -198,61 +198,62 @@ do
 			echo
 			echo -e "-f, --file            Specify model [f]ile extension to work on."
 			echo
-			echo -e "                      all    Selects ldr and mpd file formats as target."
-			echo -e "                      dat    Selects dat file format as target."
-			echo -e "                      ldr    Selects ldr file format as target."
-			echo -e "                      mpd    Selects mpd file format as target."
+			echo -e "                      all    Select dat / ldr / mpd file formats as target."
+			echo -e "                      dat    Select dat file format as target."
+			echo -e "                      ldr    Select ldr file format as target."
+			echo -e "                      mpd    Select mpd file format as target. [ Default ]"
 			echo
 			echo -e "-e, --export          Run model file [e]xport using the following parameters:"
 			echo
+			echo -e "                      csv          Export parts list file format. [ csv ]"
 			echo -e "                      3dstudio     Export 3dstudio file format. [ 3ds ]"
-			echo -e "                      collada      Export collada file format. [ dae ]"
+			echo -e "                      collada      Export collada file format. [ dae ] [ Default ]"
 			echo -e "                      blender      Optimize wavefront and export to blender file format. [ obj >>> blend ]"
-			echo -e "                      wavefront    Generate wavefront files and archive. [ obj + mtl ]"
+			echo -e "                      wavefront    Export wavefront file format. [ obj + mtl ]"
 			echo
 			echo -e "-r, --render          Run model file [r]endering using the following parameters:"
 			echo
-			echo -e "                      full         Render series of images using options 0 to 7."
-			echo -e "                      flat         Render image using option 0 without edges or shading."
-			echo -e "                      wireframe    Render image using option 0 without faces or shading."
-			echo -e "                      social       Render image using option 0 with edges with a size of 1200 x 600 pixels."
-			echo -e "                      thumbnail    Render image using option 0 without edges or shading at 12.5% of the original size."
+			echo -e "                      full         Render series of images using view presets 0 to 7. [ Default ]"
+			echo -e "                      flat         Render image using view preset 1 without edges or shading."
+			echo -e "                      wireframe    Render image using view preset 1 without faces or shading."
+			echo -e "                      overlay      Render image using view preset 1 with heavy edges."
+			echo -e "                      social       Render image using view preset 1 with edges at 1200 x 600 pixels."
+			echo -e "                      thumbnail    Render image using view preset 1 with edges at 512 x 512 pixels."
 			echo
-			echo -e "                      0            Render image using view preset 00. [ 0 ] [ Lat.:30, Lon.: 0 ]"
-			echo -e "                      1            Render image using view preset 01. [ 1 ] [ Lat.:30, Lon.: 45 ]"
-			echo -e "                      2            Render image using view preset 02. [ 2 ] [ Lat.:30, Lon.: 90 ]"
-			echo -e "                      3            Render image using view preset 03. [ 3 ] [ Lat.:30, Lon.: 135 ]"
-			echo -e "                      4            Render image using view preset 04. [ 4 ] [ Lat.:30, Lon.: 180 ]"
-			echo -e "                      5            Render image using view preset 05. [ 5 ] [ Lat.:30, Lon.: 225 ]"
-			echo -e "                      6            Render image using view preset 06. [ 6 ] [ Lat.:30, Lon.: 270 ]"
-			echo -e "                      7            Render image using view preset 07. [ 7 ] [ Lat.:30, Lon.: 315 ]"
+			echo -e "                      0            Render image using view preset 0. [ latitude // 30 ] [ longitude // 0 ]"
+			echo -e "                      1            Render image using view preset 1. [ latitude // 30 ] [ longitude // 45 ]"
+			echo -e "                      2            Render image using view preset 2. [ latitude // 30 ] [ longitude // 90 ]"
+			echo -e "                      3            Render image using view preset 3. [ latitude // 30 ] [ longitude // 135 ]"
+			echo -e "                      4            Render image using view preset 4. [ latitude // 30 ] [ longitude // 180 ]"
+			echo -e "                      5            Render image using view preset 5. [ latitude // 30 ] [ longitude // 225 ]"
+			echo -e "                      6            Render image using view preset 6. [ latitude // 30 ] [ longitude // 270 ]"
+			echo -e "                      7            Render image using view preset 7. [ latitude // 30 ] [ longitude // 315 ]"
 			echo
 			echo -e "-i, --instructions    Generate model [i]nstruction file."
 			echo
 			echo -e "                      [ pdf ]"
 			echo
 			echo -e "                      pieces     Display and generate pieces count file."
-			echo -e "                      samples    Generate instructions sample preview files. [ png ] [ Default count: 3 ]"
+			echo -e "                      samples    Generate instructions sample preview files. [ png ] [ count // 6 ]"
 			echo
 			echo -e "-m, --modify          Run model file [m]odification using the following parameters:"
 			echo
-			echo -e "                      lint         Standardize and format model files for parsing."
-			echo -e "                      color        Modify a part's color attribute only."
-			echo -e "                      part         Modify a part for another by number attribute only."
-			echo -e "                      bind         Match a part to a specific color and modify the color for that selection."
-			echo -e "                      step         Separate ldr based submodels using step meta tags."
-			echo -e "                      overwrite    Overwrite the original model file after modification."
+			echo -e "                      lint     Standardize and format model files for parsing."
+			echo -e "                      color    Modify a part's color attribute only. [ Default ]"
+			echo -e "                      part     Modify a part for another by number attribute only."
+			echo -e "                      bind     Match a part to a specific color and modify the color for that selection."
+			echo -e "                      step     Separate ldr based submodels using step meta tags."
+			echo
+			echo -e "-o, --overwrite       Write modifications to the [o]riginal model file."
 			echo
 			echo -e "-w, --download        Run do[w]nload of the LDraw parts library."
 			echo
-			echo -e "                      [ official | unofficial ]"
-			echo
-			echo -e "                      official      Download the LDraw parts library - complete official archive."
-			echo -e "                      unofficial    Download the LDraw parts library - complete unofficial archive."
+			echo -e "                      official      Download the complete official LDraw parts library archive. [ Default ]"
+			echo -e "                      unofficial    Download the complete unofficial LDraw parts library archive."
 			echo
 			echo -e "-l, --list            Generate the LDraw parts [l]ist for use with legacy editors."
 			echo
-			echo -e "                      description    Sort list by part description."
+			echo -e "                      description    Sort list by part description. [ Default ]"
 			echo -e "                      number         Sort list by part number."
 			echo
 			echo -e "-h, --help            Show [h]elp and usage information."
