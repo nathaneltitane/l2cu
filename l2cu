@@ -86,9 +86,9 @@ do
 		;;
 
 			all)
-				extension_option="all"
+				option_extension="all"
 
-				extensions_list=(
+				list_extensions=(
 					dat
 					ldr
 					mpd
@@ -96,9 +96,9 @@ do
 			;;
 
 			dat|ldr|mpd)
-				extension_option="${1}"
+				option_extension="${1}"
 
-				extensions_list=(
+				list_extensions=(
 					"${1}"
 				)
 			;;
@@ -108,35 +108,35 @@ do
 		;;
 
 			csv)
-				export_option="csv"
-				export_extension="csv"
-				export_name="Comma Separated Values"
+				option_export="csv"
+				extension_export="csv"
+				name_export="Comma Separated Values"
 			;;
 
 			3dstudio)
-				export_option="3dstudio"
-				export_extension="3ds"
-				export_name="3DS"
+				option_export="3dstudio"
+				extension_export="3ds"
+				name_export="3DS"
 			;;
 
 			collada)
-				export_option="collada"
-				export_extension="dae"
-				export_name="Collada"
+				option_export="collada"
+				extension_export="dae"
+				name_export="Collada"
 			;;
 
 			blender)
 				# exported as obj - optimized into blend
 
-				export_option="blender"
-				export_extension="obj"
-				export_name="Blender"
+				option_export="blender"
+				extension_export="obj"
+				name_export="Blender"
 			;;
 
 			wavefront)
-				export_option="wavefront"
-				export_extension="obj"
-				export_name="Wavefront"
+				option_export="wavefront"
+				extension_export="obj"
+				name_export="Wavefront"
 			;;
 
 		-r|--render)
@@ -144,7 +144,7 @@ do
 		;;
 
 			full|flat|wireframe|overlay|social|thumbnail|[0-7])
-				render_option="${1}"
+				option_render="${1}"
 			;;
 
 		-i|--instructions)
@@ -152,7 +152,7 @@ do
 		;;
 
 			pieces|samples)
-				instructions_option="${1}"
+				option_instructions="${1}"
 			;;
 
 		-m|--modify)
@@ -160,11 +160,11 @@ do
 		;;
 
 			color|part|bind|lint|step)
-				modify_option="${1}"
+				option_modify="${1}"
 			;;
 
 		-o|--overwrite)
-			overwrite_option="overwrite"
+			option_overwrite="overwrite"
 		;;
 
 		-w|--download)
@@ -172,20 +172,20 @@ do
 		;;
 
 			official|unofficial)
-				download_option="${1}"
+				option_download="${1}"
 			;;
 
 		-l|--list)
 			option="list"
-			extension_option="dat"
+			option_extension="dat"
 
-			extensions_list=(
+			list_extensions=(
 				dat
 			)
 		;;
 
 			description|number)
-				sort_option="${1}"
+				option_sort="${1}"
 			;;
 
 		-h|--help)
@@ -301,11 +301,11 @@ url_library="${marker_hts}www.ldraw.org/library"
 
 # lpub3d instructions framework - configuration / placeholders
 
-instructions_base_directory="/media/internal/Lego/lpub3d/instructions"
+directory_instructions_base="/media/internal/Lego/lpub3d/instructions"
 
 # render camera presets - latitude / longitude / view label
 
-latitude=(
+list_latitudes=(
 	30
 	30
 	30
@@ -316,7 +316,7 @@ latitude=(
 	30
 )
 
-longitude=(
+list_longitudes=(
 	0
 	45
 	90
@@ -327,7 +327,7 @@ longitude=(
 	315
 )
 
-view=(
+list_views=(
 	"00"
 	"01"
 	"02"
@@ -344,9 +344,9 @@ command_lpub3d="$(command -v lpub3d)"
 
 if [ -n "${command_lpub3d}" ]
 then
-	lpub="lpub3d"
+	command_lpub="lpub3d"
 else
-	lpub="lpub3d24"
+	command_lpub="lpub3d24"
 fi
 
 # defaults ─────────────────────────────────────────────────────────────────────
@@ -371,7 +371,7 @@ then
 	fi
 fi
 
-if [ -z "${extension_option}" ]
+if [ -z "${option_extension}" ]
 then
 	frobulator.qst "Specify model file type? [ simple / multipart ]"
 
@@ -383,9 +383,9 @@ then
 
 		while true
 		do
-			frobulator.read extension_option
+			frobulator.read option_extension
 
-			if [[ "${extension_option}" =~ ^(all|dat|ldr|mpd)$ ]]
+			if [[ "${option_extension}" =~ ^(all|dat|ldr|mpd)$ ]]
 			then
 				break
 			fi
@@ -394,16 +394,16 @@ then
 			frobulator.wrn "Try again."
 		done
 
-		if [ "${extension_option}" = "all" ]
+		if [ "${option_extension}" = "all" ]
 		then
-			extensions_list=(
+			list_extensions=(
 				dat
 				ldr
 				mpd
 			)
 		else
-			extensions_list=(
-				"${extension_option}"
+			list_extensions=(
+				"${option_extension}"
 			)
 		fi
 	else
@@ -413,54 +413,54 @@ then
 
 		frobulator.fwd "Assuming defaults..."
 
-		extension_option="mpd"
+		option_extension="mpd"
 
-		extensions_list=(
+		list_extensions=(
 			mpd
 		)
 	fi
 fi
 
-if [ "${option}" = "export" ] && [ -z "${export_option}" ]
+if [ "${option}" = "export" ] && [ -z "${option_export}" ]
 then
-	export_option="collada"
-	export_extension="dae"
-	export_name="Collada"
+	option_export="collada"
+	extension_export="dae"
+	name_export="Collada"
 fi
 
 if [ "${option}" = "render" ]
 then
-	export_extension="png"
+	extension_export="png"
 fi
 
 if [ "${option}" = "instructions" ]
 then
-	if [ "${instructions_option}" = "samples" ]
+	if [ "${option_instructions}" = "samples" ]
 	then
-		export_extension="png"
+		extension_export="png"
 	else
-		export_extension="pdf"
+		extension_export="pdf"
 	fi
 fi
 
-if [ -z "${render_option}" ]
+if [ -z "${option_render}" ]
 then
-	render_option="full"
+	option_render="full"
 fi
 
-if [ -z "${modify_option}" ]
+if [ -z "${option_modify}" ]
 then
-	modify_option="color"
+	option_modify="color"
 fi
 
-if [ -z "${download_option}" ]
+if [ -z "${option_download}" ]
 then
-	download_option="official"
+	option_download="official"
 fi
 
-if [ -z "${sort_option}" ]
+if [ -z "${option_sort}" ]
 then
-	sort_option="description"
+	option_sort="description"
 fi
 
 # functions ────────────────────────────────────────────────────────────────────
@@ -471,7 +471,7 @@ l2cu_initialize () {
 
 	# blender conversion script - temporary - removed on exit
 
-	if [ "${option}" = "export" ] && [ "${export_option}" = "blender" ]
+	if [ "${option}" = "export" ] && [ "${option_export}" = "blender" ]
 	then
 		frobulator.temporary directory_temporary
 
@@ -731,10 +731,10 @@ l2cu_model () {
 
 	local status=0
 
-	model_path="${1}"
-	model_file="${model_path##*/}"
-	model_name="${model_file%.*}"
-	model_directory="${model_path%/*}"
+	path_model="${1}"
+	file_model="${path_model##*/}"
+	name_model="${file_model%.*}"
+	directory_model="${path_model%/*}"
 
 	return "${status}"
 }
@@ -743,13 +743,13 @@ l2cu_export () {
 
 	local status=0
 
-	frobulator.inf "Exporting" "[ ${model_file} ]"
+	frobulator.inf "Exporting" "[ ${file_model} ]"
 
-	frobulator.fwd "Output" "[ ${export_name} // ${export_file} ]"
+	frobulator.fwd "Output" "[ ${name_export} // ${file_export} ]"
 
 	leocad											\
-		-"${export_extension}"	"${export_file}" 	\
-													"${model_path}" > "${sink}" 2>&1 &
+		-"${extension_export}"	"${file_export}" 	\
+													"${path_model}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
 
@@ -757,12 +757,12 @@ l2cu_export () {
 
 	# collada transparency read as opaque by viewers
 
-	if [ "${export_option}" = "collada" ]
+	if [ "${option_export}" = "collada" ]
 	then
 		sed																\
 			-i															\
 			-e		's/<transparent>/<transparent opaque="A_ONE">/g'	\
-																		"${export_file}"
+																		"${file_export}"
 
 		frobulator.track
 	fi
@@ -775,17 +775,17 @@ l2cu_optimize () {
 	# import obj into blender - save optimized blend - obj and mtl removed
 
 	local status=0
-	local export_file_blend="${model_name}.blend"
+	local file_export_blend="${name_model}.blend"
 
 	frobulator.fwd "Optimizing..."
 
-	frobulator.fwd "Output" "[ ${export_name} // ${export_file_blend} ]"
+	frobulator.fwd "Output" "[ ${name_export} // ${file_export_blend} ]"
 
 	blender									\
 		--background						\
 		--python		"${file_optimize}"	\
 		--									\
-											"${export_file}" > "${sink}" 2>&1 &
+											"${file_export}" > "${sink}" 2>&1 &
 
 	frobulator.progress "optimize"
 
@@ -793,16 +793,16 @@ l2cu_optimize () {
 
 	# blender exits without error when saving fails
 
-	if [ ! -f "${export_file_blend}" ]
+	if [ ! -f "${file_export_blend}" ]
 	then
 		status=1
 
 		return "${status}"
 	fi
 
-	rm --force "${export_file}" "${model_name}.mtl"
+	rm --force "${file_export}" "${name_model}.mtl"
 
-	export_file="${export_file_blend}"
+	file_export="${file_export_blend}"
 
 	return "${status}"
 }
@@ -812,22 +812,22 @@ l2cu_export_size () {
 	# export file size in kilobytes - threshold 25 * 1024
 
 	local status=0
-	local size_threshold=25600
-	local size_unit="kilobytes"
+	local threshold_size=25600
+	local unit_size="kilobytes"
 
-	local export_size
+	local size_export
 
-	export_size="$(du -k "${export_file}" | cut -f 1)"
+	size_export="$(du -k "${file_export}" | cut -f 1)"
 
 	frobulator.track || return "${status}"
 
-	if [ "${export_size}" -le "${size_threshold}" ]
+	if [ "${size_export}" -le "${threshold_size}" ]
 	then
-		frobulator.scs "File size" "[ ${size_unit} // ${export_size} ]"
+		frobulator.scs "File size" "[ ${unit_size} // ${size_export} ]"
 	else
-		frobulator.wrn "File size" "[ ${size_unit} // ${export_size} ]"
+		frobulator.wrn "File size" "[ ${unit_size} // ${size_export} ]"
 
-		frobulator.wrn "Model file size is above recommended threshold of ${size_threshold} ${size_unit}!"
+		frobulator.wrn "Model file size is above recommended threshold of ${threshold_size} ${unit_size}!"
 		frobulator.nul "You may experience higher than average loading times."
 	fi
 
@@ -837,23 +837,23 @@ l2cu_export_size () {
 l2cu_render () {
 
 	local status=0
-	local coordinates="${1}"
-	local antialias_samples=8
-	local render_file="${model_name}-${view[coordinates]}.${export_extension}"
+	local index_view="${1}"
+	local count_samples_antialias=8
+	local file_render="${name_model}-${list_views[index_view]}.${extension_export}"
 
-	frobulator.inf "Rendering" "[ ${model_name} ]"
+	frobulator.inf "Rendering" "[ ${name_model} ]"
 
-	frobulator.fwd "Output" "[ view preset ${view[coordinates]} // ${render_file} ]"
+	frobulator.fwd "Output" "[ view preset ${list_views[index_view]} // ${file_render} ]"
 
 	leocad																			\
-		--height		"${height}"													\
-		--width			"${width}"													\
-		--camera-angles	"${latitude[coordinates]}" "${longitude[coordinates]}"		\
+		--height		"${height_render}"													\
+		--width			"${width_render}"													\
+		--camera-angles	"${list_latitudes[index_view]}" "${list_longitudes[index_view]}"		\
 		--shading		"${shading}"												\
-		--line-width	"${line_width}"												\
-		--aa-samples	"${antialias_samples}"										\
-		--image			"${render_file}"											\
-																					"${model_path}" > "${sink}" 2>&1 &
+		--line-width	"${width_line}"												\
+		--aa-samples	"${count_samples_antialias}"										\
+		--image			"${file_render}"											\
+																					"${path_model}" > "${sink}" 2>&1 &
 
 	frobulator.progress "render"
 
@@ -867,19 +867,19 @@ l2cu_pieces () {
 	# total piece count written to model pieces file
 
 	local status=0
-	local part_count_file="${model_directory}/parts.csv"
-	local pieces_file="${model_directory}/pieces"
-	local total_pieces=0
+	local file_csv_parts="${directory_model}/parts.csv"
+	local file_pieces="${directory_model}/pieces"
+	local count_pieces_total=0
 
-	local part_quantity
+	local count_pieces_part
 
-	local -a part_fields=()
+	local -a list_fields_csv=()
 
-	frobulator.inf "Generating pieces count file" "[ ${model_name} ]"
+	frobulator.inf "Generating pieces count file" "[ ${name_model} ]"
 
 	leocad										\
-		--export-csv	"${part_count_file}"	\
-												"${model_path}" > "${sink}" 2>&1 &
+		--export-csv	"${file_csv_parts}"	\
+												"${path_model}" > "${sink}" 2>&1 &
 
 	frobulator.progress "parse"
 
@@ -887,20 +887,20 @@ l2cu_pieces () {
 
 	# quantity is the third field from the end - part names may contain commas - header skipped
 
-	while IFS=',' read -r -a part_fields
+	while IFS=',' read -r -a list_fields_csv
 	do
-		part_quantity="${part_fields[-3]//\"/}"
+		count_pieces_part="${list_fields_csv[-3]//\"/}"
 
-		total_pieces=$(( total_pieces + part_quantity ))
-	done < <(tail -n +2 "${part_count_file}")
+		count_pieces_total=$(( count_pieces_total + count_pieces_part ))
+	done < <(tail -n +2 "${file_csv_parts}")
 
-	echo "${total_pieces}" > "${pieces_file}"
+	echo "${count_pieces_total}" > "${file_pieces}"
 
 	frobulator.track
 
-	rm --force "${part_count_file}"
+	rm --force "${file_csv_parts}"
 
-	frobulator.stp "Pieces" "[ ${total_pieces} ]"
+	frobulator.stp "Pieces" "[ ${count_pieces_total} ]"
 
 	return "${status}"
 }
@@ -914,9 +914,9 @@ l2cu_instructions_clean () {
 	rm																		\
 		--recursive															\
 		--force																\
-			"${instructions_directory}/configuration"						\
-			"${instructions_model_path}"									\
-			"${instructions_directory}"/[lL][pP][uU][bB][3][dD]
+			"${directory_instructions}/configuration"						\
+			"${path_model_instructions}"									\
+			"${directory_instructions}"/[lL][pP][uU][bB][3][dD]
 
 	frobulator.track
 
@@ -929,19 +929,19 @@ l2cu_instructions_prepare () {
 
 	local status=0
 
-	frobulator.inf "Preparing instructions setup" "[ ${model_name} ]"
+	frobulator.inf "Preparing instructions setup" "[ ${name_model} ]"
 
-	cd "${model_directory}"
-
-	frobulator.track || return "${status}"
-
-	rm --recursive --force "${instructions_directory}"
-
-	frobulator.directory "${model_directory}" instructions
+	cd "${directory_model}"
 
 	frobulator.track || return "${status}"
 
-	frobulator.directory "${instructions_directory}" samples
+	rm --recursive --force "${directory_instructions}"
+
+	frobulator.directory "${directory_model}" instructions
+
+	frobulator.track || return "${status}"
+
+	frobulator.directory "${directory_instructions}" samples
 
 	frobulator.track
 
@@ -952,28 +952,28 @@ l2cu_instructions_configure () {
 
 	local status=0
 
-	local configuration_file
-	local configuration_title
-	local configuration_pieces
-	local configuration_url_category
-	local configuration_url_name
+	local file_configuration
+	local title_configuration
+	local count_pieces_configuration
+	local category_url_configuration
+	local name_url_configuration
 	local line
 
-	local -a configuration_files_list=(
-		"${model_directory}/title"
-		"${model_directory}/pieces"
-		"${model_directory%/*}/title"
+	local -a list_files_configuration=(
+		"${directory_model}/title"
+		"${directory_model}/pieces"
+		"${directory_model%/*}/title"
 	)
 
-	frobulator.inf "Configuring instructions" "[ ${model_name} ]"
+	frobulator.inf "Configuring instructions" "[ ${name_model} ]"
 
 	frobulator.inf "Validating configuration elements"
 
-	for configuration_file in "${configuration_files_list[@]}"
+	for file_configuration in "${list_files_configuration[@]}"
 	do
-		if [ ! -f "${configuration_file}" ]
+		if [ ! -f "${file_configuration}" ]
 		then
-			frobulator.err "Configuration element missing" "[ ${configuration_file} ]"
+			frobulator.err "Configuration element missing" "[ ${file_configuration} ]"
 
 			status=1
 		fi
@@ -988,30 +988,30 @@ l2cu_instructions_configure () {
 
 	# title on one line - line breaks removed
 
-	configuration_title="$(< "${model_directory}/title")"
-	configuration_title="${configuration_title//$'\n'/ }"
-	configuration_title="${configuration_title//<\/br>/}"
+	title_configuration="$(< "${directory_model}/title")"
+	title_configuration="${title_configuration//$'\n'/ }"
+	title_configuration="${title_configuration//<\/br>/}"
 
-	configuration_pieces="$(< "${model_directory}/pieces")"
+	count_pieces_configuration="$(< "${directory_model}/pieces")"
 
 	# category from parent directory title - url form
 
-	configuration_url_category="$(< "${model_directory%/*}/title")"
-	configuration_url_category="${configuration_url_category// /-}"
+	category_url_configuration="$(< "${directory_model%/*}/title")"
+	category_url_configuration="${category_url_configuration// /-}"
 
-	configuration_url_name="${model_name^^}"
+	name_url_configuration="${name_model^^}"
 
 	# substitute configuration variables - write instructions configuration
 
 	while IFS='' read -r line
 	do
-		line="${line//'${configuration_title_string}'/"${configuration_title}"}"
-		line="${line//'${configuration_pieces}'/"${configuration_pieces}"}"
-		line="${line//'${configuration_url_category}'/"${configuration_url_category}"}"
-		line="${line//'${configuration_url_name}'/"${configuration_url_name}"}"
+		line="${line//'${configuration_title_string}'/"${title_configuration}"}"
+		line="${line//'${configuration_pieces}'/"${count_pieces_configuration}"}"
+		line="${line//'${configuration_url_category}'/"${category_url_configuration}"}"
+		line="${line//'${configuration_url_name}'/"${name_url_configuration}"}"
 
 		echo "${line}"
-	done < "${instructions_base_directory}/configuration" > "${instructions_directory}/configuration"
+	done < "${directory_instructions_base}/configuration" > "${directory_instructions}/configuration"
 
 	frobulator.track || return "${status}"
 
@@ -1019,7 +1019,7 @@ l2cu_instructions_configure () {
 
 	# configuration from base instructions framework followed by model
 
-	cat "${instructions_directory}/configuration" "${model_path}" > "${instructions_model_path}"
+	cat "${directory_instructions}/configuration" "${path_model}" > "${path_model_instructions}"
 
 	frobulator.track
 
@@ -1030,13 +1030,13 @@ l2cu_instructions_samples_placeholders () {
 
 	local status=0
 
-	local sample_index
+	local index_sample
 
-	frobulator.inf "Generating placeholders" "[ ${model_name} ]"
+	frobulator.inf "Generating placeholders" "[ ${name_model} ]"
 
-	for (( sample_index = 1; sample_index <= 6; sample_index++ ))
+	for (( index_sample = 1; index_sample <= 6; index_sample++ ))
 	do
-		cp "${instructions_base_directory}/work-in-progress.png" "${instructions_samples_directory}/sample-0${sample_index}.png"
+		cp "${directory_instructions_base}/work-in-progress.png" "${directory_samples_instructions}/sample-0${index_sample}.png"
 
 		frobulator.track
 	done
@@ -1049,55 +1049,55 @@ l2cu_instructions_samples () {
 	local status=0
 	local renderer="native"
 	local projection="perspective"
-	local sample_number=1
+	local number_sample=1
 
-	local step_count
-	local sample_index
-	local sample_range
-	local sample_path
+	local count_step
+	local index_sample
+	local range_sample
+	local path_sample
 
-	local -a sample_pages=()
-	local -a samples_list=()
+	local -a list_pages_sample=()
+	local -a list_samples=()
 
-	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	frobulator.inf "Generating instructions" "[ ${name_model} ]"
 
 	# step count of the instructions model
 
-	step_count="$(grep -c -E '^0 STEP' "${instructions_model_path}")"
+	count_step="$(grep -c -E '^0 STEP' "${path_model_instructions}")"
 
 	# six sample pages spread over the instructions - first page minimum
 
-	sample_pages=(
+	list_pages_sample=(
 		1
-		$(( step_count / 5 - 2 ))
-		$(( step_count / 4 - 3 ))
-		$(( step_count / 3 - 4 ))
-		$(( step_count / 2 - 5 ))
-		"${step_count}"
+		$(( count_step / 5 - 2 ))
+		$(( count_step / 4 - 3 ))
+		$(( count_step / 3 - 4 ))
+		$(( count_step / 2 - 5 ))
+		"${count_step}"
 	)
 
-	for sample_index in "${!sample_pages[@]}"
+	for index_sample in "${!list_pages_sample[@]}"
 	do
-		if [ "${sample_pages[sample_index]}" -lt 1 ]
+		if [ "${list_pages_sample[index_sample]}" -lt 1 ]
 		then
-			sample_pages[sample_index]=1
+			list_pages_sample[index_sample]=1
 		fi
 	done
 
-	printf -v sample_range '%s,' "${sample_pages[@]}"
+	printf -v range_sample '%s,' "${list_pages_sample[@]}"
 
-	sample_range="${sample_range%,}"
+	range_sample="${range_sample%,}"
 
-	frobulator.stp "Generating range" "[ ${sample_range} ]"
+	frobulator.stp "Generating range" "[ ${range_sample} ]"
 
-	"${lpub}"											\
+	"${command_lpub}"											\
 		--clear-cache									\
 		--preferred-renderer	"${renderer}"			\
 		--projection			"${projection}"			\
 		--process-export								\
-		--export-option			"${export_extension}"	\
-		--range					"${sample_range}"		\
-														"${instructions_model_path}" > "${sink}" 2>&1 &
+		--export-option			"${extension_export}"	\
+		--range					"${range_sample}"		\
+														"${path_model_instructions}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
 
@@ -1107,15 +1107,15 @@ l2cu_instructions_samples () {
 
 	# sample pages renamed in page order
 
-	mapfile -t samples_list < <(find "${instructions_directory}" -type f -iname "*page*.${export_extension}" | sort -V)
+	mapfile -t list_samples < <(find "${directory_instructions}" -type f -iname "*page*.${extension_export}" | sort -V)
 
-	for sample_path in "${samples_list[@]}"
+	for path_sample in "${list_samples[@]}"
 	do
-		mv "${sample_path}" "${instructions_samples_directory}/sample-0${sample_number}.${export_extension}"
+		mv "${path_sample}" "${directory_samples_instructions}/sample-0${number_sample}.${extension_export}"
 
 		frobulator.track
 
-		sample_number=$(( sample_number + 1 ))
+		number_sample=$(( number_sample + 1 ))
 	done
 
 	return "${status}"
@@ -1127,16 +1127,16 @@ l2cu_instructions () {
 	local renderer="native"
 	local projection="perspective"
 
-	frobulator.inf "Generating instructions" "[ ${model_name} ]"
+	frobulator.inf "Generating instructions" "[ ${name_model} ]"
 
-	"${lpub}"																\
+	"${command_lpub}"																\
 		--clear-cache														\
 		--preferred-renderer	"${renderer}"								\
 		--projection			"${projection}"								\
 		--process-export													\
-		--export-option			"${export_extension}"						\
-		--pdf-output-file		"${instructions_directory}/${model_name}.pdf"	\
-																			"${instructions_model_path}" > "${sink}" 2>&1 &
+		--export-option			"${extension_export}"						\
+		--pdf-output-file		"${directory_instructions}/${name_model}.pdf"	\
+																			"${path_model_instructions}" > "${sink}" 2>&1 &
 
 	frobulator.progress "generate"
 
@@ -1191,34 +1191,34 @@ l2cu_parse_colors () {
 
 	local status=0
 
-	local color_input
-	local color_name
-	local color_value
-	local color_hex
+	local input_color
+	local name_color
+	local value_color
+	local hex_color
 
 	l2cu_parse_input
 
-	color_input="${input,,}"
-	color_input="${color_input#\#}"
+	input_color="${input,,}"
+	input_color="${input_color#\#}"
 
-	while read -r color_name color_value color_hex
+	while read -r name_color value_color hex_color
 	do
-		color_name="${color_name//_/ }"
-		color_hex="${color_hex#\#}"
+		name_color="${name_color//_/ }"
+		hex_color="${hex_color#\#}"
 
-		if [ "${color_input}" = "${color_name,,}" ] ||
-		   [ "${color_input}" = "${color_value}" ] ||
-		   [ "${color_input}" = "${color_hex,,}" ]
+		if [ "${input_color}" = "${name_color,,}" ] ||
+		   [ "${input_color}" = "${value_color}" ] ||
+		   [ "${input_color}" = "${hex_color,,}" ]
 		then
-			ldraw_color_value="${color_value}"
+			value_color_ldraw="${value_color}"
 
 			frobulator.fwd "Confirming input..."
 
 			frobulator.timeout
 
-			frobulator.inf "Color name"              "[ ${color_name} ]"
-			frobulator.inf "Color value"             "[ ${color_value} ]"
-			frobulator.inf "Color hexadecimal value" "[ ${color_hex} ]"
+			frobulator.inf "Color name"              "[ ${name_color} ]"
+			frobulator.inf "Color value"             "[ ${value_color} ]"
+			frobulator.inf "Color hexadecimal value" "[ ${hex_color} ]"
 
 			return "${status}"
 		fi
@@ -1241,20 +1241,20 @@ l2cu_parse_modification () {
 
 	local status=0
 
-	case "${modify_option}"
+	case "${option_modify}"
 	in
 		color)
 			frobulator.ipt "Enter color to modify" "[ name / number / hexadecimal ]"
 
 			l2cu_parse_colors
 
-			old_color="${ldraw_color_value}"
+			value_color_old="${value_color_ldraw}"
 
 			frobulator.ipt "Enter color to set" "[ name / number / hexadecimal ]"
 
 			l2cu_parse_colors
 
-			new_color="${ldraw_color_value}"
+			value_color_new="${value_color_ldraw}"
 		;;
 
 		part)
@@ -1262,13 +1262,13 @@ l2cu_parse_modification () {
 
 			l2cu_parse_input
 
-			old_part="${input}"
+			number_part_old="${input}"
 
 			frobulator.ipt "Enter part to set" "[ number ]"
 
 			l2cu_parse_input
 
-			new_part="${input}"
+			number_part_new="${input}"
 		;;
 
 		bind)
@@ -1276,19 +1276,19 @@ l2cu_parse_modification () {
 
 			l2cu_parse_input
 
-			part_selection="${input}"
+			number_part_selection="${input}"
 
 			frobulator.ipt "Enter part color to modify" "[ name / number / hexadecimal ]"
 
 			l2cu_parse_colors
 
-			old_color="${ldraw_color_value}"
+			value_color_old="${value_color_ldraw}"
 
 			frobulator.ipt "Enter part color to set" "[ name / number / hexadecimal ]"
 
 			l2cu_parse_colors
 
-			new_color="${ldraw_color_value}"
+			value_color_new="${value_color_ldraw}"
 		;;
 	esac
 
@@ -1339,7 +1339,7 @@ l2cu_lint () {
 		-e 's/(//g'							\
 		-e 's/)//g'							\
 		-e '/^$/d'							\
-											"${model_path}" > "${model_buffer}"
+											"${path_model}" > "${file_buffer_model}"
 
 	frobulator.track
 
@@ -1349,7 +1349,7 @@ l2cu_lint () {
 l2cu_line_repair () {
 
 	# ' . . .' tails left on meta lines by earlier l2cu versions removed
-	# works on the caller's line - counted in the caller's lines_repaired
+	# works on the caller's line - counted in the caller's count_lines_repaired
 
 	local status=0
 	local pattern_tail='^(0.*[^ ])( +\.)+ *$'
@@ -1367,13 +1367,13 @@ l2cu_line_repair () {
 	then
 		line="${line%%$'\r'*}"
 
-		lines_repaired=$(( lines_repaired + 1 ))
+		count_lines_repaired=$(( count_lines_repaired + 1 ))
 
 	elif [[ "${line}" =~ ${pattern_tail} ]]
 	then
 		line="${BASH_REMATCH[1]}"
 
-		lines_repaired=$(( lines_repaired + 1 ))
+		count_lines_repaired=$(( count_lines_repaired + 1 ))
 	fi
 
 	return "${status}"
@@ -1385,12 +1385,12 @@ l2cu_modify () {
 	# line ending set aside before parsing - fields never carry it
 
 	local status=0
-	local lines_repaired=0
+	local count_lines_repaired=0
 
 	local line
-	local line_ending
-	local line_modified
-	local flag
+	local ending_line
+	local state_line_modified
+	local type_line
 	local color
 	local x
 	local y
@@ -1407,7 +1407,7 @@ l2cu_modify () {
 	local component
 	local part
 
-	: > "${model_buffer}"
+	: > "${file_buffer_model}"
 
 	frobulator.track || return "${status}"
 
@@ -1415,23 +1415,23 @@ l2cu_modify () {
 
 	while IFS='' read -r line || [ -n "${line}" ]
 	do
-		unset line_ending
+		unset ending_line
 
 		if [[ "${line}" = *$'\r' ]]
 		then
-			line_ending=$'\r'
+			ending_line=$'\r'
 			line="${line%$'\r'}"
 		fi
 
 		l2cu_line_repair
 
-		read -r flag color x y z a b c d e f g h i component <<< "${line}"
+		read -r type_line color x y z a b c d e f g h i component <<< "${line}"
 
 		# part / submodel references only - line type 1 with all fields
 
-		if [ "${flag}" != "1" ] || [ -z "${component}" ]
+		if [ "${type_line}" != "1" ] || [ -z "${component}" ]
 		then
-			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+			printf '%s%s\n' "${line}" "${ending_line}" >> "${file_buffer_model}"
 
 			continue
 		fi
@@ -1440,63 +1440,63 @@ l2cu_modify () {
 
 		part="${component%.*}"
 
-		unset line_modified
+		unset state_line_modified
 
-		case "${modify_option}"
+		case "${option_modify}"
 		in
 			color)
-				if [ "${color}" = "${old_color}" ]
+				if [ "${color}" = "${value_color_old}" ]
 				then
-					color="${new_color}"
-					line_modified=true
+					color="${value_color_new}"
+					state_line_modified=true
 
-					frobulator.inf "Modifying" "[ ${old_color} ]"
-					frobulator.inf "Setting"   "[ ${new_color} ]"
+					frobulator.inf "Modifying" "[ ${value_color_old} ]"
+					frobulator.inf "Setting"   "[ ${value_color_new} ]"
 				fi
 			;;
 
 			part)
-				if [ "${part}" = "${old_part}" ]
+				if [ "${part}" = "${number_part_old}" ]
 				then
-					component="${new_part}.${component##*.}"
-					line_modified=true
+					component="${number_part_new}.${component##*.}"
+					state_line_modified=true
 
-					frobulator.inf "Modifying" "[ ${old_part} ]"
-					frobulator.inf "Setting"   "[ ${new_part} ]"
+					frobulator.inf "Modifying" "[ ${number_part_old} ]"
+					frobulator.inf "Setting"   "[ ${number_part_new} ]"
 				fi
 			;;
 
 			bind)
-				if [ "${part}" = "${part_selection}" ] && [ "${color}" = "${old_color}" ]
+				if [ "${part}" = "${number_part_selection}" ] && [ "${color}" = "${value_color_old}" ]
 				then
-					color="${new_color}"
-					line_modified=true
+					color="${value_color_new}"
+					state_line_modified=true
 
 					frobulator.inf "Part"      "[ ${part} ]"
 
-					frobulator.inf "Modifying" "[ ${old_color} ]"
-					frobulator.inf "Setting"   "[ ${new_color} ]"
+					frobulator.inf "Modifying" "[ ${value_color_old} ]"
+					frobulator.inf "Setting"   "[ ${value_color_new} ]"
 				fi
 			;;
 		esac
 
-		if [ "${line_modified}" != "true" ]
+		if [ "${state_line_modified}" != "true" ]
 		then
-			printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+			printf '%s%s\n' "${line}" "${ending_line}" >> "${file_buffer_model}"
 
 			continue
 		fi
 
 		# rebuilt line shares the original line ending
 
-		printf '%s%s\n' "${flag} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${line_ending}" >> "${model_buffer}"
-	done < "${model_path}"
+		printf '%s%s\n' "${type_line} ${color} ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${ending_line}" >> "${file_buffer_model}"
+	done < "${path_model}"
 
 	frobulator.track
 
-	if [ "${lines_repaired}" -gt 0 ]
+	if [ "${count_lines_repaired}" -gt 0 ]
 	then
-		frobulator.inf "Repaired meta lines" "[ ${lines_repaired} ]"
+		frobulator.inf "Repaired meta lines" "[ ${count_lines_repaired} ]"
 	fi
 
 	return "${status}"
@@ -1509,15 +1509,15 @@ l2cu_step () {
 	# line ending set aside before parsing - fields never carry it
 
 	local status=0
-	local lines_repaired=0
-	local steps_removed=0
-	local step_content=false
+	local count_lines_repaired=0
+	local count_steps_removed=0
+	local state_step_parts=false
 
 	local line
-	local line_ending
+	local ending_line
 	local line_pending
-	local step_added
-	local flag
+	local state_step_added
+	local type_line
 	local color
 	local x
 	local y
@@ -1533,9 +1533,9 @@ l2cu_step () {
 	local i
 	local component
 
-	local -a lines_pending=()
+	local -a list_lines_pending=()
 
-	: > "${model_buffer}"
+	: > "${file_buffer_model}"
 
 	frobulator.track || return "${status}"
 
@@ -1543,11 +1543,11 @@ l2cu_step () {
 
 	while IFS='' read -r line || [ -n "${line}" ]
 	do
-		unset line_ending
+		unset ending_line
 
 		if [[ "${line}" = *$'\r' ]]
 		then
-			line_ending=$'\r'
+			ending_line=$'\r'
 			line="${line%$'\r'}"
 		fi
 
@@ -1557,7 +1557,7 @@ l2cu_step () {
 
 		if [[ "${line}" = "0 !LEOCAD PIECE "* ]]
 		then
-			lines_pending+=("${line}${line_ending}")
+			list_lines_pending+=("${line}${ending_line}")
 
 			continue
 		fi
@@ -1566,94 +1566,94 @@ l2cu_step () {
 
 		if [ "${line}" = "0 STEP" ]
 		then
-			if [ "${step_content}" = "true" ]
+			if [ "${state_step_parts}" = "true" ]
 			then
-				printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+				printf '%s%s\n' "${line}" "${ending_line}" >> "${file_buffer_model}"
 
-				step_content=false
+				state_step_parts=false
 
-			elif [ "${step_added}" != "true" ]
+			elif [ "${state_step_added}" != "true" ]
 			then
-				steps_removed=$(( steps_removed + 1 ))
+				count_steps_removed=$(( count_steps_removed + 1 ))
 			fi
 
-			unset step_added
+			unset state_step_added
 
 			continue
 		fi
 
-		unset step_added
+		unset state_step_added
 
-		read -r flag color x y z a b c d e f g h i component <<< "${line}"
+		read -r type_line color x y z a b c d e f g h i component <<< "${line}"
 
 		# ldr submodel - previous step closed - own step
 
-		if [ "${flag}" = "1" ] && [[ "${component}" = *.[lL][dD][rR] ]]
+		if [ "${type_line}" = "1" ] && [[ "${component}" = *.[lL][dD][rR] ]]
 		then
-			if [ "${step_content}" = "true" ]
+			if [ "${state_step_parts}" = "true" ]
 			then
-				printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
+				printf '%s%s\n' "0 STEP" "${ending_line}" >> "${file_buffer_model}"
 			fi
 
-			for line_pending in "${lines_pending[@]}"
+			for line_pending in "${list_lines_pending[@]}"
 			do
-				printf '%s\n' "${line_pending}" >> "${model_buffer}"
+				printf '%s\n' "${line_pending}" >> "${file_buffer_model}"
 			done
 
-			lines_pending=()
+			list_lines_pending=()
 
 			# submodel color reset - applications use incompatible color schemes
 
-			printf '%s%s\n' "${flag} 0 ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${line_ending}" >> "${model_buffer}"
-			printf '%s%s\n' "0 STEP" "${line_ending}" >> "${model_buffer}"
+			printf '%s%s\n' "${type_line} 0 ${x} ${y} ${z} ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${component}" "${ending_line}" >> "${file_buffer_model}"
+			printf '%s%s\n' "0 STEP" "${ending_line}" >> "${file_buffer_model}"
 
-			step_content=false
-			step_added=true
+			state_step_parts=false
+			state_step_added=true
 
 			frobulator.inf "Stepping" "[ ${component} ]"
 
 			continue
 		fi
 
-		for line_pending in "${lines_pending[@]}"
+		for line_pending in "${list_lines_pending[@]}"
 		do
-			printf '%s\n' "${line_pending}" >> "${model_buffer}"
+			printf '%s\n' "${line_pending}" >> "${file_buffer_model}"
 		done
 
-		lines_pending=()
+		list_lines_pending=()
 
-		printf '%s%s\n' "${line}" "${line_ending}" >> "${model_buffer}"
+		printf '%s%s\n' "${line}" "${ending_line}" >> "${file_buffer_model}"
 
 		# drawing lines fill the step - a new submodel starts empty
 
-		case "${flag}"
+		case "${type_line}"
 		in
 			1|2|3|4|5)
-				step_content=true
+				state_step_parts=true
 			;;
 		esac
 
 		if [[ "${line}" = "0 FILE "* ]]
 		then
-			step_content=false
+			state_step_parts=false
 		fi
-	done < "${model_path}"
+	done < "${path_model}"
 
 	frobulator.track
 
-	for line_pending in "${lines_pending[@]}"
+	for line_pending in "${list_lines_pending[@]}"
 	do
-		printf '%s\n' "${line_pending}" >> "${model_buffer}"
+		printf '%s\n' "${line_pending}" >> "${file_buffer_model}"
 	done
 
-	if [ "${lines_repaired}" -gt 0 ]
+	if [ "${count_lines_repaired}" -gt 0 ]
 	then
-		frobulator.inf "Repaired meta lines" "[ ${lines_repaired} ]"
+		frobulator.inf "Repaired meta lines" "[ ${count_lines_repaired} ]"
 	fi
 
-	if [ "${steps_removed}" -gt 0 ]
+	if [ "${count_steps_removed}" -gt 0 ]
 	then
-		frobulator.inf "Removed empty steps" "[ ${steps_removed} ]"
+		frobulator.inf "Removed empty steps" "[ ${count_steps_removed} ]"
 	fi
 
 	return "${status}"
@@ -1664,21 +1664,21 @@ l2cu_write () {
 	# modified model file - original overwritten or timestamped copy
 
 	local status=0
-	local model_copy="${model_directory}/${model_name}-modified-${stamp}.${extension}"
+	local file_copy_model="${directory_model}/${name_model}-modified-${stamp}.${extension}"
 
-	if [ "${overwrite_option}" = "overwrite" ]
+	if [ "${option_overwrite}" = "overwrite" ]
 	then
-		frobulator.wrn "Writing to model file original" "[ ${model_file} ]"
+		frobulator.wrn "Writing to model file original" "[ ${file_model} ]"
 
 		frobulator.timeout
 
-		mv "${model_buffer}" "${model_path}"
+		mv "${file_buffer_model}" "${path_model}"
 	else
-		frobulator.wrn "Writing to model file copy" "[ ${model_copy##*/} ]"
+		frobulator.wrn "Writing to model file copy" "[ ${file_copy_model##*/} ]"
 
 		frobulator.fwd "Writing..."
 
-		mv "${model_buffer}" "${model_copy}"
+		mv "${file_buffer_model}" "${file_copy_model}"
 	fi
 
 	frobulator.track
@@ -1692,16 +1692,16 @@ l2cu_download () {
 
 	local status=0
 
-	frobulator.download "${url_library}/${library_release}" "${directory}" "${library_archive}"
+	frobulator.download "${url_library}/${path_release_library}" "${directory}" "${file_archive_library}"
 
 	frobulator.track || return "${status}"
 
 	# leocad reads the parts archive without extraction - official archive renamed
 
-	if [ "${download_option}" = "official" ]
+	if [ "${option_download}" = "official" ]
 	then
 		mv 											\
-			"${directory}/${library_archive}"		\
+			"${directory}/${file_archive_library}"		\
 			"${directory}/ldraw.zip"
 
 		frobulator.track
@@ -1717,40 +1717,40 @@ l2cu_list () {
 	local status=0
 
 	local extension
-	local part_path
-	local part_file
-	local part_file_header
-	local part_file_description
+	local path_part
+	local file_part
+	local line_header_part
+	local description_part
 
-	local -a parts_list=()
+	local -a list_parts=()
 
-	for extension in "${extensions_list[@]}"
+	for extension in "${list_extensions[@]}"
 	do
-		mapfile -t parts_list < <(find "${directory}" -type f -iname "*.${extension}")
+		mapfile -t list_parts < <(find "${directory}" -type f -iname "*.${extension}")
 
-		for part_path in "${parts_list[@]}"
+		for path_part in "${list_parts[@]}"
 		do
-			part_file="${part_path##*/}"
+			file_part="${path_part##*/}"
 
-			read -r part_file_header < "${part_path}"
+			read -r line_header_part < "${path_part}"
 
-			part_file_description="${part_file_header:2}"
-			part_file_description="${part_file_description%$'\r'}"
+			description_part="${line_header_part:2}"
+			description_part="${description_part%$'\r'}"
 
-			if [[ "${part_file_description}" == *~Moved* ]]
+			if [[ "${description_part}" == *~Moved* ]]
 			then
 				continue
 			fi
 
-			if [[ "${part_file_description}" == *_* ]]
+			if [[ "${description_part}" == *_* ]]
 			then
-				printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> "._.lst"
+				printf '%-30s %-s\n' "${file_part}" "${description_part}" >> "._.lst"
 
-			elif [[ "${part_file_description}" == *~* ]]
+			elif [[ "${description_part}" == *~* ]]
 			then
-				printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> ".~.lst"
+				printf '%-30s %-s\n' "${file_part}" "${description_part}" >> ".~.lst"
 			else
-				printf '%-30s %-s\n' "${part_file}" "${part_file_description}" >> parts.lst
+				printf '%-30s %-s\n' "${file_part}" "${description_part}" >> parts.lst
 			fi
 		done
 	done
@@ -1770,7 +1770,7 @@ list=(
 	leocad
 )
 
-if [ "${option}" = "export" ] && [ "${export_option}" = "blender" ]
+if [ "${option}" = "export" ] && [ "${option_export}" = "blender" ]
 then
 	list+=(
 		blender
@@ -1780,7 +1780,7 @@ fi
 if [ "${option}" = "instructions" ]
 then
 	list+=(
-		"${lpub}"
+		"${command_lpub}"
 	)
 fi
 
@@ -1821,42 +1821,42 @@ if [ "${option}" = "export" ]       ||
    [ "${option}" = "instructions" ] ||
    [ "${option}" = "modify" ]
 then
-	frobulator.stp "Extension option" "[ ${extension_option} ]"
+	frobulator.stp "Extension option" "[ ${option_extension} ]"
 
 	frobulator.inf "Option" "[ ${option} ]"
 fi
 
 if [ "${option}" = "download" ]
 then
-	frobulator.inf "Download option" "[ ${download_option} ]"
+	frobulator.inf "Download option" "[ ${option_download} ]"
 fi
 
 if [ "${option}" = "list" ]
 then
-	frobulator.inf "Sort option" "[ ${sort_option} ]"
+	frobulator.inf "Sort option" "[ ${option_sort} ]"
 fi
 
 if [ "${option}" = "export" ]
 then
-	frobulator.inf "Export option" "[ ${export_name} ]"
+	frobulator.inf "Export option" "[ ${name_export} ]"
 fi
 
 if [ "${option}" = "render" ]
 then
-	frobulator.inf "Render option" "[ ${render_option} ]"
+	frobulator.inf "Render option" "[ ${option_render} ]"
 fi
 
-if [ "${option}" = "instructions" ] && [ -n "${instructions_option}" ]
+if [ "${option}" = "instructions" ] && [ -n "${option_instructions}" ]
 then
-	frobulator.inf "Instructions option" "[ ${instructions_option} ]"
+	frobulator.inf "Instructions option" "[ ${option_instructions} ]"
 fi
 
 if [ "${option}" = "modify" ]
 then
-	frobulator.inf "Modify option" "[ ${modify_option} ]"
+	frobulator.inf "Modify option" "[ ${option_modify} ]"
 fi
 
-if [ "${overwrite_option}" = "overwrite" ]
+if [ "${option_overwrite}" = "overwrite" ]
 then
 	frobulator.wrn "WARNING"
 
@@ -1872,32 +1872,32 @@ frobulator.fwd "Proceeding..."
 
 if [ "${option}" = "export" ]
 then
-	for extension in "${extensions_list[@]}"
+	for extension in "${list_extensions[@]}"
 	do
-		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions*" | sort)
+		mapfile -t list_models < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions*" | sort)
 
-		for model_path in "${models_list[@]}"
+		for path_model in "${list_models[@]}"
 		do
-			l2cu_model "${model_path}"
+			l2cu_model "${path_model}"
 
-			export_directory="${model_directory}/exports"
-			export_file="${model_name}.${export_extension}"
+			directory_export="${directory_model}/exports"
+			file_export="${name_model}.${extension_export}"
 
-			frobulator.directory "${model_directory}" exports
+			frobulator.directory "${directory_model}" exports
 
-			cd "${export_directory}"
+			cd "${directory_export}"
 
-			frobulator.fail "Export failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Export failure" "[ '${file_model}' ]" || continue
 
 			l2cu_export
 
-			frobulator.fail "Export failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Export failure" "[ '${file_model}' ]" || continue
 
-			if [ "${export_option}" = "blender" ]
+			if [ "${option_export}" = "blender" ]
 			then
 				l2cu_optimize
 
-				frobulator.fail "Optimization failure" "[ '${model_file}' ]" || continue
+				frobulator.fail "Optimization failure" "[ '${file_model}' ]" || continue
 			fi
 
 			# export size threshold
@@ -1913,106 +1913,106 @@ if [ "${option}" = "render" ]
 then
 	# camera positions / shading / edge width / image size per render option
 
-	height=4096
-	width=4096
+	height_render=4096
+	width_render=4096
 
-	case "${render_option}"
+	case "${option_render}"
 	in
 		[0-7])
-			positions_list=("${render_option}")
+			list_positions=("${option_render}")
 			shading="full"
-			line_width=1
+			width_line=1
 		;;
 
 		full)
-			positions_list=(0 1 2 3 4 5 6 7)
+			list_positions=(0 1 2 3 4 5 6 7)
 			shading="full"
-			line_width=1
+			width_line=1
 		;;
 
 		flat)
-			positions_list=(1)
+			list_positions=(1)
 			shading="flat"
-			line_width=0
+			width_line=0
 		;;
 
 		wireframe)
-			positions_list=(1)
+			list_positions=(1)
 			shading="wireframe"
-			line_width=1
+			width_line=1
 		;;
 
 		overlay)
-			positions_list=(1)
+			list_positions=(1)
 			shading="full"
-			line_width=2
+			width_line=2
 		;;
 
 		social)
-			height=600
-			width=1200
+			height_render=600
+			width_render=1200
 
-			positions_list=(1)
+			list_positions=(1)
 			shading="flat"
-			line_width=2
+			width_line=2
 		;;
 
 		thumbnail)
-			height=512
-			width=512
+			height_render=512
+			width_render=512
 
-			positions_list=(1)
+			list_positions=(1)
 			shading="flat"
-			line_width=2
+			width_line=2
 		;;
 	esac
 
-	for extension in "${extensions_list[@]}"
+	for extension in "${list_extensions[@]}"
 	do
-		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions*" | sort)
+		mapfile -t list_models < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions*" | sort)
 
-		for model_path in "${models_list[@]}"
+		for path_model in "${list_models[@]}"
 		do
-			l2cu_model "${model_path}"
+			l2cu_model "${path_model}"
 
 			# base render directory - generated if missing
 
-			render_directory="${model_directory}/renders"
+			directory_render="${directory_model}/renders"
 
-			frobulator.directory "${model_directory}" renders
+			frobulator.directory "${directory_model}" renders
 
 			# named render option directory - purged and regenerated
 
-			if [[ "${render_option}" != [0-7] ]]
+			if [[ "${option_render}" != [0-7] ]]
 			then
-				rm --recursive --force "${render_directory}/${render_option}"
+				rm --recursive --force "${directory_render}/${option_render}"
 
-				frobulator.directory "${render_directory}" "${render_option}"
+				frobulator.directory "${directory_render}" "${option_render}"
 
-				render_directory="${render_directory}/${render_option}"
+				directory_render="${directory_render}/${option_render}"
 			fi
 
-			cd "${render_directory}"
+			cd "${directory_render}"
 
-			frobulator.fail "Render failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Render failure" "[ '${file_model}' ]" || continue
 
-			for coordinates in "${positions_list[@]}"
+			for index_view in "${list_positions[@]}"
 			do
-				l2cu_render "${coordinates}"
+				l2cu_render "${index_view}"
 
-				frobulator.fail "Render failure" "[ '${model_file}' // view ${view[coordinates]} ]"
+				frobulator.fail "Render failure" "[ '${file_model}' // view ${list_views[index_view]} ]"
 			done
 
 			# single view renders renamed to designated splash images
 
-			case "${render_option}"
+			case "${option_render}"
 			in
 				flat|overlay|social|thumbnail)
-					if [ -f "${model_name}-${view[1]}.${export_extension}" ]
+					if [ -f "${name_model}-${list_views[1]}.${extension_export}" ]
 					then
 						mv											\
-							"${model_name}-${view[1]}.${export_extension}"	\
-							"${render_option}.${export_extension}"
+							"${name_model}-${list_views[1]}.${extension_export}"	\
+							"${option_render}.${extension_export}"
 					fi
 				;;
 			esac
@@ -2026,68 +2026,68 @@ if [ "${option}" = "instructions" ]
 then
 	# instructions configuration required
 
-	if [ ! -f "${instructions_base_directory}/configuration" ]
+	if [ ! -f "${directory_instructions_base}/configuration" ]
 	then
-		frobulator.err "Missing instructions configuration file" "[ ${instructions_base_directory}/configuration ]"
+		frobulator.err "Missing instructions configuration file" "[ ${directory_instructions_base}/configuration ]"
 
 		frobulator.inf "Instructions configuration file required to proceed"
 
 		exit 1
 	fi
 
-	for extension in "${extensions_list[@]}"
+	for extension in "${list_extensions[@]}"
 	do
-		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort)
+		mapfile -t list_models < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*instructions.${extension}" | sort)
 
-		for model_path in "${models_list[@]}"
+		for path_model in "${list_models[@]}"
 		do
-			l2cu_model "${model_path}"
+			l2cu_model "${path_model}"
 
-			instructions_directory="${model_directory}/instructions"
-			instructions_samples_directory="${instructions_directory}/samples"
-			instructions_model_path="${instructions_directory}/instructions.${extension}"
+			directory_instructions="${directory_model}/instructions"
+			directory_samples_instructions="${directory_instructions}/samples"
+			path_model_instructions="${directory_instructions}/instructions.${extension}"
 
 			# pieces count file - all instructions options
 
 			l2cu_pieces
 
-			frobulator.fail "Pieces failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Pieces failure" "[ '${file_model}' ]" || continue
 
-			if [ "${instructions_option}" = "pieces" ]
+			if [ "${option_instructions}" = "pieces" ]
 			then
 				continue
 			fi
 
 			l2cu_instructions_prepare
 
-			frobulator.fail "Preparation failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Preparation failure" "[ '${file_model}' ]" || continue
 
 			# model work in progress - placeholder samples
 
-			if [ -f "${model_directory}/work-in-progress" ]
+			if [ -f "${directory_model}/work-in-progress" ]
 			then
-				frobulator.wrn "Model work in progress" "[ ${instructions_option:-instructions} ]"
+				frobulator.wrn "Model work in progress" "[ ${option_instructions:-instructions} ]"
 
 				l2cu_instructions_samples_placeholders
 
-				frobulator.fail "Placeholders failure" "[ '${model_file}' ]"
+				frobulator.fail "Placeholders failure" "[ '${file_model}' ]"
 
 				continue
 			fi
 
 			l2cu_instructions_configure
 
-			frobulator.fail "Configuration failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Configuration failure" "[ '${file_model}' ]" || continue
 
-			if [ "${instructions_option}" = "samples" ]
+			if [ "${option_instructions}" = "samples" ]
 			then
 				l2cu_instructions_samples
 
-				frobulator.fail "Samples failure" "[ '${model_file}' ]"
+				frobulator.fail "Samples failure" "[ '${file_model}' ]"
 			else
 				l2cu_instructions
 
-				frobulator.fail "Instructions failure" "[ '${model_file}' ]"
+				frobulator.fail "Instructions failure" "[ '${file_model}' ]"
 			fi
 		done
 	done
@@ -2099,19 +2099,19 @@ if [ "${option}" = "modify" ]
 then
 	l2cu_parse_modification
 
-	for extension in "${extensions_list[@]}"
+	for extension in "${list_extensions[@]}"
 	do
-		mapfile -t models_list < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}" | sort)
+		mapfile -t list_models < <(find "${directory}" -type f -iname "*.${extension}" ! -iname "*modified*" ! -iname "*instructions.${extension}" | sort)
 
-		for model_path in "${models_list[@]}"
+		for path_model in "${list_models[@]}"
 		do
-			l2cu_model "${model_path}"
+			l2cu_model "${path_model}"
 
-			model_buffer="${model_path}.tmp"
+			file_buffer_model="${path_model}.tmp"
 
-			frobulator.stp "Model" "[ ${model_file} ]"
+			frobulator.stp "Model" "[ ${file_model} ]"
 
-			case "${modify_option}"
+			case "${option_modify}"
 			in
 				lint)
 					l2cu_lint
@@ -2126,11 +2126,11 @@ then
 				;;
 			esac
 
-			frobulator.fail "Modification failure" "[ '${model_file}' ]" || continue
+			frobulator.fail "Modification failure" "[ '${file_model}' ]" || continue
 
 			l2cu_write
 
-			frobulator.fail "Write failure" "[ '${model_file}' ]"
+			frobulator.fail "Write failure" "[ '${file_model}' ]"
 		done
 	done
 fi
@@ -2139,18 +2139,18 @@ fi
 
 if [ "${option}" = "download" ]
 then
-	if [ "${download_option}" = "official" ]
+	if [ "${option_download}" = "official" ]
 	then
-		library_release="updates"
-		library_archive="complete.zip"
+		path_release_library="updates"
+		file_archive_library="complete.zip"
 	else
-		library_release="unofficial"
-		library_archive="ldrawunf.zip"
+		path_release_library="unofficial"
+		file_archive_library="ldrawunf.zip"
 	fi
 
 	l2cu_download
 
-	frobulator.fail "Download failure" "[ '${library_archive}' ]"
+	frobulator.fail "Download failure" "[ '${file_archive_library}' ]"
 fi
 
 # list ─────────────────────────────────────────────────────────────────────────
@@ -2185,21 +2185,21 @@ then
 
 	# sort - merge - cleanup
 
-	for list_file in "._.lst" ".~.lst" parts.lst
+	for file_list in "._.lst" ".~.lst" parts.lst
 	do
-		if [ ! -f "${list_file}" ]
+		if [ ! -f "${file_list}" ]
 		then
 			continue
 		fi
 
-		if [ "${sort_option}" = "description" ]
+		if [ "${option_sort}" = "description" ]
 		then
-			sort -b -d -k 2 -t ' ' -o "${list_file}" "${list_file}"
+			sort -b -d -k 2 -t ' ' -o "${file_list}" "${file_list}"
 		fi
 
-		if [ "${sort_option}" = "number" ]
+		if [ "${option_sort}" = "number" ]
 		then
-			sort -b -n -k 1 -t ' ' -o "${list_file}" "${list_file}"
+			sort -b -n -k 1 -t ' ' -o "${file_list}" "${file_list}"
 		fi
 	done
 
@@ -2209,9 +2209,9 @@ then
 
 	# parts list line count
 
-	part_count="$(wc -l < parts.lst)"
+	count_parts_list="$(wc -l < parts.lst)"
 
-	frobulator.inf "Part count" "[ ${part_count} ]"
+	frobulator.inf "Part count" "[ ${count_parts_list} ]"
 fi
 
 # complete ─────────────────────────────────────────────────────────────────────
