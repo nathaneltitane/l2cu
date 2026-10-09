@@ -207,7 +207,7 @@ do
 			echo
 			echo -e "                      csv          Export parts list file format. [ csv ]"
 			echo -e "                      3dstudio     Export 3dstudio file format. [ 3ds ]"
-			echo -e "                      collada      Export collada file format. [ dae ] [ Default ]"
+			echo -e "                      collada      Export collada file format - visible surface only. [ dae ] [ Default ]"
 			echo -e "                      blender      Optimize wavefront and export to blender file format. [ obj >>> blend ]"
 			echo -e "                      wavefront    Export wavefront file format. [ obj + mtl ]"
 			echo
@@ -481,9 +481,9 @@ l2cu_initialize () {
 
 		file_optimize="${directory_temporary}/optimize.py"
 
-		# python indentation uses spaces - heredoc strips leading tabs only
+		# python indentation in tabs - only the shell indentation removed
 
-		cat <<- 'OPTIMIZE' > "${file_optimize}"
+		sed -e 's/^\t\t//' > "${file_optimize}" << 'OPTIMIZE'
 		#!/usr/bin/env python3
 
 		import os
@@ -508,7 +508,7 @@ l2cu_initialize () {
 		meshes = [obj for obj in bpy.context.scene.objects if obj.type == "MESH"]
 
 		for obj in meshes:
-		    obj.select_set(True)
+			obj.select_set(True)
 
 		bpy.context.view_layer.objects.active = meshes[0]
 		bpy.ops.object.join()
@@ -516,16 +516,16 @@ l2cu_initialize () {
 		# normalize transforms
 
 		bpy.ops.object.transform_apply(
-		    location = True,
-		    rotation = True,
-		    scale = True
+			location = True,
+			rotation = True,
+			scale = True
 		)
 
 		# add smooth shade and edge split modifiers
 
 		bpy.ops.object.shade_smooth()
 		bpy.ops.object.modifier_add(
-		    type = "EDGE_SPLIT"
+			type = "EDGE_SPLIT"
 		)
 
 		# remove doubles - loose vertices - fix normals
@@ -538,7 +538,7 @@ l2cu_initialize () {
 		bpy.ops.mesh.delete(type = "VERT")
 		bpy.ops.mesh.select_all(action = "SELECT")
 		bpy.ops.mesh.normals_make_consistent(
-		    inside = False
+			inside = False
 		)
 		bpy.ops.object.mode_set(mode = "OBJECT")
 
@@ -546,12 +546,213 @@ l2cu_initialize () {
 
 		blend_file = os.path.splitext(export_model)[0] + ".blend"
 		bpy.ops.wm.save_as_mainfile(
-		    filepath = blend_file,
-		    compress = True
+			filepath = blend_file,
+			compress = True
 		)
 
 		print("saved as:", blend_file)
-		OPTIMIZE
+OPTIMIZE
+
+		frobulator.track
+	fi
+
+
+	# collada surface script - temporary - removed on exit
+
+	if [ "${option}" = "export" ] && [ "${option_export}" = "collada" ]
+	then
+		frobulator.temporary directory_temporary
+
+		frobulator.track || return "${status}"
+
+		frobulator.trap "${directory_temporary}"
+
+		file_surface="${directory_temporary}/surface.py"
+
+		# python indentation in tabs - only the shell indentation removed
+
+		sed -e 's/^\t\t//' > "${file_surface}" << 'SURFACE'
+		#!/usr/bin/env python3
+
+		# collada surface - flatten parts into one mesh per color - remove geometry hidden from every direction
+		# arguments - [collada file] - rewritten in place
+
+		import re
+		import sys
+		import numpy
+		import xml.etree.ElementTree as tree
+
+		file_collada = sys.argv[1]
+
+		namespace = "{http://www.collada.org/2005/11/COLLADASchema}"
+
+		# depth map cell size in ldraw units - viewing directions around the model
+
+		size_cell = 2.0
+		count_directions = 96
+
+		text_collada = open(file_collada).read()
+		root_collada = tree.fromstring(text_collada)
+
+		# part geometries - triangle corner positions and normals
+
+		dictionary_geometries = {}
+
+		for element_geometry in root_collada.iter(namespace + "geometry"):
+			element_mesh = element_geometry.find(namespace + "mesh")
+			dictionary_sources = {
+				element_source.get("id"): numpy.array(element_source.find(namespace + "float_array").text.split(), dtype = numpy.float64).reshape(-1, 3)
+				for element_source in element_mesh.findall(namespace + "source")
+			}
+			element_triangles = element_mesh.find(namespace + "triangles")
+			dictionary_inputs = {element_input.get("semantic"): element_input for element_input in element_triangles.findall(namespace + "input")}
+			count_stride = max(int(element_input.get("offset")) for element_input in dictionary_inputs.values()) + 1
+			list_indices = numpy.array(element_triangles.find(namespace + "p").text.split(), dtype = numpy.int64).reshape(-1, count_stride)
+			id_positions = element_mesh.find(namespace + "vertices").find(namespace + "input").get("source")[1:]
+			id_normals = dictionary_inputs["NORMAL"].get("source")[1:]
+			dictionary_geometries[element_geometry.get("id")] = (
+				dictionary_sources[id_positions][list_indices[:, int(dictionary_inputs["VERTEX"].get("offset"))]],
+				dictionary_sources[id_normals][list_indices[:, int(dictionary_inputs["NORMAL"].get("offset"))]]
+			)
+
+		# part instances - baked to world space - grouped by material
+
+		dictionary_materials = {}
+
+		for element_node in root_collada.iter(namespace + "node"):
+			element_instance = element_node.find(namespace + "instance_geometry")
+			if element_instance is None:
+				continue
+			matrix_node = numpy.array(element_node.find(namespace + "matrix").text.split(), dtype = numpy.float64).reshape(4, 4)
+			positions_part, normals_part = dictionary_geometries[element_instance.get("url")[1:]]
+			id_material = element_instance.find(".//" + namespace + "instance_material").get("target")[1:]
+			positions_world = positions_part @ matrix_node[:3, :3].T + matrix_node[:3, 3]
+			normals_world = normals_part @ numpy.linalg.inv(matrix_node[:3, :3])
+			normals_world /= numpy.maximum(numpy.linalg.norm(normals_world, axis = 1, keepdims = True), 1e-12)
+			dictionary_materials.setdefault(id_material, []).append((positions_world, normals_world))
+
+		list_materials = list(dictionary_materials)
+
+		triangles_positions = numpy.concatenate([numpy.concatenate([entry[0] for entry in dictionary_materials[id_material]]) for id_material in list_materials]).reshape(-1, 3, 3)
+		triangles_normals = numpy.concatenate([numpy.concatenate([entry[1] for entry in dictionary_materials[id_material]]) for id_material in list_materials]).reshape(-1, 3, 3)
+		triangles_material = numpy.concatenate([
+			numpy.full(sum(len(entry[0]) for entry in dictionary_materials[id_material]) // 3, index_material)
+			for index_material, id_material in enumerate(list_materials)
+		])
+
+		# sample points - centroid and corners pulled toward it - plus random points by triangle area
+
+		area_triangles = 0.5 * numpy.linalg.norm(numpy.cross(triangles_positions[:, 1] - triangles_positions[:, 0], triangles_positions[:, 2] - triangles_positions[:, 0]), axis = 1)
+		count_samples = numpy.clip(numpy.ceil(area_triangles / (size_cell * size_cell) * 2).astype(numpy.int64), 0, 4000)
+		generator_random = numpy.random.default_rng(1)
+
+		centroids = triangles_positions.mean(axis = 1)
+		points_fixed = numpy.concatenate([centroids] + [centroids + 0.9 * (triangles_positions[:, index_corner] - centroids) for index_corner in range(3)])
+		owners_fixed = numpy.tile(numpy.arange(len(triangles_positions)), 4)
+
+		owners_random = numpy.repeat(numpy.arange(len(triangles_positions)), count_samples)
+		weights_random = generator_random.random((len(owners_random), 2))
+		mask_flip = weights_random.sum(axis = 1) > 1
+		weights_random[mask_flip] = 1 - weights_random[mask_flip]
+		points_random = (
+			triangles_positions[owners_random, 0]
+			+ weights_random[:, :1] * (triangles_positions[owners_random, 1] - triangles_positions[owners_random, 0])
+			+ weights_random[:, 1:] * (triangles_positions[owners_random, 2] - triangles_positions[owners_random, 0])
+		)
+
+		points_samples = numpy.concatenate([points_fixed, points_random])
+		owners_samples = numpy.concatenate([owners_fixed, owners_random])
+
+		# viewing directions - evenly spread over a sphere
+
+		index_directions = numpy.arange(count_directions) + 0.5
+		angle_polar = numpy.arccos(1 - 2 * index_directions / count_directions)
+		angle_azimuth = numpy.pi * (1 + 5 ** 0.5) * index_directions
+		list_directions = numpy.stack([numpy.cos(angle_azimuth) * numpy.sin(angle_polar), numpy.sin(angle_azimuth) * numpy.sin(angle_polar), numpy.cos(angle_polar)], axis = 1)
+
+		# depth map per direction - nearest sample per cell - triangle kept when any sample is nearest
+
+		mask_visible = numpy.zeros(len(triangles_positions), dtype = bool)
+
+		for direction_view in list_directions:
+			axis_first = numpy.cross(direction_view, [1, 0, 0] if abs(direction_view[0]) < 0.9 else [0, 1, 0])
+			axis_first /= numpy.linalg.norm(axis_first)
+			axis_second = numpy.cross(direction_view, axis_first)
+			coordinates_first = points_samples @ axis_first
+			coordinates_second = points_samples @ axis_second
+			depth_samples = points_samples @ direction_view
+			cells_first = ((coordinates_first - coordinates_first.min()) / size_cell).astype(numpy.int64)
+			cells_second = ((coordinates_second - coordinates_second.min()) / size_cell).astype(numpy.int64)
+			width_map = cells_first.max() + 1
+			keys_cells = cells_second * width_map + cells_first
+			map_depth = numpy.full((cells_second.max() + 1) * width_map, numpy.inf)
+			order_depth = numpy.argsort(-depth_samples)
+			map_depth[keys_cells[order_depth]] = depth_samples[order_depth]
+			mask_visible[owners_samples[depth_samples <= map_depth[keys_cells] + size_cell]] = True
+
+		# collada output - original effects and materials - one geometry and node per material - no part names or dates
+
+		text_head = text_collada[:text_collada.index("<library_geometries>")]
+		text_head = re.sub(r"<created>[^<]*</created>", "<created>2000-01-01T00:00:00</created>", text_head)
+		text_head = re.sub(r"<modified>[^<]*</modified>", "<modified>2000-01-01T00:00:00</modified>", text_head)
+
+		def format_values (values, count_decimals):
+			list_lines = []
+			for row_values in values:
+				list_numbers = []
+				for value in row_values:
+					text_value = f"{value:.{count_decimals}f}".rstrip("0").rstrip(".")
+					list_numbers.append("0" if text_value in ("", "-0") else text_value)
+				list_lines.append(" ".join(list_numbers))
+			return "\n".join(list_lines)
+
+		list_output = [text_head, "<library_geometries>\n"]
+		list_nodes = []
+
+		for index_material, id_material in enumerate(list_materials):
+			mask_material = mask_visible & (triangles_material == index_material)
+			if not mask_material.any():
+				continue
+			vertices = numpy.concatenate([triangles_positions[mask_material].reshape(-1, 3), triangles_normals[mask_material].reshape(-1, 3)], axis = 1)
+			vertices[:, :3] = numpy.round(vertices[:, :3], 2)
+			vertices[:, 3:] = numpy.round(vertices[:, 3:], 3)
+			vertices_unique, indices_vertices = numpy.unique(vertices, axis = 0, return_inverse = True)
+			id_geometry = f"mesh-{index_material}"
+			count_vertices = vertices_unique.shape[0]
+			list_output.append(
+				f'\t<geometry id="{id_geometry}">\n'
+				f'\t\t<mesh>\n'
+				f'\t\t\t<source id="{id_geometry}-pos">\n'
+				f'\t\t\t\t<float_array id="{id_geometry}-pos-array" count="{count_vertices * 3}">{format_values(vertices_unique[:, :3], 2)}</float_array>\n'
+				f'\t\t\t\t<technique_common><accessor source="#{id_geometry}-pos-array" count="{count_vertices}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common>\n'
+				f'\t\t\t</source>\n'
+				f'\t\t\t<source id="{id_geometry}-normal">\n'
+				f'\t\t\t\t<float_array id="{id_geometry}-normal-array" count="{count_vertices * 3}">{format_values(vertices_unique[:, 3:], 3)}</float_array>\n'
+				f'\t\t\t\t<technique_common><accessor source="#{id_geometry}-normal-array" count="{count_vertices}" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common>\n'
+				f'\t\t\t</source>\n'
+				f'\t\t\t<vertices id="{id_geometry}-vertices"><input semantic="POSITION" source="#{id_geometry}-pos"/></vertices>\n'
+				f'\t\t\t<triangles count="{int(mask_material.sum())}" material="surface">\n'
+				f'\t\t\t\t<input semantic="VERTEX" source="#{id_geometry}-vertices" offset="0"/>\n'
+				f'\t\t\t\t<input semantic="NORMAL" source="#{id_geometry}-normal" offset="0"/>\n'
+				f'\t\t\t\t<p>{" ".join(map(str, indices_vertices.ravel()))}</p>\n'
+				f'\t\t\t</triangles>\n'
+				f'\t\t</mesh>\n'
+				f'\t</geometry>\n'
+			)
+			list_nodes.append(
+				f'\t\t<node>\n'
+				f'\t\t\t<instance_geometry url="#{id_geometry}">\n'
+				f'\t\t\t\t<bind_material><technique_common><instance_material symbol="surface" target="#{id_material}"/></technique_common></bind_material>\n'
+				f'\t\t\t</instance_geometry>\n'
+				f'\t\t</node>\n'
+			)
+
+		list_output.append("</library_geometries>\n<library_visual_scenes>\n\t<visual_scene id=\"DefaultScene\">\n" + "".join(list_nodes) + "\t</visual_scene>\n</library_visual_scenes>\n<scene>\n\t<instance_visual_scene url=\"#DefaultScene\"/>\n</scene>\n</COLLADA>\n")
+
+		open(file_collada + ".surface", "w").write("".join(list_output))
+
+		print("triangles kept:", int(mask_visible.sum()), "of", len(triangles_positions))
+SURFACE
 
 		frobulator.track
 	fi
@@ -766,6 +967,34 @@ l2cu_export () {
 
 		frobulator.track
 	fi
+
+	return "${status}"
+}
+
+l2cu_surface () {
+
+	# collada flattened to one mesh per color - geometry hidden from every direction removed - part names and placements dropped
+
+	local status=0
+
+	python3 "${file_surface}" "${file_export}" > "${sink}" 2>&1 &
+
+	frobulator.progress "strip" "[ hidden geometry ]"
+
+	frobulator.track || return "${status}"
+
+	# python exits with an error when parsing fails - file checked regardless
+
+	if [ ! -f "${file_export}.surface" ]
+	then
+		status=1
+
+		return "${status}"
+	fi
+
+	mv --force "${file_export}.surface" "${file_export}"
+
+	frobulator.track
 
 	return "${status}"
 }
@@ -1777,6 +2006,13 @@ then
 	)
 fi
 
+if [ "${option}" = "export" ] && [ "${option_export}" = "collada" ]
+then
+	list+=(
+		python3-numpy
+	)
+fi
+
 if [ "${option}" = "instructions" ]
 then
 	list+=(
@@ -1892,6 +2128,13 @@ then
 			l2cu_export
 
 			frobulator.fail "Export failure" "[ '${file_model}' ]" || continue
+
+			if [ "${option_export}" = "collada" ]
+			then
+				l2cu_surface
+
+				frobulator.fail "Surface failure" "[ '${file_model}' ]" || continue
+			fi
 
 			if [ "${option_export}" = "blender" ]
 			then
