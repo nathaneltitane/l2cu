@@ -125,6 +125,18 @@ do
 				name_export="Collada"
 			;;
 
+			surface)
+				# collada reduced to its visible surface
+
+				option_surface="true"
+			;;
+
+			kmz)
+				# collada compressed into a kmz archive
+
+				option_kmz="true"
+			;;
+
 			blender)
 				# exported as obj - optimized into blend
 
@@ -207,7 +219,9 @@ do
 			echo
 			echo -e "                      csv          Export parts list file format. [ csv ]"
 			echo -e "                      3dstudio     Export 3dstudio file format. [ 3ds ]"
-			echo -e "                      collada      Export collada file format - visible surface only. [ dae ] [ Default ]"
+			echo -e "                      collada      Export collada file format. [ dae ] [ Default ]"
+			echo -e "                      surface      Reduce collada export to its visible surface - parts merged per color. [ dae ]"
+			echo -e "                      kmz          Compress collada export into a kmz archive. [ dae >>> kmz ]"
 			echo -e "                      blender      Optimize wavefront and export to blender file format. [ obj >>> blend ]"
 			echo -e "                      wavefront    Export wavefront file format. [ obj + mtl ]"
 			echo
@@ -428,6 +442,15 @@ then
 	name_export="Collada"
 fi
 
+# surface and kmz apply to collada exports only
+
+if { [ "${option_surface}" = "true" ] || [ "${option_kmz}" = "true" ]; } && [ "${option_export}" != "collada" ]
+then
+	frobulator.err "Surface and kmz require the collada export" "[ ${option_export} ]"
+
+	exit 1
+fi
+
 if [ "${option}" = "render" ]
 then
 	extension_export="png"
@@ -557,9 +580,9 @@ OPTIMIZE
 	fi
 
 
-	# collada surface script - temporary - removed on exit
+	# collada surface and kmz scripts - temporary - removed on exit
 
-	if [ "${option}" = "export" ] && [ "${option_export}" = "collada" ]
+	if [ "${option_surface}" = "true" ] || [ "${option_kmz}" = "true" ]
 	then
 		frobulator.temporary directory_temporary
 
@@ -568,6 +591,7 @@ OPTIMIZE
 		frobulator.trap "${directory_temporary}"
 
 		file_surface="${directory_temporary}/surface.py"
+		file_kmz="${directory_temporary}/kmz.py"
 
 		# python indentation in tabs - only the shell indentation removed
 
@@ -575,7 +599,7 @@ OPTIMIZE
 		#!/usr/bin/env python3
 
 		# collada surface - flatten parts into one mesh per color - remove geometry hidden from every direction
-		# arguments - [collada file] - rewritten in place
+		# arguments - [collada input] [collada output]
 
 		import re
 		import sys
@@ -583,6 +607,7 @@ OPTIMIZE
 		import xml.etree.ElementTree as tree
 
 		file_collada = sys.argv[1]
+		file_output = sys.argv[2]
 
 		namespace = "{http://www.collada.org/2005/11/COLLADASchema}"
 
@@ -749,10 +774,34 @@ OPTIMIZE
 
 		list_output.append("</library_geometries>\n<library_visual_scenes>\n\t<visual_scene id=\"DefaultScene\">\n" + "".join(list_nodes) + "\t</visual_scene>\n</library_visual_scenes>\n<scene>\n\t<instance_visual_scene url=\"#DefaultScene\"/>\n</scene>\n</COLLADA>\n")
 
-		open(file_collada + ".surface", "w").write("".join(list_output))
+		open(file_output, "w").write("".join(list_output))
 
 		print("triangles kept:", int(mask_visible.sum()), "of", len(triangles_positions))
 SURFACE
+
+		frobulator.track
+
+		sed -e 's/^\t\t//' > "${file_kmz}" << 'KMZ'
+		#!/usr/bin/env python3
+
+		# collada compression - kml index and collada model packed into a kmz archive - fixed entry dates
+		# arguments - [collada input] [kmz output]
+
+		import sys
+		import zipfile
+
+		file_collada = sys.argv[1]
+		file_kmz = sys.argv[2]
+
+		text_index = '<?xml version="1.0" encoding="UTF-8"?>\n<kml><Placemark><Model><Link><href>doc.dae</href></Link></Model></Placemark></kml>\n'
+		text_collada = open(file_collada).read()
+
+		with zipfile.ZipFile(file_kmz, "w") as archive_kmz:
+			for name_entry, text_entry in (("doc.kml", text_index), ("doc.dae", text_collada)):
+				info_entry = zipfile.ZipInfo(name_entry, date_time = (2000, 1, 1, 0, 0, 0))
+				info_entry.compress_type = zipfile.ZIP_DEFLATED
+				archive_kmz.writestr(info_entry, text_entry, compresslevel = 9)
+KMZ
 
 		frobulator.track
 	fi
@@ -977,7 +1026,7 @@ l2cu_surface () {
 
 	local status=0
 
-	python3 "${file_surface}" "${file_export}" > "${sink}" 2>&1 &
+	python3 "${file_surface}" "${file_export}" "${file_export}.surface" > "${sink}" 2>&1 &
 
 	frobulator.progress "strip" "[ hidden geometry ]"
 
@@ -995,6 +1044,37 @@ l2cu_surface () {
 	mv --force "${file_export}.surface" "${file_export}"
 
 	frobulator.track
+
+	return "${status}"
+}
+
+l2cu_kmz () {
+
+	# collada packed into a compressed kmz archive - collada removed
+
+	local status=0
+	local file_export_kmz="${name_model}.kmz"
+
+	frobulator.fwd "Output" "[ KMZ // ${file_export_kmz} ]"
+
+	python3 "${file_kmz}" "${file_export}" "${file_export_kmz}" > "${sink}" 2>&1 &
+
+	frobulator.progress "compress"
+
+	frobulator.track || return "${status}"
+
+	# python exits with an error when packing fails - file checked regardless
+
+	if [ ! -f "${file_export_kmz}" ]
+	then
+		status=1
+
+		return "${status}"
+	fi
+
+	rm --force "${file_export}"
+
+	file_export="${file_export_kmz}"
 
 	return "${status}"
 }
@@ -2006,7 +2086,14 @@ then
 	)
 fi
 
-if [ "${option}" = "export" ] && [ "${option_export}" = "collada" ]
+if [ "${option}" = "export" ] && [ "${option_kmz}" = "true" ]
+then
+	list+=(
+		python3
+	)
+fi
+
+if [ "${option}" = "export" ] && [ "${option_surface}" = "true" ]
 then
 	list+=(
 		python3-numpy
@@ -2129,11 +2216,18 @@ then
 
 			frobulator.fail "Export failure" "[ '${file_model}' ]" || continue
 
-			if [ "${option_export}" = "collada" ]
+			if [ "${option_surface}" = "true" ]
 			then
 				l2cu_surface
 
 				frobulator.fail "Surface failure" "[ '${file_model}' ]" || continue
+			fi
+
+			if [ "${option_kmz}" = "true" ]
+			then
+				l2cu_kmz
+
+				frobulator.fail "Compression failure" "[ '${file_model}' ]" || continue
 			fi
 
 			if [ "${option_export}" = "blender" ]
