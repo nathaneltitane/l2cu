@@ -444,7 +444,7 @@ fi
 
 # surface and kmz apply to collada exports only
 
-if { [ "${option_surface}" = "true" ] || [ "${option_kmz}" = "true" ]; } && [ "${option_export}" != "collada" ]
+if [[ "${option_surface}" = "true" || "${option_kmz}" = "true" ]] && [ "${option_export}" != "collada" ]
 then
 	frobulator.err "Surface and kmz require the collada export" "[ ${option_export} ]"
 
