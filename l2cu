@@ -997,11 +997,9 @@ l2cu_export () {
 
 	frobulator.fwd "Output" "[ ${name_export} // ${file_export} ]"
 
-	leocad											\
+	frobulator.background quiet "generate" -- leocad											\
 		-"${extension_export}"	"${file_export}" 	\
-													"${path_model}" > "${sink}" 2>&1 &
-
-	frobulator.progress "generate"
+													"${path_model}"
 
 	frobulator.track || return "${status}"
 
@@ -1026,9 +1024,7 @@ l2cu_surface () {
 
 	local status=0
 
-	python3 "${file_surface}" "${file_export}" "${file_export}.surface" > "${sink}" 2>&1 &
-
-	frobulator.progress "strip" "[ hidden geometry ]"
+	frobulator.background quiet "strip" "[ hidden geometry ]" -- python3 "${file_surface}" "${file_export}" "${file_export}.surface"
 
 	frobulator.track || return "${status}"
 
@@ -1057,9 +1053,7 @@ l2cu_kmz () {
 
 	frobulator.fwd "Output" "[ KMZ // ${file_export_kmz} ]"
 
-	python3 "${file_kmz}" "${file_export}" "${file_export_kmz}" > "${sink}" 2>&1 &
-
-	frobulator.progress "compress"
+	frobulator.background quiet "compress" -- python3 "${file_kmz}" "${file_export}" "${file_export_kmz}"
 
 	frobulator.track || return "${status}"
 
@@ -1090,13 +1084,11 @@ l2cu_optimize () {
 
 	frobulator.fwd "Output" "[ ${name_export} // ${file_export_blend} ]"
 
-	blender									\
+	frobulator.background quiet "optimize" -- blender									\
 		--background						\
 		--python		"${file_optimize}"	\
 		--									\
-											"${file_export}" > "${sink}" 2>&1 &
-
-	frobulator.progress "optimize"
+											"${file_export}"
 
 	frobulator.track || return "${status}"
 
@@ -1154,7 +1146,7 @@ l2cu_render () {
 
 	frobulator.fwd "Output" "[ view preset ${list_views[index_view]} // ${file_render} ]"
 
-	leocad																			\
+	frobulator.background quiet "render" -- leocad																			\
 		--height		"${height_render}"													\
 		--width			"${width_render}"													\
 		--camera-angles	"${list_latitudes[index_view]}" "${list_longitudes[index_view]}"		\
@@ -1162,9 +1154,7 @@ l2cu_render () {
 		--line-width	"${width_line}"												\
 		--aa-samples	"${count_samples_antialias}"										\
 		--image			"${file_render}"											\
-																					"${path_model}" > "${sink}" 2>&1 &
-
-	frobulator.progress "render"
+																					"${path_model}"
 
 	frobulator.track
 
@@ -1186,11 +1176,9 @@ l2cu_pieces () {
 
 	frobulator.inf "Generating pieces count file" "[ ${name_model} ]"
 
-	leocad										\
+	frobulator.background quiet "parse" -- leocad										\
 		--export-csv	"${file_csv_parts}"	\
-												"${path_model}" > "${sink}" 2>&1 &
-
-	frobulator.progress "parse"
+												"${path_model}"
 
 	frobulator.track || return "${status}"
 
@@ -1399,16 +1387,14 @@ l2cu_instructions_samples () {
 
 	frobulator.stp "Generating range" "[ ${range_sample} ]"
 
-	"${command_lpub}"											\
+	frobulator.background quiet "generate" -- "${command_lpub}"											\
 		--clear-cache									\
 		--preferred-renderer	"${renderer}"			\
 		--projection			"${projection}"			\
 		--process-export								\
 		--export-option			"${extension_export}"	\
 		--range					"${range_sample}"		\
-														"${path_model_instructions}" > "${sink}" 2>&1 &
-
-	frobulator.progress "generate"
+														"${path_model_instructions}"
 
 	frobulator.track
 
@@ -1438,16 +1424,14 @@ l2cu_instructions () {
 
 	frobulator.inf "Generating instructions" "[ ${name_model} ]"
 
-	"${command_lpub}"																\
+	frobulator.background quiet "generate" -- "${command_lpub}"																\
 		--clear-cache														\
 		--preferred-renderer	"${renderer}"								\
 		--projection			"${projection}"								\
 		--process-export													\
 		--export-option			"${extension_export}"						\
 		--pdf-output-file		"${directory_instructions}/${name_model}.pdf"	\
-																			"${path_model_instructions}" > "${sink}" 2>&1 &
-
-	frobulator.progress "generate"
+																			"${path_model_instructions}"
 
 	frobulator.track
 
@@ -2514,9 +2498,7 @@ then
 
 	frobulator.fwd "Processing..."
 
-	l2cu_list &
-
-	frobulator.progress "parse"
+	frobulator.background "parse" -- l2cu_list
 
 	frobulator.fail "List failure" "[ parts.lst ]"
 
