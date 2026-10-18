@@ -1,6 +1,8 @@
 ![l2cu](https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg)
 
-[![Donate](https://img.shields.io/badge/Paypal-2f343f.svg?style=for-the-badge&logo=paypal&label=Donate)](https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ)
+[![Donate](https://img.shields.io/badge/Paypal-2f343f.svg?style=for-the-badge&logo=paypal&label=Donate)](https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ) [![Star](https://img.shields.io/github/stars/nathaneltitane/l2cu.svg?style=for-the-badge&logo=github&label=Star&color=2f343f)](https://github.com/nathaneltitane/l2cu)
+
+⭐ Useful? Star the repository - it helps others find it.
 
 [[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu) [ Version // 2026-10-06 ]
 
