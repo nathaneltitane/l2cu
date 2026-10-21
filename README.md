@@ -67,6 +67,7 @@ Usage: ./l2cu [EXTENSION] | [OPTION] [PARAMETER]
 -o, --overwrite       Write modifications to the [o]riginal model file.
 -w, --download        Run do[w]nload of the LDraw parts library.                      [ official | unofficial ]
 -l, --list            Generate the LDraw parts [l]ist for use with legacy editors.    [ description | number ]
+-u, --uninstall       Run [u]ninstallation of l2cu - installed copies removed.
 -h, --help            Show [h]elp and usage information.
 ```
 
