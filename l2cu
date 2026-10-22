@@ -311,13 +311,13 @@ done
 
 # uninstall ────────────────────────────────────────────────────────────────────
 
-# installed copies of the script removed - files it made and packages kept
+# remove installed copies
 
 if [ "${option}" = "uninstall" ]
 then
 	count_removed=0
 
-	# every copy of the script on the search path - user and system wide
+	# installed copies
 
 	mapfile -t list_paths_installed < <(type -a -P "${script}")
 
