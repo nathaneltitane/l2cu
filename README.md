@@ -10,7 +10,7 @@ Useful? Star the repository - it helps others find it.
 
 ---
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu)-------------------------------------------------------------------------------------------------------------------------------[ Version // 2026-10-06 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu)---------------------------------------------------------------------------------------------[ Version // 2026-10-06 ]
 
 ---
 
@@ -244,7 +244,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ---
 
-[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu)-------------------------------------------------------------------------------------------------------------------------------[ Version // 2026-10-06 ]
+[[ L²CU // Project Page ]](https://github.com/nathaneltitane/l2cu)---------------------------------------------------------------------------------------------[ Version // 2026-10-06 ]
 
 ---
 
