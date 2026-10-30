@@ -236,7 +236,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/nathaneltitane/mechablocks?style=for-the-badge&logo=gnubash&logoColor=ffffff&label=MECHA%20//%20BLOCKS)](https://github.com/nathaneltitane/mechablocks)
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/nathaneltitane/studworks?style=for-the-badge&logo=gnubash&logoColor=ffffff&label=STUDWORKS)](https://github.com/nathaneltitane/studworks)
+[![GitHub Repo stars](https://img.shields.io/github/stars/nathaneltitane/studworx?style=for-the-badge&logo=gnubash&logoColor=ffffff&label=STUDWORX)](https://github.com/nathaneltitane/studworx)
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/nathaneltitane/pixtrm?style=for-the-badge&logo=gnubash&logoColor=ffffff&label=PIXTRM)](https://github.com/nathaneltitane/pixtrm)
 
