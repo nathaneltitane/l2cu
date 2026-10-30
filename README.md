@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg" alt="l2cu"><br><b>LDraw Linux Command line Utility</b><br>Simple, user-friendly LDraw model management</p>
+<p align="center"><img src="https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg" alt="l2cu"><br><b>LDraw Linux Command line Utility</b><br>RENDER. EDIT. CONVERT.</p>
 
 ---
 
