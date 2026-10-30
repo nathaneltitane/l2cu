@@ -1,4 +1,6 @@
-![l2cu](https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg)
+<p align="center"><img src="https://raw.githubusercontent.com/nathaneltitane/l2cu/main/l2cu.svg" alt="l2cu"><br><b>LDraw Linux Command line Utility</b><br>Simple, user-friendly LDraw model management</p>
+
+---
 
 [![Donate](https://img.shields.io/badge/Paypal-2f343f.svg?style=for-the-badge&logo=paypal&label=Donate)](https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ)<br>
 Show your appreciation with a PayPal donation!
