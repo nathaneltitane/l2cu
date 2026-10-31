@@ -65,7 +65,7 @@ frobulator.script
 
 # version ──────────────────────────────────────────────────────────────────────
 
-version="2026-10-06"
+version="2026-10-31"
 
 # usage ────────────────────────────────────────────────────────────────────────
 
@@ -354,6 +354,10 @@ stamp="$(date +"%m-%d-%Y-%H-%M-%S")"
 # ldraw parts library
 
 url_library="${marker_hts}www.ldraw.org/library"
+
+# studworx releases - not packaged in distribution repositories
+
+url_studworx="${marker_hts}api.github.com/repos/nathaneltitane/studworx/releases/latest"
 
 # lpub3d instructions framework - configuration / placeholders
 
@@ -1039,7 +1043,7 @@ l2cu_export () {
 
 	frobulator.fwd "Output" "[ ${name_export} // ${file_export} ]"
 
-	frobulator.background quiet "generate" -- leocad											\
+	frobulator.background quiet "generate" -- studworx											\
 		-"${extension_export}"	"${file_export}" 	\
 													"${path_model}"
 
@@ -1188,7 +1192,7 @@ l2cu_render () {
 
 	frobulator.fwd "Output" "[ view preset ${list_views[index_view]} // ${file_render} ]"
 
-	frobulator.background quiet "render" -- leocad																			\
+	frobulator.background quiet "render" -- studworx																			\
 		--height		"${height_render}"													\
 		--width			"${width_render}"													\
 		--camera-angles	"${list_latitudes[index_view]}" "${list_longitudes[index_view]}"		\
@@ -1218,7 +1222,7 @@ l2cu_pieces () {
 
 	frobulator.inf "Generating pieces count file" "[ ${name_model} ]"
 
-	frobulator.background quiet "parse" -- leocad										\
+	frobulator.background quiet "parse" -- studworx										\
 		--export-csv	"${file_csv_parts}"	\
 												"${path_model}"
 
@@ -2031,16 +2035,65 @@ l2cu_download () {
 
 	frobulator.track || return "${status}"
 
-	# leocad reads the parts archive without extraction - official archive renamed
+	# studworx reads the parts archive without extraction - archive renamed
 
-	if [ "${option_download}" = "official" ]
+	mv 												\
+		"${directory}/${file_archive_library}"			\
+		"${directory}/${file_archive_saved}"
+
+	frobulator.track
+
+	return "${status}"
+}
+
+l2cu_studworx () {
+
+	# studworx package from its latest release - deb or rpm for the package manager
+
+	local status=0
+	local directory_package="$(mktemp -d)"
+
+	local architecture
+	local extension_package
+	local url_package
+
+	case "$(uname -m)" in
+		x86_64)		architecture="amd64"	;;
+		aarch64)	architecture="arm64"	;;
+		*)
+			frobulator.err "Unsupported architecture" "[ studworx // $(uname -m) ]"
+
+			return 1
+		;;
+	esac
+
+	if [ "${manager_package}" = "dnf" ] || [ "${manager_package}" = "yum" ]
 	then
-		mv 											\
-			"${directory}/${file_archive_library}"		\
-			"${directory}/ldraw.zip"
-
-		frobulator.track
+		extension_package="$(uname -m).rpm"
+	else
+		extension_package="${architecture}.deb"
 	fi
+
+	url_package="$(curl -s -L "${url_studworx}" | grep -o '"browser_download_url": *"[^"]*'"${extension_package}"'"' | grep -o 'https[^"]*')"
+
+	if [ -z "${url_package}" ]
+	then
+		frobulator.err "Release not found" "[ studworx // ${extension_package} ]"
+
+		return 1
+	fi
+
+	frobulator.download "${url_package}" "${directory_package}" "${url_package##*/}"
+
+	frobulator.track || return "${status}"
+
+	# package manager resolves the package dependencies
+
+	frobulator.background process "Installing" -- frobulator.silence log "$(frobulator.manager install) ${directory_package}/${url_package##*/}"
+
+	frobulator.track
+
+	rm --recursive --force "${directory_package}"
 
 	return "${status}"
 }
@@ -2102,7 +2155,7 @@ l2cu_list () {
 # requirements ─────────────────────────────────────────────────────────────────
 
 list=(
-	leocad
+	studworx
 )
 
 if [ "${option}" = "export" ] && [ "${option_export}" = "blender" ]
@@ -2140,9 +2193,26 @@ then
 	)
 fi
 
-frobulator.assess ${list[@]}
+# root installs studworx from its release - left out of the package manager requirements
 
-frobulator.fail || exit 1
+if [ "${EUID}" -eq 0 ]
+then
+	if [ -z "$(command -v studworx)" ]
+	then
+		l2cu_studworx
+
+		frobulator.fail "Installation failure" "[ studworx ]" || exit 1
+	fi
+
+	list=("${list[@]:1}")
+fi
+
+if [ "${#list[@]}" -gt 0 ]
+then
+	frobulator.assess ${list[@]}
+
+	frobulator.fail || exit 1
+fi
 
 unset list
 
@@ -2506,14 +2576,16 @@ then
 	then
 		path_release_library="updates"
 		file_archive_library="complete.zip"
+		file_archive_saved="ldraw.zip"
 	else
 		path_release_library="unofficial"
 		file_archive_library="ldrawunf.zip"
+		file_archive_saved="ldraw-unofficial.zip"
 	fi
 
 	l2cu_download
 
-	frobulator.fail "Download failure" "[ '${file_archive_library}' ]"
+	frobulator.fail "Download failure" "[ '${file_archive_saved}' ]"
 fi
 
 # list ─────────────────────────────────────────────────────────────────────────

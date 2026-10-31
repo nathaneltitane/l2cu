@@ -1,0 +1,15 @@
+{
+	"name": "L²CU",
+	"short_name": "L²CU",
+	"icons": [
+		{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "icon-256.png", "sizes": "256x256", "type": "image/png" },
+		{ "src": "icon-384.png", "sizes": "384x384", "type": "image/png" },
+		{ "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+		{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+	],
+	"start_url": "../../",
+	"theme_color": "#bbbbbb",
+	"background_color": "#ffffff",
+	"display": "standalone"
+}

@@ -51,7 +51,7 @@ Missing dependencies are installed on request - privilege escalation is only ask
 
 You will need:
 
-- [LeoCAD](https://github.com/leozide/leocad) - Leonardo Zide's LDraw model editor - all options
+- [StudWorx](https://studworx.app) - LDraw / LEGO® model builder, built on LeoCAD - all options - installed from its latest release when missing
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite - 'blender' export
 - [LPub3D](https://github.com/trevorsandy/lpub3d) - LDraw building instructions editor - 'instructions' option
 - curl - 'download' option
@@ -87,7 +87,7 @@ Without a directory or file extension, L²CU asks for them - defaults are the cu
 
 ### 'render'
 
-The render function generates preset, high definition renders of the selected LDraw model files or projects (using [LeoCAD](https://github.com/leozide/leocad) to process the renders).
+The render function generates preset, high definition renders of the selected LDraw model files or projects (using [StudWorx](https://studworx.app) to process the renders).
 
 Renders are saved under each model's 'renders' directory:
 
@@ -110,12 +110,12 @@ View presets (latitude / longitude):
 | 6 | 30 | 270 |
 | 7 | 30 | 315 |
 
-You can refer to the [LeoCAD help manual](https://www.leocad.org/docs/start.html) to get you started on setting up your editing and rendering preferences.
+You can refer to the [StudWorx help](https://studworx.app/#help) to get you started on setting up your editing and rendering preferences.
 
 ### 'export'
 
 This function serves as a 3D standard file exporter.
-It can generate (with the use of LeoCAD and/or Blender) the following formats:
+It can generate (with the use of StudWorx and/or Blender) the following formats:
 
 - collada (dae) - default
 - csv (parts list)
@@ -173,9 +173,9 @@ The 'download' function lets you download the LDraw parts library. This is espec
 You can download:
 
 - the complete 'official' LDraw parts library archive - saved as 'ldraw.zip'
-- the complete 'unofficial' LDraw parts library archive - saved as 'ldrawunf.zip'
+- the complete 'unofficial' LDraw parts library archive - saved as 'ldraw-unofficial.zip'
 
-LeoCAD reads the parts library archive directly - no extraction needed.
+StudWorx reads the parts library archive directly - no extraction needed.
 
 ### 'list'
 
@@ -199,6 +199,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 - [LDraw](https://www.LDraw.org) - The open standard for LEGO® CAD
 - [mechablocks](https://mechablocks.com) - Where LEGO® meets Linux
 - [LeoCAD](https://leocad.org) - A CAD program for creating virtual LEGO® models
+- [StudWorx](https://studworx.app) - LDraw / LEGO® model builder, built on LeoCAD
 - [MLCAD](http://mlcad.lm-software.com/) - Mike's Lego CAD
 - [Three.JS](https://threejs.org) - JavaScript 3D library
 - [Sketchfab](https://sketchfab.com) - Publish & find 3D models online
@@ -208,7 +209,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 [Frobulator](https://github.com/nathaneltitane/frobulator) to streamline the scripts and make redundant code a thing of the past.
 
-[LeoCAD](https://github.com/leozide/leocad) to export LDraw models into an exploitable 3D format via L²CU.
+[StudWorx](https://github.com/nathaneltitane/studworx) to render and export LDraw models into an exploitable 3D format via L²CU.
 
 [LPub3D](https://github.com/trevorsandy/lpub3d) to generate instructions out of the models submitted to L²CU.
 
