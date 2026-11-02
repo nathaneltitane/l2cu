@@ -762,19 +762,23 @@
 				margin: 0;
 			}
 
-			/* the bird avatar sits beside the version and copyright line, as in the mechablocks drawer */
+			/* the authorship closes the credits like the mechablocks drawer copyright: a separation, then the bird avatar over the centered version and copyright line */
 
-			.copyright .made {
+			.copyright .authorship {
 				display: flex;
+				flex-direction: column;
 				align-items: center;
 				gap: 10px;
-				margin: 0 0 10px 0;
+				margin: 20px 0 0 0;
+				padding: 20px 0 0 0;
+				border-top: inherit;
+				text-align: center;
 			}
 
 			.copyright .avatar img {
 				display: block;
-				width: 40px;
-				height: 40px;
+				width: 64px;
+				height: 64px;
 			}
 
 			/* the last section ends flush so every site keeps the same gap above the credits */
@@ -1431,13 +1435,13 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 
 		<div class="copyright reveal">
 			<p>L²CU builds on <a href="https://github.com/leozide/leocad">LeoCAD</a> by Leonardo Zide and its contributors. Instructions come from <a href="https://github.com/trevorsandy/lpub3d">LPub3D</a> by Trevor Sandy, Blender files from <a href="https://www.blender.org">Blender</a> and parts from the <a href="https://www.ldraw.org">LDraw</a> library.</p>
-			<p>L²CU is free software released under the GNU General Public License version 3.</p>
 			<p>Related projects: <a href="https://studworx.app">StudWorx</a>, the LeoCAD based LDraw editor L²CU renders and exports with, <a href="https://frobulator.app">Frobulator</a>, the shell scripting function library behind every L²CU script, and <a href="https://mechablocks.com">MechaBlocks</a>, custom LEGO® mecha models rendered and documented with L²CU.</p>
-			<div class="made">
-				<a class="avatar" href="https://nathaneltitane.com" aria-label="N Λ T H Λ N E L"><img src="logo/avatar-bird.png" alt="" width="40" height="40"></a>
+			<p>L²CU is free software released under the GNU General Public License version 3.</p>
+			<p>LEGO® is a trademark of the LEGO® Group, which does not sponsor, authorize or endorse this project.</p>
+			<div class="authorship">
+				<a class="avatar" href="https://nathaneltitane.com" aria-label="N Λ T H Λ N E L"><img src="logo/avatar-bird.png" alt="" width="64" height="64"></a>
 				<p>Version // 2026-10-31<br>2026 - <a href="https://github.com/nathaneltitane">N Λ T H Λ N E L</a> - <a href="https://github.com/nathaneltitane/l2cu/issues">Submit bug reports or feature requests</a></p>
 			</div>
-			<p>LEGO® is a trademark of the LEGO® Group, which does not sponsor, authorize or endorse this project.</p>
 		</div>
 
 		<nav id="footer" aria-label="Sections">
