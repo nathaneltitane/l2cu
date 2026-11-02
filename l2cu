@@ -110,18 +110,21 @@ do
 			csv)
 				option_export="csv"
 				extension_export="csv"
+				flag_export="--export-csv"
 				name_export="Comma Separated Values"
 			;;
 
 			3dstudio)
 				option_export="3dstudio"
 				extension_export="3ds"
+				flag_export="--export-3ds"
 				name_export="3DS"
 			;;
 
 			collada)
 				option_export="collada"
 				extension_export="dae"
+				flag_export="--export-collada"
 				name_export="Collada"
 			;;
 
@@ -134,6 +137,7 @@ do
 			kmz)
 				option_export="kmz"
 				extension_export="kmz"
+				flag_export="--export-kmz"
 				name_export="KMZ"
 			;;
 
@@ -142,12 +146,14 @@ do
 
 				option_export="blender"
 				extension_export="obj"
+				flag_export="--export-wavefront"
 				name_export="Blender"
 			;;
 
 			wavefront)
 				option_export="wavefront"
 				extension_export="obj"
+				flag_export="--export-wavefront"
 				name_export="Wavefront"
 			;;
 
@@ -485,6 +491,7 @@ if [ "${option}" = "export" ] && [ -z "${option_export}" ]
 then
 	option_export="collada"
 	extension_export="dae"
+	flag_export="--export-collada"
 	name_export="Collada"
 fi
 
@@ -1019,7 +1026,7 @@ l2cu_export () {
 	frobulator.fwd "Output" "[ ${name_export} // ${file_export} ]"
 
 	frobulator.background quiet "generate" -- studworx											\
-		-"${extension_export}"	"${file_export}" 	\
+		"${flag_export}"		"${file_export}" 	\
 													"${path_model}"
 
 	frobulator.track || return "${status}"
@@ -1141,14 +1148,14 @@ l2cu_render () {
 	# studworx renders an opaque background unless asked for transparency
 
 	frobulator.background quiet "render" -- studworx																			\
-		--height		"${height_render}"													\
-		--width			"${width_render}"													\
-		--camera-angles	"${list_latitudes[index_view]}" "${list_longitudes[index_view]}"		\
-		--shading		"${shading}"												\
-		--line-width	"${width_line}"												\
-		--aa-samples	"${count_samples_antialias}"										\
+		--height				"${height_render}"											\
+		--width					"${width_render}"											\
+		--camera-angles			"${list_latitudes[index_view]}" "${list_longitudes[index_view]}"	\
+		--shading				"${shading}"										\
+		--line-width			"${width_line}"										\
+		--antialiasing-samples	"${count_samples_antialias}"										\
 		--transparent																		\
-		--image			"${file_render}"											\
+		--image					"${file_render}"									\
 																					"${path_model}"
 
 	frobulator.track
