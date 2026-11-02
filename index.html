@@ -102,7 +102,6 @@
 				justify-content: center;
 				overflow: hidden;
 				opacity: 0;
-				filter: blur(1px);
 				animation: reveal-backdrop 2s ease forwards;
 			}
 
@@ -115,6 +114,7 @@
 				color: #222222;
 				font-size: clamp(6px, 1vw, 12px);
 				line-height: 1.3;
+				zoom: 2;
 			}
 
 			@keyframes reveal-backdrop {
@@ -299,6 +299,9 @@
 				height: 40px;
 				display: block;
 				margin: 0 auto;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: contain;
 			}
 
 			.icon.big {
@@ -306,6 +309,72 @@
 				height: 56px;
 				margin: 0;
 				flex: none;
+			}
+
+			/* buttons */
+
+			.logo-button-red {
+				background-image: url(logo/logo-button-red.svg);
+			}
+
+			.logo-button-orange {
+				background-image: url(logo/logo-button-orange.svg);
+			}
+
+			.logo-button-amber {
+				background-image: url(logo/logo-button-amber.svg);
+			}
+
+			.logo-button-yellow {
+				background-image: url(logo/logo-button-yellow.svg);
+			}
+
+			.logo-button-lime {
+				background-image: url(logo/logo-button-lime.svg);
+			}
+
+			.logo-button-green {
+				background-image: url(logo/logo-button-green.svg);
+			}
+
+			.logo-button-emerald {
+				background-image: url(logo/logo-button-emerald.svg);
+			}
+
+			.logo-button-teal {
+				background-image: url(logo/logo-button-teal.svg);
+			}
+
+			.logo-button-cyan {
+				background-image: url(logo/logo-button-cyan.svg);
+			}
+
+			.logo-button-blue {
+				background-image: url(logo/logo-button-blue.svg);
+			}
+
+			.logo-button-indigo {
+				background-image: url(logo/logo-button-indigo.svg);
+			}
+
+			.logo-button-violet {
+				background-image: url(logo/logo-button-violet.svg);
+			}
+
+			.logo-button-purple {
+				background-image: url(logo/logo-button-purple.svg);
+			}
+
+			.logo-button-fuchsia {
+				background-image: url(logo/logo-button-fuchsia.svg);
+			}
+
+			.logo-button-pink {
+				background-image: url(logo/logo-button-pink.svg);
+			}
+
+			.logo-button-rose {
+				background-image: url(logo/logo-button-rose.svg);
 			}
 
 			/* figures */
@@ -869,7 +938,7 @@ Options:
 
 		<section id="overview" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#2ca02c" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-orange" aria-hidden="true"></span>
 				<h2>OVERVIEW // ONE COMMAND FOR A FOLDER OF MODELS</h2>
 			</header>
 
@@ -897,7 +966,7 @@ Options:
 
 		<section id="install" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#ffcc00" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-amber" aria-hidden="true"></span>
 				<h2>INSTALL // ONE SCRIPT, FETCHED AND RUN</h2>
 			</header>
 
@@ -940,7 +1009,7 @@ bash l2cu --file mpd --modify step --directory ~/models/work-in-progress</code><
 
 		<section id="render" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#c837ab" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-yellow" aria-hidden="true"></span>
 				<h2>RENDER // PRESET VIEWS OF EVERY MODEL</h2>
 			</header>
 
@@ -1063,7 +1132,7 @@ bash l2cu --file mpd --modify step --directory ~/models/work-in-progress</code><
 
 		<section id="export" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#ff6600" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-lime" aria-hidden="true"></span>
 				<h2>EXPORT // STANDARD 3D FORMATS</h2>
 			</header>
 
@@ -1098,7 +1167,7 @@ bash l2cu --file mpd --export surface kmz --directory ~/models</code></pre>
 
 		<section id="instructions" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#7137c8" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-green" aria-hidden="true"></span>
 				<h2>INSTRUCTIONS // BUILDING GUIDES WITH LPUB3D</h2>
 			</header>
 
@@ -1174,7 +1243,7 @@ bash l2cu --file mpd --export surface kmz --directory ~/models</code></pre>
 
 		<section id="modify" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#ff0000" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-emerald" aria-hidden="true"></span>
 				<h2>MODIFY // BULK EDITS ACROSS EVERY MODEL</h2>
 			</header>
 
@@ -1208,7 +1277,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 
 		<section id="download" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#a02c5a" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-teal" aria-hidden="true"></span>
 				<h2>DOWNLOAD // THE LDRAW PARTS LIBRARY</h2>
 			</header>
 
@@ -1233,7 +1302,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 
 		<section id="list" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#669900" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-cyan" aria-hidden="true"></span>
 				<h2>LIST // THE LEGACY PARTS INDEX</h2>
 			</header>
 
@@ -1259,7 +1328,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 
 		<section id="options" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#a05a2c" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-blue" aria-hidden="true"></span>
 				<h2>OPTIONS // THE FULL HELP</h2>
 			</header>
 
@@ -1333,7 +1402,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 
 		<section id="uninstall" class="section reveal">
 			<header class="head-section">
-				<svg class="icon big" style="color:#666666" aria-hidden="true"><use href="#icon-l2cu"/></svg>
+				<span class="icon big logo-button-indigo" aria-hidden="true"></span>
 				<h2>UNINSTALL // REMOVE INSTALLED COPIES</h2>
 			</header>
 
@@ -1355,22 +1424,22 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 			<div class="footer">
 				<div class="inner-footer">
 					<span class="start-footer" aria-hidden="true"></span>
-					<a class="button-navigation" href="#top"><svg class="icon" style="color:#37abc8" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Home</span></a>
-					<a class="button-navigation" href="#overview"><svg class="icon" style="color:#2ca02c" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Overview</span></a>
-					<a class="button-navigation" href="#install"><svg class="icon" style="color:#ffcc00" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Install</span></a>
-					<a class="button-navigation" href="#render"><svg class="icon" style="color:#c837ab" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Render</span></a>
-					<a class="button-navigation" href="#export"><svg class="icon" style="color:#ff6600" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Export</span></a>
-					<a class="button-navigation" href="#instructions"><svg class="icon" style="color:#7137c8" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Instructions</span></a>
-					<a class="button-navigation" href="#modify"><svg class="icon" style="color:#ff0000" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Modify</span></a>
-					<a class="button-navigation" href="#download"><svg class="icon" style="color:#a02c5a" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Download</span></a>
-					<a class="button-navigation" href="#list"><svg class="icon" style="color:#669900" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">List</span></a>
-					<a class="button-navigation" href="#options"><svg class="icon" style="color:#a05a2c" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Options</span></a>
-					<a class="button-navigation" href="#uninstall"><svg class="icon" style="color:#666666" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Uninstall</span></a>
-					<a class="button-navigation" href="https://github.com/nathaneltitane/l2cu"><svg class="icon" style="color:#333333" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">GitHub</span></a>
-					<a class="button-navigation" href="https://studworx.app"><svg class="icon" style="color:#2ca089" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">StudWorx</span></a>
-					<a class="button-navigation" href="https://mechablocks.com"><svg class="icon" style="color:#a02c2c" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">MechaBlocks</span></a>
-					<a class="button-navigation" href="https://frobulator.app"><svg class="icon" style="color:#5294e2" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Frobulator</span></a>
-					<a class="button-navigation" href="https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ"><svg class="icon" style="color:#0066ff" aria-hidden="true"><use href="#icon-l2cu"/></svg><span class="label">Donate</span></a>
+					<a class="button-navigation" href="#top"><span class="icon logo-button-red" aria-hidden="true"></span><span class="label">Home</span></a>
+					<a class="button-navigation" href="#overview"><span class="icon logo-button-orange" aria-hidden="true"></span><span class="label">Overview</span></a>
+					<a class="button-navigation" href="#install"><span class="icon logo-button-amber" aria-hidden="true"></span><span class="label">Install</span></a>
+					<a class="button-navigation" href="#render"><span class="icon logo-button-yellow" aria-hidden="true"></span><span class="label">Render</span></a>
+					<a class="button-navigation" href="#export"><span class="icon logo-button-lime" aria-hidden="true"></span><span class="label">Export</span></a>
+					<a class="button-navigation" href="#instructions"><span class="icon logo-button-green" aria-hidden="true"></span><span class="label">Instructions</span></a>
+					<a class="button-navigation" href="#modify"><span class="icon logo-button-emerald" aria-hidden="true"></span><span class="label">Modify</span></a>
+					<a class="button-navigation" href="#download"><span class="icon logo-button-teal" aria-hidden="true"></span><span class="label">Download</span></a>
+					<a class="button-navigation" href="#list"><span class="icon logo-button-cyan" aria-hidden="true"></span><span class="label">List</span></a>
+					<a class="button-navigation" href="#options"><span class="icon logo-button-blue" aria-hidden="true"></span><span class="label">Options</span></a>
+					<a class="button-navigation" href="#uninstall"><span class="icon logo-button-indigo" aria-hidden="true"></span><span class="label">Uninstall</span></a>
+					<a class="button-navigation" href="https://github.com/nathaneltitane/l2cu"><span class="icon logo-button-violet" aria-hidden="true"></span><span class="label">GitHub</span></a>
+					<a class="button-navigation" href="https://studworx.app"><span class="icon logo-button-purple" aria-hidden="true"></span><span class="label">StudWorx</span></a>
+					<a class="button-navigation" href="https://mechablocks.com"><span class="icon logo-button-fuchsia" aria-hidden="true"></span><span class="label">MechaBlocks</span></a>
+					<a class="button-navigation" href="https://frobulator.app"><span class="icon logo-button-pink" aria-hidden="true"></span><span class="label">Frobulator</span></a>
+					<a class="button-navigation" href="https://www.paypal.com/donate?hosted_button_id=ZW3CDCANHJCWJ"><span class="icon logo-button-rose" aria-hidden="true"></span><span class="label">Donate</span></a>
 					<span class="end-footer" aria-hidden="true"></span>
 				</div>
 			</div>
