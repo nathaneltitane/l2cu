@@ -1,4 +1,5 @@
-/tools/l2cu-site-update
-/tools/l2cu-social-update
-/site/
+/tools/l2cu-site
+/tools/l2cu-social
+/resources/site/
+/index-social.html
 AGENTS.md
