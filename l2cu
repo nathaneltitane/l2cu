@@ -1192,6 +1192,8 @@ l2cu_render () {
 
 	frobulator.fwd "Output" "[ view preset ${list_views[index_view]} // ${file_render} ]"
 
+	# studworx renders an opaque background unless asked for transparency
+
 	frobulator.background quiet "render" -- studworx																			\
 		--height		"${height_render}"													\
 		--width			"${width_render}"													\
@@ -1199,6 +1201,7 @@ l2cu_render () {
 		--shading		"${shading}"												\
 		--line-width	"${width_line}"												\
 		--aa-samples	"${count_samples_antialias}"										\
+		--transparent																		\
 		--image			"${file_render}"											\
 																					"${path_model}"
 
