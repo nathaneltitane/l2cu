@@ -258,7 +258,7 @@ do
 			echo
 			echo -e "                      lint     Standardize and format model files for parsing."
 			echo -e "                      color    Modify a part's color attribute only. [ Default ]"
-			echo -e "                      part     Modify a part for another by number attribute only."
+			echo -e "                      part     Modify a part for another by name or number attribute only."
 			echo -e "                      bind     Match a part to a specific color and modify the color for that selection."
 			echo -e "                      step     Separate ldr based submodels using step meta tags."
 			echo
@@ -1510,6 +1510,24 @@ l2cu_parse_input () {
 	return "${status}"
 }
 
+l2cu_parse_part () {
+
+	# part names are alphanumeric - a typed file extension is dropped
+
+	local status=0
+
+	shopt -s nocasematch
+
+	if [[ "${input}" =~ ^(.+)\.(dat|ldr|mpd)$ ]]
+	then
+		input="${BASH_REMATCH[1]}"
+	fi
+
+	shopt -u nocasematch
+
+	return "${status}"
+}
+
 l2cu_help_colors () {
 
 	local status=0
@@ -1600,23 +1618,29 @@ l2cu_parse_modification () {
 		;;
 
 		part)
-			frobulator.ipt "Enter part to modify" "[ number ]"
+			frobulator.ipt "Enter part to modify" "[ name / number ]"
 
 			l2cu_parse_input
+
+			l2cu_parse_part
 
 			number_part_old="${input}"
 
-			frobulator.ipt "Enter part to set" "[ number ]"
+			frobulator.ipt "Enter part to set" "[ name / number ]"
 
 			l2cu_parse_input
+
+			l2cu_parse_part
 
 			number_part_new="${input}"
 		;;
 
 		bind)
-			frobulator.ipt "Enter part to modify" "[ number ]"
+			frobulator.ipt "Enter part to modify" "[ name / number ]"
 
 			l2cu_parse_input
+
+			l2cu_parse_part
 
 			number_part_selection="${input}"
 
@@ -1798,7 +1822,9 @@ l2cu_modify () {
 			;;
 
 			part)
-				if [ "${part}" = "${number_part_old}" ]
+				# ldraw file names ignore case
+
+				if [ "${part,,}" = "${number_part_old,,}" ]
 				then
 					component="${number_part_new}.${component##*.}"
 					state_line_modified=true
@@ -1809,7 +1835,7 @@ l2cu_modify () {
 			;;
 
 			bind)
-				if [ "${part}" = "${number_part_selection}" ] && [ "${color}" = "${value_color_old}" ]
+				if [ "${part,,}" = "${number_part_selection,,}" ] && [ "${color}" = "${value_color_old}" ]
 				then
 					color="${value_color_new}"
 					state_line_modified=true

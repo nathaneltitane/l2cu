@@ -915,7 +915,7 @@ Options:
 
                       lint     Standardize and format model files for parsing.
                       color    Modify a part's color attribute only. [ Default ]
-                      part     Modify a part for another by number attribute only.
+                      part     Modify a part for another by name or number attribute only.
                       bind     Match a part to a specific color and modify the color for that selection.
                       step     Separate ldr based submodels using step meta tags.
 
@@ -1281,7 +1281,7 @@ bash l2cu --file mpd --export surface kmz --directory ~/models</code></pre>
 
 					<tbody>
 						<tr><td><code>color</code></td><td>One color for another, on every part - the default</td></tr>
-						<tr><td><code>part</code></td><td>One part for another, by number</td></tr>
+						<tr><td><code>part</code></td><td>One part for another, by name or number, in any case</td></tr>
 						<tr><td><code>bind</code></td><td>The color of one part only, matched by part and color</td></tr>
 						<tr><td><code>step</code></td><td>Each ldr submodel reference wrapped in its own step</td></tr>
 						<tr><td><code>lint</code></td><td>The model standardized for parsing: extraneous meta tags and blank lines removed, special characters stripped from submodel names</td></tr>
@@ -1392,7 +1392,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 				<div class="option">
 					<code>-m, --modify</code>
 					<p>Run model file <span class="marker">m</span>odification using the following parameters:</p>
-					<ul class="values"><li><code>lint</code> Standardize and format model files for parsing.</li><li><code>color</code> <a href="#modify">Modify</a> a part's color attribute only. <span class="tag default">Default</span></li><li><code>part</code> Modify a part for another by number attribute only.</li><li><code>bind</code> Match a part to a specific color and modify the color for that selection.</li><li><code>step</code> Separate ldr based submodels using step meta tags.</li></ul>
+					<ul class="values"><li><code>lint</code> Standardize and format model files for parsing.</li><li><code>color</code> <a href="#modify">Modify</a> a part's color attribute only. <span class="tag default">Default</span></li><li><code>part</code> Modify a part for another by name or number attribute only.</li><li><code>bind</code> Match a part to a specific color and modify the color for that selection.</li><li><code>step</code> Separate ldr based submodels using step meta tags.</li></ul>
 				</div>
 
 				<div class="option">
