@@ -472,6 +472,7 @@
 			.table {
 				overflow-x: auto;
 				margin: 20px 0;
+				border-radius: 20px 20px 0 0;
 			}
 
 			table {
@@ -497,9 +498,6 @@
 				min-width: 140px;
 			}
 
-			th:first-child { border-radius: 20px 0 0 0; }
-			th:last-child { border-radius: 0 20px 0 0; }
-
 			pre {
 				background: #eeeeee;
 				color: #222222;
@@ -519,11 +517,11 @@
 				background: transparent;
 			}
 
-			.table::-webkit-scrollbar-track:horizontal, pre::-webkit-scrollbar-track:horizontal {
+			pre::-webkit-scrollbar-track:horizontal {
 				margin: 0 20px;
 			}
 
-			.table::-webkit-scrollbar-track:vertical, pre::-webkit-scrollbar-track:vertical {
+			pre::-webkit-scrollbar-track:vertical {
 				margin: 20px 0;
 			}
 
@@ -882,7 +880,7 @@ Options:
                       3dstudio     Export 3dstudio file format. [ 3ds ]
                       collada      Export collada file format. [ dae ] [ Default ]
                       surface      Reduce collada export to its visible surface - parts merged per color. [ dae ]
-                      kmz          Compress collada export into a kmz archive. [ dae &gt;&gt;&gt; kmz ]
+                      kmz          Export kmz file format - visible surface only. [ kmz ]
                       blender      Optimize wavefront and export to blender file format. [ obj &gt;&gt;&gt; blend ]
                       wavefront    Export wavefront file format. [ obj + mtl ]
 
@@ -970,7 +968,7 @@ Options:
 
 			<ul class="points">
 				<li><b><a href="#render">Render</a>.</b> Eight views around every model, or one view as flat, wireframe, overlay, social card or thumbnail, through StudWorx.</li>
-				<li><b><a href="#export">Export</a>.</b> Collada, 3D Studio, Wavefront, a parts list or an optimized Blender file, with collada reduced to its visible surface or packed as kmz.</li>
+				<li><b><a href="#export">Export</a>.</b> Collada, 3D Studio, Wavefront, a parts list or an optimized Blender file, with collada or kmz reduced to its visible surface.</li>
 				<li><b><a href="#instructions">Instructions</a>.</b> Building instructions, piece counts and sample pages with LPub3D.</li>
 				<li><b><a href="#modify">Modify</a>.</b> Colors, parts and color bound parts changed across every model at once, submodels stepped and files linted.</li>
 				<li><b><a href="#download">Download</a>.</b> The official or unofficial LDraw parts library archive, ready for StudWorx.</li>
@@ -1015,7 +1013,7 @@ bash l2cu --help</code></pre>
 						<tr><td><a href="https://studworx.app">StudWorx</a></td><td>Renders, exports and piece counts</td></tr>
 						<tr><td><a href="https://github.com/trevorsandy/lpub3d">LPub3D</a></td><td><a href="#instructions">Instructions</a> and sample pages</td></tr>
 						<tr><td><a href="https://www.blender.org">Blender</a></td><td>The <code>blender</code> export</td></tr>
-						<tr><td>python3, numpy</td><td>The <code>surface</code> and <code>kmz</code> exports</td></tr>
+						<tr><td>python3, numpy</td><td>The <code>surface</code> export</td></tr>
 						<tr><td>curl</td><td>The parts library download</td></tr>
 						<tr><td>sed</td><td>Every modification</td></tr>
 					</tbody>
@@ -1171,7 +1169,7 @@ bash l2cu --file mpd --modify step --directory ~/models/work-in-progress</code><
 					<tbody>
 						<tr><td><code>collada</code></td><td>Collada, transparency kept for viewers - the default</td><td><code>dae</code></td></tr>
 						<tr><td><code>surface</code></td><td>Collada reduced to its visible surface, parts merged per color</td><td><code>dae</code></td></tr>
-						<tr><td><code>kmz</code></td><td>Collada packed into a kmz archive</td><td><code>dae</code> › <code>kmz</code></td></tr>
+						<tr><td><code>kmz</code></td><td>KMZ archive reduced to its visible surface by StudWorx</td><td><code>kmz</code></td></tr>
 						<tr><td><code>csv</code></td><td>Parts list</td><td><code>csv</code></td></tr>
 						<tr><td><code>3dstudio</code></td><td>3D Studio</td><td><code>3ds</code></td></tr>
 						<tr><td><code>wavefront</code></td><td>Wavefront</td><td><code>obj</code> + <code>mtl</code></td></tr>
@@ -1180,10 +1178,10 @@ bash l2cu --file mpd --modify step --directory ~/models/work-in-progress</code><
 				</table>
 			</div>
 
-			<p>The surface and kmz options apply to collada exports and combine with each other. Exports are saved in an exports folder next to each model, and files above 25 MB are flagged for their loading times.</p>
+			<p>The surface option applies to collada exports. Exports are saved in an exports folder next to each model, and files above 25 MB are flagged for their loading times.</p>
 
 			<pre><code>bash l2cu --file mpd --export collada --directory ~/models
-bash l2cu --file mpd --export surface kmz --directory ~/models</code></pre>
+bash l2cu --file mpd --export kmz --directory ~/models</code></pre>
 
 			<p>The exports are ready for web galleries built on WebGL and Three.js, or for sites such as Sketchfab.</p>
 			<p class="more"><a href="https://mechablocks.com">MECHA // BLOCKS ›</a> // <a href="https://threejs.org">Three.js ›</a></p>
@@ -1374,7 +1372,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 				<div class="option">
 					<code>-e, --export</code>
 					<p>Run model file <span class="marker">e</span>xport using the following parameters:</p>
-					<ul class="values"><li><code>csv</code> <a href="#export">Export</a> parts list file format. <span class="tag">csv</span></li><li><code>3dstudio</code> Export 3dstudio file format. <span class="tag">3ds</span></li><li><code>collada</code> Export collada file format. <span class="tag">dae</span> <span class="tag default">Default</span></li><li><code>surface</code> Reduce collada export to its visible surface - parts merged per color. <span class="tag">dae</span></li><li><code>kmz</code> Compress collada export into a kmz archive. <span class="tag">dae › kmz</span></li><li><code>blender</code> Optimize wavefront and export to blender file format. <span class="tag">obj › blend</span></li><li><code>wavefront</code> Export wavefront file format. <span class="tag">obj + mtl</span></li></ul>
+					<ul class="values"><li><code>csv</code> <a href="#export">Export</a> parts list file format. <span class="tag">csv</span></li><li><code>3dstudio</code> Export 3dstudio file format. <span class="tag">3ds</span></li><li><code>collada</code> Export collada file format. <span class="tag">dae</span> <span class="tag default">Default</span></li><li><code>surface</code> Reduce collada export to its visible surface - parts merged per color. <span class="tag">dae</span></li><li><code>kmz</code> Export kmz file format - visible surface only. <span class="tag">kmz</span></li><li><code>blender</code> Optimize wavefront and export to blender file format. <span class="tag">obj › blend</span></li><li><code>wavefront</code> Export wavefront file format. <span class="tag">obj + mtl</span></li></ul>
 				</div>
 
 				<div class="option">

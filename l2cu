@@ -132,9 +132,9 @@ do
 			;;
 
 			kmz)
-				# collada compressed into a kmz archive
-
-				option_kmz="true"
+				option_export="kmz"
+				extension_export="kmz"
+				name_export="KMZ"
 			;;
 
 			blender)
@@ -225,7 +225,7 @@ do
 			echo -e "                      3dstudio     Export 3dstudio file format. [ 3ds ]"
 			echo -e "                      collada      Export collada file format. [ dae ] [ Default ]"
 			echo -e "                      surface      Reduce collada export to its visible surface - parts merged per color. [ dae ]"
-			echo -e "                      kmz          Compress collada export into a kmz archive. [ dae >>> kmz ]"
+			echo -e "                      kmz          Export kmz file format - visible surface only. [ kmz ]"
 			echo -e "                      blender      Optimize wavefront and export to blender file format. [ obj >>> blend ]"
 			echo -e "                      wavefront    Export wavefront file format. [ obj + mtl ]"
 			echo
@@ -488,11 +488,11 @@ then
 	name_export="Collada"
 fi
 
-# surface and kmz apply to collada exports only
+# surface applies to collada exports only
 
-if [[ "${option_surface}" = "true" || "${option_kmz}" = "true" ]] && [ "${option_export}" != "collada" ]
+if [ "${option_surface}" = "true" ] && [ "${option_export}" != "collada" ]
 then
-	frobulator.err "Surface and kmz require the collada export" "[ ${option_export} ]"
+	frobulator.err "Surface requires the collada export" "[ ${option_export} ]"
 
 	exit 1
 fi
@@ -626,9 +626,9 @@ OPTIMIZE
 	fi
 
 
-	# collada surface and kmz scripts - temporary - removed on exit
+	# collada surface script - temporary - removed on exit
 
-	if [ "${option_surface}" = "true" ] || [ "${option_kmz}" = "true" ]
+	if [ "${option_surface}" = "true" ]
 	then
 		frobulator.temporary directory_temporary
 
@@ -637,7 +637,6 @@ OPTIMIZE
 		frobulator.trap "${directory_temporary}"
 
 		file_surface="${directory_temporary}/surface.py"
-		file_kmz="${directory_temporary}/kmz.py"
 
 		# python indentation in tabs - only the shell indentation removed
 
@@ -824,30 +823,6 @@ OPTIMIZE
 
 		print("triangles kept:", int(mask_visible.sum()), "of", len(triangles_positions))
 SURFACE
-
-		frobulator.track
-
-		sed -e 's/^\t\t//' > "${file_kmz}" << 'KMZ'
-		#!/usr/bin/env python3
-
-		# collada compression - kml index and collada model packed into a kmz archive - fixed entry dates
-		# arguments - [collada input] [kmz output]
-
-		import sys
-		import zipfile
-
-		file_collada = sys.argv[1]
-		file_kmz = sys.argv[2]
-
-		text_index = '<?xml version="1.0" encoding="UTF-8"?>\n<kml><Placemark><Model><Link><href>doc.dae</href></Link></Model></Placemark></kml>\n'
-		text_collada = open(file_collada).read()
-
-		with zipfile.ZipFile(file_kmz, "w") as archive_kmz:
-			for name_entry, text_entry in (("doc.kml", text_index), ("doc.dae", text_collada)):
-				info_entry = zipfile.ZipInfo(name_entry, date_time = (2000, 1, 1, 0, 0, 0))
-				info_entry.compress_type = zipfile.ZIP_DEFLATED
-				archive_kmz.writestr(info_entry, text_entry, compresslevel = 9)
-KMZ
 
 		frobulator.track
 	fi
@@ -1086,35 +1061,6 @@ l2cu_surface () {
 	mv --force "${file_export}.surface" "${file_export}"
 
 	frobulator.track
-
-	return "${status}"
-}
-
-l2cu_kmz () {
-
-	# collada packed into a compressed kmz archive - collada removed
-
-	local status=0
-	local file_export_kmz="${name_model}.kmz"
-
-	frobulator.fwd "Output" "[ KMZ // ${file_export_kmz} ]"
-
-	frobulator.background quiet "compress" -- python3 "${file_kmz}" "${file_export}" "${file_export_kmz}"
-
-	frobulator.track || return "${status}"
-
-	# python exits with an error when packing fails - file checked regardless
-
-	if [ ! -f "${file_export_kmz}" ]
-	then
-		status=1
-
-		return "${status}"
-	fi
-
-	rm --force "${file_export}"
-
-	file_export="${file_export_kmz}"
 
 	return "${status}"
 }
@@ -2194,16 +2140,10 @@ then
 	)
 fi
 
-if [ "${option}" = "export" ] && [ "${option_kmz}" = "true" ]
-then
-	list+=(
-		python3
-	)
-fi
-
 if [ "${option}" = "export" ] && [ "${option_surface}" = "true" ]
 then
 	list+=(
+		python3
 		python3-numpy
 	)
 fi
@@ -2346,13 +2286,6 @@ then
 				l2cu_surface
 
 				frobulator.fail "Surface failure" "[ '${file_model}' ]" || continue
-			fi
-
-			if [ "${option_kmz}" = "true" ]
-			then
-				l2cu_kmz
-
-				frobulator.fail "Compression failure" "[ '${file_model}' ]" || continue
 			fi
 
 			if [ "${option_export}" = "blender" ]
