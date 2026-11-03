@@ -508,12 +508,12 @@
 
 			/* scrollbars kept clear of the corner radii */
 
-			html::-webkit-scrollbar, .table::-webkit-scrollbar, pre::-webkit-scrollbar {
+			::-webkit-scrollbar {
 				width: 6px;
 				height: 6px;
 			}
 
-			html::-webkit-scrollbar-track, .table::-webkit-scrollbar-track, pre::-webkit-scrollbar-track {
+			::-webkit-scrollbar-track {
 				background: transparent;
 			}
 
@@ -525,17 +525,17 @@
 				margin: 20px 0;
 			}
 
-			html::-webkit-scrollbar-thumb, .table::-webkit-scrollbar-thumb, pre::-webkit-scrollbar-thumb {
+			::-webkit-scrollbar-thumb {
 				background: #bbbbbb;
 				border-radius: 3px;
 			}
 
-			html::-webkit-scrollbar-thumb:hover, .table::-webkit-scrollbar-thumb:hover, pre::-webkit-scrollbar-thumb:hover {
+			::-webkit-scrollbar-thumb:hover {
 				background: #666666;
 			}
 
 			@supports not selector(::-webkit-scrollbar) {
-				html, .table, pre {
+				* {
 					scrollbar-width: thin;
 					scrollbar-color: #bbbbbb transparent;
 				}
