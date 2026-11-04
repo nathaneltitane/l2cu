@@ -254,9 +254,8 @@
 				padding: 0;
 				margin: 25px 0;
 				display: grid;
-				align-items: start;
 				grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-				gap: 10px 30px;
+				gap: 10px 20px;
 			}
 
 			.points li {
@@ -495,7 +494,9 @@
 			}
 
 			.gallery.cube .shot {
+				display: block;
 				width: auto;
+				margin: 0 auto;
 				background: transparent;
 			}
 
@@ -1261,11 +1262,11 @@ Options:
 			<p class="lead">L²CU grew out of scripts written to manage LDraw models in bulk, the work an editor makes you do one model at a time. It runs over a whole folder: rendering, exporting, documenting and editing every model in it.</p>
 
 			<ul class="points">
-				<li><b><a href="#render">Render</a>.</b> Eight views around every model, or one view as flat, wireframe, overlay, social card or thumbnail, through StudWorx.</li>
 				<li><b><a href="#export">Export</a>.</b> Collada, 3D Studio, Wavefront, a parts list or an optimized Blender file, with collada or kmz reduced to its visible surface.</li>
-				<li><b><a href="#instructions">Instructions</a>.</b> Building instructions, piece counts and sample pages with LPub3D.</li>
+				<li><b><a href="#render">Render</a>.</b> Eight views around every model, or one view as flat, wireframe, overlay, social card or thumbnail, through StudWorx.</li>
 				<li><b><a href="#modify">Modify</a>.</b> Colors, parts and color bound parts changed across every model at once, submodels stepped and files linted.</li>
 				<li><b><a href="#download">Download</a>.</b> The official or unofficial LDraw parts library archive, ready for StudWorx.</li>
+				<li><b><a href="#instructions">Instructions</a>.</b> Building instructions, piece counts and sample pages with LPub3D.</li>
 				<li><b><a href="#list">List</a>.</b> The legacy parts.lst index, sorted by description or number.</li>
 			</ul>
 
