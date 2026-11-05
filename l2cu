@@ -1154,6 +1154,8 @@ l2cu_render () {
 		--shading				"${shading}"										\
 		--line-width			"${width_line}"										\
 		--antialiasing-samples	"${count_samples_antialias}"										\
+		--no-highlight																		\
+		--no-fade-steps																		\
 		--transparent																		\
 		--image					"${file_render}"									\
 																					"${path_model}"
