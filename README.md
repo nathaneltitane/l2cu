@@ -243,6 +243,22 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ---
 
+### Credits:
+
+L²CU builds on [LeoCAD](https://github.com/leozide/leocad) by Leonardo Zide and its contributors. Instructions come from [LPub3D](https://github.com/trevorsandy/lpub3d) by Trevor Sandy, Blender files from [Blender](https://www.blender.org) and parts from the [LDraw](https://www.ldraw.org) library.
+
+L²CU is related to [StudWorx](https://github.com/nathaneltitane/studworx), the LeoCAD based LDraw editor L²CU renders and exports with, [Frobulator](https://github.com/nathaneltitane/frobulator), the shell scripting function library behind every L²CU script, and [MechaBlocks](https://github.com/nathaneltitane/mechablocks), custom LEGO® mecha models rendered and documented with L²CU.
+
+---
+
+### License:
+
+L²CU is free software released under the GNU General Public License version 3 - see 'LICENSE.md'.
+
+LEGO® is a trademark of the LEGO® Group, which does not sponsor, authorize or endorse this project.
+
+---
+
 ### Reports:
 
 [Submit bug report or feature request](https://github.com/nathaneltitane/l2cu/issues)
