@@ -229,20 +229,6 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ---
 
-### Repositories:
-
-[Frobulator](https://github.com/nathaneltitane/frobulator) to streamline the scripts and make redundant code a thing of the past.
-
-[StudWorx](https://github.com/nathaneltitane/studworx) to render and export LDraw models into an exploitable 3D format via L²CU.
-
-[LPub3D](https://github.com/trevorsandy/lpub3d) to generate instructions out of the models submitted to L²CU.
-
-[Three.JS](https://github.com/mrdoob/three.js) to create the viewer used to render and display my models on your web browser.
-
-[GNU/Bash](https://github.com/gitGNU/gnu_bash) as the shell environment on top of which the scripts function.
-
----
-
 ### Credits:
 
 L²CU renders and exports through StudWorx, built on [LeoCAD](https://github.com/leozide/leocad) by Leonardo Zide and its contributors. Instructions come from [LPub3D](https://github.com/trevorsandy/lpub3d) by Trevor Sandy, Blender files from [Blender](https://www.blender.org) and parts from the [LDraw](https://www.ldraw.org) library.
