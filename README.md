@@ -20,6 +20,8 @@ L²CU (The LDraw Linux Command line Utility) stems from a set of independent scr
 
 Most older and even more modern editors miss that mark to provide such features and that is where L²CU tries to fill the gap in a simple, user-friendly way.
 
+---
+
 ### What can it do?
 
 L²CU supports the standard LDraw model file extension ([ldr](https://www.ldraw.org/article/218.html)), the multi-part document (model assembly) file extension ([mpd](https://www.ldraw.org/article/47.html)) and the LDraw part file extension (dat).
@@ -35,6 +37,8 @@ In short, with L²CU you can:
 
 You can also tweak or rework the utility's functions to match your preferences.
 
+---
+
 ### How does it work?
 
 LDraw model files (ldr, mpd and even dat) are plain text files, thus making them stream edit friendly:
@@ -43,6 +47,8 @@ L²CU is a shell script (BASH) that parses and modifies the text in the model fi
 It is optimized for portability and uses a very minimal set of dependencies to get the job done.
 
 Every model found in the selected directory (and its subdirectories) is processed - paths containing spaces included.
+
+---
 
 ### What does it need?
 
@@ -56,6 +62,8 @@ You will need:
 - [LPub3D](https://github.com/trevorsandy/lpub3d) - LDraw building instructions editor - 'instructions' option
 - curl - 'download' option
 - sed
+
+---
 
 ### Usage
 
@@ -75,7 +83,7 @@ Usage: ./l2cu [EXTENSION] | [OPTION] [PARAMETER]
 -h, --help            Show [h]elp and usage information.
 ```
 
-Examples ↴
+**Examples ↴**
 
 ```
 bash l2cu --file mpd --render full --directory ~/models
@@ -84,6 +92,8 @@ bash l2cu --file mpd --modify step --directory ~/models/work-in-progress
 ```
 
 Without a directory or file extension, L²CU asks for them - defaults are the current directory and mpd files.
+
+---
 
 ### 'render'
 
@@ -112,6 +122,8 @@ View presets (latitude / longitude):
 
 You can refer to the [StudWorx help](https://studworx.app/#help) to get you started on setting up your editing and rendering preferences.
 
+---
+
 ### 'export'
 
 This function serves as a 3D standard file exporter.
@@ -132,6 +144,8 @@ Examples:
 - [mechablocks](https://mechablocks.com)
 - [Sketchfab](https://sketchfab.com)
 
+---
+
 ### 'instructions'
 
 This function generates building instructions with [LPub3D](https://github.com/trevorsandy/lpub3d), based on a configuration framework (title, piece count, category and url are filled in for each model):
@@ -141,6 +155,8 @@ This function generates building instructions with [LPub3D](https://github.com/t
 - samples: six sample pages spread over the instructions (png) - saved under 'instructions/samples'
 
 Models flagged with a 'work-in-progress' file receive placeholder samples instead.
+
+---
 
 ### 'modify'
 
@@ -166,6 +182,8 @@ Stray ' . . .' tails left on meta lines by earlier versions of L²CU are repaire
 
 Modifications are written to a timestamped copy of the model file ('[model]-modified-[timestamp].[extension]') unless the overwrite option is selected.
 
+---
+
 ### 'download'
 
 The 'download' function lets you download the LDraw parts library. This is especially useful for quick updates or if you're getting started.
@@ -176,6 +194,8 @@ You can download:
 - the complete 'unofficial' LDraw parts library archive - saved as 'ldraw-unofficial.zip'
 
 StudWorx reads the parts library archive directly - no extraction needed.
+
+---
 
 ### 'list'
 
@@ -193,6 +213,8 @@ More modern or cutting-edge editors now generate a cached dynamic index or datab
 
 To find examples that make use of L²CU, or to simply browse my models, you can visit my [Blog](https://mechablocks.com) which is hosted at [GitHub](https://github.com/nathaneltitane/mechablocks) as well.
 
+---
+
 ### Links:
 
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite
@@ -204,6 +226,8 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 - [Three.JS](https://threejs.org) - JavaScript 3D library
 - [Sketchfab](https://sketchfab.com) - Publish & find 3D models online
 - [Wine](https://www.winehq.org/) - Windows compatibility layer for POSIX-compliant operating systems
+
+---
 
 ### Repositories:
 
@@ -217,9 +241,13 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 [GNU/Bash](https://github.com/gitGNU/gnu_bash) as the shell environment on top of which the scripts function.
 
+---
+
 ### Reports:
 
 [Submit bug report or feature request](https://github.com/nathaneltitane/l2cu/issues)
+
+---
 
 ### Projects:
 
