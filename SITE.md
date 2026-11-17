@@ -1,10 +1,10 @@
 # Site
 
-Every section of [l2cu.app](https://l2cu.app). `tools/l2cu-site` builds the page from this file. Each `##` section starts with a comment that sets its page id, icon and heading, and its first paragraph is the lead. `- **Title.** text` lines become points and `1. **Title.** text` lines steps, a `<!-- table class -->` comment sets the class of the table below it, and a `<!-- gallery class -->` comment turns the images and video links below it into one gallery, the title of a single image setting its figure class. A `<!-- video -->` comment turns the link below it into a looping video. A `<!-- include name -->` comment places content read from the scripts, a paragraph made of links ending in › becomes a more link, and `@NAME@` placeholders are filled with counts read from the scripts.
+Every section of [l2cu.app](https://l2cu.app). `tools/l2cu-site` builds the page from this file. Each `##` section starts with a comment that sets its page id, icon and heading, and its first paragraph is the lead. `- **Title.** text` lines become points and `1. **Title.** text` lines steps, a `[//]: # (table class)` comment sets the class of the table below it, and a `[//]: # (gallery class)` comment turns the images and video links below it into one gallery, the title of a single image setting its figure class. A `[//]: # (video)` comment turns the link below it into a looping video. A `[//]: # (include name)` comment places content read from the scripts, a paragraph made of links ending in › becomes a more link, and `@NAME@` placeholders are filled with counts read from the scripts.
 
 ## Overview
 
-<!-- overview | orange | OVERVIEW // ONE COMMAND FOR A FOLDER OF MODELS -->
+[//]: # (overview | orange | OVERVIEW // ONE COMMAND FOR A FOLDER OF MODELS)
 
 L²CU grew out of scripts written to manage LDraw models in bulk, the work an editor makes you do one model at a time. It runs over a whole folder: rendering, exporting, documenting and editing every model in it.
 
@@ -21,7 +21,7 @@ Every model found in the chosen directory and its subdirectories is processed, p
 
 ## Install
 
-<!-- install | amber | INSTALL // ONE SCRIPT, FETCHED AND RUN -->
+[//]: # (install | amber | INSTALL // ONE SCRIPT, FETCHED AND RUN)
 
 Download the script and run it with bash. It sets up what it needs on the first run.
 
@@ -34,7 +34,7 @@ bash l2cu --help
 2. **Run it.** On start it loads Frobulator, its scripting library, from `get.frbltr.app` and keeps it up to date.
 3. **Install what is missing.** Requirements are checked on each run. Missing ones are offered for install, and root is asked for only then. StudWorx is installed from its latest release package, deb or rpm, for amd64 or arm64.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Requirement | Used for |
 | --- | --- |
 | <a href="https://studworx.app">StudWorx</a> | Renders, exports and piece counts |
@@ -56,11 +56,11 @@ Without a directory or a file extension, L²CU asks for them. The defaults are t
 
 ## Render
 
-<!-- render | yellow | RENDER // PRESET VIEWS OF EVERY MODEL -->
+[//]: # (render | yellow | RENDER // PRESET VIEWS OF EVERY MODEL)
 
 High definition renders of every model, through StudWorx, saved in a renders folder next to each model.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Option | Output | Saved under |
 | --- | --- | --- |
 | `full` | Eight 4096 x 4096 views around the model, presets 0 to 7 - the default | `renders/full` |
@@ -71,7 +71,7 @@ High definition renders of every model, through StudWorx, saved in a renders fol
 | `thumbnail` | One 512 x 512 view, preset 1, with edges | `renders/thumbnail` |
 | `0` to `7` | One view from that preset | `renders` |
 
-<!-- gallery four square -->
+[//]: # (gallery four square)
 
 ![Preset 0 // longitude 0](resources/images/render-full-00.png)
 ![Preset 1 // longitude 45](resources/images/render-full-01.png)
@@ -84,7 +84,7 @@ High definition renders of every model, through StudWorx, saved in a renders fol
 
 Every preset looks down at 30 degrees of latitude, stepping 45 degrees of longitude around the model.
 
-<!-- gallery three square -->
+[//]: # (gallery three square)
 
 ![Flat](resources/images/render-flat.png)
 ![Wireframe](resources/images/render-wireframe.png)
@@ -96,11 +96,11 @@ bash l2cu --file mpd --render full --directory ~/models
 
 ## Export
 
-<!-- export | lime | EXPORT // STANDARD 3D FORMATS -->
+[//]: # (export | lime | EXPORT // STANDARD 3D FORMATS)
 
 Every model exported to a standard 3D format through StudWorx, and Blender for blend files.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Option | Format | Files |
 | --- | --- | --- |
 | `collada` | Collada, transparency kept for viewers - the default | `dae` |
@@ -124,18 +124,18 @@ The exports are ready for web galleries built on WebGL and Three.js, or for site
 
 ## Instructions
 
-<!-- instructions | green | INSTRUCTIONS // BUILDING GUIDES WITH LPUB3D -->
+[//]: # (instructions | green | INSTRUCTIONS // BUILDING GUIDES WITH LPUB3D)
 
 Building instructions, piece counts and sample pages for every model, generated with LPub3D.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Option | Output |
 | --- | --- |
 | none | The full instructions document, `pdf` |
 | `pieces` | The piece count, written to the pieces file of the model |
 | `samples` | Six sample pages spread over the instructions, `png`, saved under `instructions/samples` |
 
-<!-- gallery three -->
+[//]: # (gallery three)
 
 ![Cover](resources/images/instructions-sample-01.png)
 ![Step 8](resources/images/instructions-sample-02.png)
@@ -152,11 +152,11 @@ bash l2cu --file mpd --instructions samples --directory ~/models
 
 ## Modify
 
-<!-- modify | emerald | MODIFY // BULK EDITS ACROSS EVERY MODEL -->
+[//]: # (modify | emerald | MODIFY // BULK EDITS ACROSS EVERY MODEL)
 
 Batch editing for color and part changes that would take hours by hand in an editor, read and written with the LDraw file specification as reference.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Option | Change |
 | --- | --- |
 | `color` | One color for another, on every part - the default |
@@ -176,11 +176,11 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models
 
 ## Download
 
-<!-- download | teal | DOWNLOAD // THE LDRAW PARTS LIBRARY -->
+[//]: # (download | teal | DOWNLOAD // THE LDRAW PARTS LIBRARY)
 
 The LDraw parts library, fetched from ldraw.org, for quick updates or for getting started.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Option | Library | Saved as |
 | --- | --- | --- |
 | `official` | The complete official LDraw parts library - the default | `ldraw.zip` |
@@ -194,11 +194,11 @@ bash l2cu --download official --directory ~/ldraw
 
 ## List
 
-<!-- list | cyan | LIST // THE LEGACY PARTS INDEX -->
+[//]: # (list | cyan | LIST // THE LEGACY PARTS INDEX)
 
 The parts.lst index for legacy editors, the script that started L²CU.
 
-<!-- table wrap -->
+[//]: # (table wrap)
 | Option | Sorted by |
 | --- | --- |
 | `description` | Part description - the default |
@@ -214,15 +214,15 @@ bash l2cu --list number --directory ~/ldraw
 
 ## Options
 
-<!-- options | blue | OPTIONS // THE FULL HELP -->
+[//]: # (options | blue | OPTIONS // THE FULL HELP)
 
 Every option and value, read from the help of the script itself. The marked letter is the short option.
 
-<!-- include options -->
+[//]: # (include options)
 
 ## Uninstall
 
-<!-- uninstall | indigo | UNINSTALL // REMOVE INSTALLED COPIES -->
+[//]: # (uninstall | indigo | UNINSTALL // REMOVE INSTALLED COPIES)
 
 L²CU installs nothing but itself, so removing it removes its copies.
 
