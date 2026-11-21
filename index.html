@@ -33,6 +33,63 @@
 		<meta name="description" content="L²CU is the LDraw Linux command line utility: it renders, exports, documents and bulk edits LDraw / LEGO® models from the command line, with StudWorx and LPub3D.">
 		<meta name="theme-color" content="#8f9fa3">
 
+		<!-- structured data -->
+
+		<script type="application/ld+json">
+
+		{
+			"@context": "https://schema.org",
+			"@graph": [
+				{
+					"@type": "SoftwareApplication",
+					"@id": "https://l2cu.app/#application",
+					"name": "L²CU",
+					"url": "https://l2cu.app/",
+					"description": "L²CU is the LDraw Linux command line utility: it renders, exports, documents and bulk edits LDraw / LEGO® models from the command line, with StudWorx and LPub3D.",
+					"applicationCategory": "DesignApplication",
+					"operatingSystem": "Linux",
+					"softwareVersion": "2026-10-31",
+					"license": "https://www.gnu.org/licenses/gpl-3.0.html",
+					"downloadUrl": "https://github.com/nathaneltitane/l2cu",
+					"image": "https://l2cu.app/resources/social/social.png",
+					"offers": {
+						"@type": "Offer",
+						"price": "0",
+						"priceCurrency": "USD"
+					},
+					"author": {
+						"@id": "https://l2cu.app/#author"
+					},
+					"sameAs": [
+						"https://github.com/nathaneltitane/l2cu"
+					],
+					"isRelatedTo": [
+						{
+							"@type": "SoftwareApplication",
+							"name": "StudWorx",
+							"url": "https://studworx.app/"
+						}
+					]
+				},
+				{
+					"@type": "Person",
+					"@id": "https://l2cu.app/#author",
+					"name": "Nathanel Titane",
+					"url": "https://github.com/nathaneltitane",
+					"sameAs": [
+						"https://www.linkedin.com/in/nathaneltitane",
+						"https://terminal.me/",
+						"https://dextop.app/",
+						"https://frobulator.app/",
+						"https://studworx.app/",
+						"https://mechablocks.com/"
+					]
+				}
+			]
+		}
+
+		</script>
+
 		<!-- social media -->
 
 		<meta property="og:type" content="website">
@@ -657,7 +714,7 @@ bash l2cu --file mpd --modify lint --overwrite --directory ~/models</code></pre>
 			<p>LEGO® is a trademark of the LEGO® Group, which does not sponsor, authorize or endorse this project.</p>
 			<div class="authorship">
 				<a class="avatar" href="https://nathaneltitane.com" aria-label="N Λ T H Λ N E L"><img src="resources/avatar/avatar-bird.png" alt="" width="64" height="64"></a>
-				<p>Version // 2026-10-31<br>2026 - <a href="https://github.com/nathaneltitane">N Λ T H Λ N E L</a> - <a href="https://github.com/nathaneltitane/l2cu/issues">Submit bug reports or feature requests</a></p>
+				<p>Version // 2026-10-31<br>2026 - <a href="https://github.com/nathaneltitane">N Λ T H Λ N E L</a> - <a href="https://www.linkedin.com/in/nathaneltitane">LinkedIn</a> - <a href="https://github.com/nathaneltitane/l2cu/issues">Submit bug reports or feature requests</a></p>
 			</div>
 		</div>
 
