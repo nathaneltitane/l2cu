@@ -415,6 +415,18 @@ else
 	command_lpub="lpub3d24"
 fi
 
+# no screen - lpub3d on a virtual one
+
+list_display=()
+
+if [ -z "${DISPLAY}" ] && [ -z "${WAYLAND_DISPLAY}" ] && command -v xvfb-run > "${sink}" 2>&1
+then
+	list_display=(
+		xvfb-run
+		--auto-servernum
+	)
+fi
+
 # defaults ─────────────────────────────────────────────────────────────────────
 
 if [ -z "${directory}" ]
@@ -1391,7 +1403,7 @@ l2cu_instructions_samples () {
 
 	frobulator.stp "Generating range" "[ ${range_sample} ]"
 
-	frobulator.background quiet "generate" -- "${command_lpub}"											\
+	frobulator.background quiet "generate" -- "${list_display[@]}" "${command_lpub}"						\
 		--clear-cache									\
 		--preferred-renderer	"${renderer}"			\
 		--projection			"${projection}"			\
@@ -1417,6 +1429,15 @@ l2cu_instructions_samples () {
 		number_sample=$(( number_sample + 1 ))
 	done
 
+	# no sample pages - lpub3d failed
+
+	if [ "${number_sample}" -eq 1 ]
+	then
+		frobulator.err "No sample pages generated" "[ ${name_model} ]"
+
+		status=1
+	fi
+
 	return "${status}"
 }
 
@@ -1428,7 +1449,7 @@ l2cu_instructions () {
 
 	frobulator.inf "Generating instructions" "[ ${name_model} ]"
 
-	frobulator.background quiet "generate" -- "${command_lpub}"																\
+	frobulator.background quiet "generate" -- "${list_display[@]}" "${command_lpub}"											\
 		--clear-cache														\
 		--preferred-renderer	"${renderer}"								\
 		--projection			"${projection}"								\
@@ -1440,6 +1461,15 @@ l2cu_instructions () {
 	frobulator.track
 
 	l2cu_instructions_clean
+
+	# no document - lpub3d failed
+
+	if [ ! -f "${directory_instructions}/${name_model}.pdf" ]
+	then
+		frobulator.err "No instructions document generated" "[ ${name_model} ]"
+
+		status=1
+	fi
 
 	return "${status}"
 }
