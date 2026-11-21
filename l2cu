@@ -255,7 +255,7 @@ do
 			echo
 			echo -e "-i, --instructions    Generate model [i]nstruction file."
 			echo
-			echo -e "                      [ pdf ]"
+			echo -e "                      Generate the full instructions document. [ pdf ]"
 			echo
 			echo -e "                      pieces     Display and generate pieces count file."
 			echo -e "                      samples    Generate instructions sample preview files. [ png ] [ count // 6 ]"
