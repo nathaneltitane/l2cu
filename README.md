@@ -57,9 +57,8 @@ Missing dependencies are installed on request - privilege escalation is only ask
 
 You will need:
 
-- [StudWorx](https://studworx.app) - LDraw / LEGO® model builder, built on LeoCAD - all options - installed from its latest release when missing
+- [StudWorx](https://studworx.app) - LDraw / LEGO® model builder and instructions editor, built on LeoCAD - all options - installed from its latest release when missing
 - [Blender](https://www.blender.org) - The free and open source 3D creation suite - 'blender' export
-- [LPub3D](https://github.com/trevorsandy/lpub3d) - LDraw building instructions editor - 'instructions' option
 - curl - 'download' option
 - sed
 
@@ -148,7 +147,7 @@ Examples:
 
 ### 'instructions'
 
-This function generates building instructions with [LPub3D](https://github.com/trevorsandy/lpub3d), based on a configuration framework (title, piece count, category and url are filled in for each model):
+This function generates building instructions with StudWorx, based on an instructions template (title, piece count, category and url are filled in for each model):
 
 - default: full instructions document (pdf)
 - pieces: piece count written to the model's 'pieces' file
@@ -231,7 +230,7 @@ To find examples that make use of L²CU, or to simply browse my models, you can 
 
 ### Credits:
 
-L²CU renders and exports through StudWorx, built on [LeoCAD](https://github.com/leozide/leocad) by Leonardo Zide and its contributors. Instructions come from [LPub3D](https://github.com/trevorsandy/lpub3d) by Trevor Sandy, Blender files from [Blender](https://www.blender.org) and parts from the [LDraw](https://www.ldraw.org) library.
+L²CU renders and exports through StudWorx, built on [LeoCAD](https://github.com/leozide/leocad) by Leonardo Zide and its contributors. Blender files from [Blender](https://www.blender.org) and parts from the [LDraw](https://www.ldraw.org) library.
 
 L²CU is related to [StudWorx](https://github.com/nathaneltitane/studworx), the LDraw / LEGO® model builder behind every L²CU render and export, [Frobulator](https://github.com/nathaneltitane/frobulator), the shell scripting function library behind every L²CU script, and [MechaBlocks](https://github.com/nathaneltitane/mechablocks), custom LEGO® mecha models rendered and documented with L²CU.
 

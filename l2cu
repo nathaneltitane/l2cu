@@ -365,9 +365,9 @@ url_library="${marker_hts}www.ldraw.org/library"
 
 url_studworx="${marker_hts}api.github.com/repos/nathaneltitane/studworx/releases/latest"
 
-# lpub3d instructions framework - configuration / placeholders
+# studworx instructions template - configuration / placeholders
 
-directory_instructions_base="/media/internal/Lego/lpub3d/instructions"
+directory_instructions_base="/media/internal/Lego/studworx/instructions"
 
 # render camera presets - latitude / longitude / view label
 
@@ -403,29 +403,6 @@ list_views=(
 	"06"
 	"07"
 )
-
-# 'lpub3d' path - empty if not installed
-
-command_lpub3d="$(command -v lpub3d)"
-
-if [ -n "${command_lpub3d}" ]
-then
-	command_lpub="lpub3d"
-else
-	command_lpub="lpub3d24"
-fi
-
-# no screen - lpub3d on a virtual one
-
-list_display=()
-
-if [ -z "${DISPLAY}" ] && [ -z "${WAYLAND_DISPLAY}" ] && command -v xvfb-run > "${sink}" 2>&1
-then
-	list_display=(
-		xvfb-run
-		--auto-servernum
-	)
-fi
 
 # defaults ─────────────────────────────────────────────────────────────────────
 
@@ -1220,7 +1197,7 @@ l2cu_pieces () {
 
 l2cu_instructions_clean () {
 
-	# lpub3d configuration and cache files
+	# configuration and page files
 
 	local status=0
 
@@ -1229,7 +1206,7 @@ l2cu_instructions_clean () {
 		--force																\
 			"${directory_instructions}/configuration"						\
 			"${path_model_instructions}"									\
-			"${directory_instructions}"/[lL][pP][uU][bB][3][dD]
+			"${directory_instructions}/pages"
 
 	frobulator.track
 
@@ -1330,9 +1307,15 @@ l2cu_instructions_configure () {
 
 	frobulator.fwd "Configuring..."
 
-	# configuration from base instructions framework followed by model
+	# configuration inside the main model - before its first step or part line
 
-	cat "${directory_instructions}/configuration" "${path_model}" > "${path_model_instructions}"
+	awk -v path_configuration="${directory_instructions}/configuration" '
+		!done && /^(0 !SW |0 STEP|0 ROTSTEP|[1-5] )/ {
+			while ((getline line < path_configuration) > 0) print line
+			done = 1
+		}
+		{ print }
+	' "${path_model}" > "${path_model_instructions}"
 
 	frobulator.track
 
@@ -1360,33 +1343,39 @@ l2cu_instructions_samples_placeholders () {
 l2cu_instructions_samples () {
 
 	local status=0
-	local renderer="native"
-	local projection="perspective"
 	local number_sample=1
 
-	local count_step
+	local count_page
 	local index_sample
 	local range_sample
-	local path_sample
+	local page_sample
 
+	local -a list_pages=()
 	local -a list_pages_sample=()
-	local -a list_samples=()
 
 	frobulator.inf "Generating instructions" "[ ${name_model} ]"
 
-	# step count of the instructions model
+	frobulator.background quiet "generate" -- studworx					\
+		--export-pages	"${directory_instructions}/pages"	\
+														"${path_model_instructions}"
 
-	count_step="$(grep -c -E '^0 STEP' "${path_model_instructions}")"
+	frobulator.track
+
+	# every page in page order
+
+	mapfile -t list_pages < <(find "${directory_instructions}/pages" -type f -iname "*-page-*.png" 2> "${sink}" | sort -V)
+
+	count_page="${#list_pages[@]}"
 
 	# six sample pages spread over the instructions - first page minimum
 
 	list_pages_sample=(
 		1
-		$(( count_step / 5 - 2 ))
-		$(( count_step / 4 - 3 ))
-		$(( count_step / 3 - 4 ))
-		$(( count_step / 2 - 5 ))
-		"${count_step}"
+		$(( count_page / 5 - 2 ))
+		$(( count_page / 4 - 3 ))
+		$(( count_page / 3 - 4 ))
+		$(( count_page / 2 - 5 ))
+		"${count_page}"
 	)
 
 	for index_sample in "${!list_pages_sample[@]}"
@@ -1403,40 +1392,29 @@ l2cu_instructions_samples () {
 
 	frobulator.stp "Generating range" "[ ${range_sample} ]"
 
-	frobulator.background quiet "generate" -- "${list_display[@]}" "${command_lpub}"						\
-		--clear-cache									\
-		--preferred-renderer	"${renderer}"			\
-		--projection			"${projection}"			\
-		--process-export								\
-		--export-option			"${extension_export}"	\
-		--range					"${range_sample}"		\
-														"${path_model_instructions}"
+	# no pages - studworx failed
 
-	frobulator.track
+	if [ "${count_page}" -eq 0 ]
+	then
+		frobulator.err "No sample pages generated" "[ ${name_model} ]"
 
-	l2cu_instructions_clean
+		l2cu_instructions_clean
 
-	# sample pages renamed in page order
+		return 1
+	fi
 
-	mapfile -t list_samples < <(find "${directory_instructions}" -type f -iname "*page*.${extension_export}" | sort -V)
+	# sample pages copied in page order - a page may repeat
 
-	for path_sample in "${list_samples[@]}"
+	for page_sample in "${list_pages_sample[@]}"
 	do
-		mv "${path_sample}" "${directory_samples_instructions}/sample-0${number_sample}.${extension_export}"
+		cp "${list_pages[page_sample - 1]}" "${directory_samples_instructions}/sample-0${number_sample}.png"
 
 		frobulator.track
 
 		number_sample=$(( number_sample + 1 ))
 	done
 
-	# no sample pages - lpub3d failed
-
-	if [ "${number_sample}" -eq 1 ]
-	then
-		frobulator.err "No sample pages generated" "[ ${name_model} ]"
-
-		status=1
-	fi
+	l2cu_instructions_clean
 
 	return "${status}"
 }
@@ -1444,25 +1422,18 @@ l2cu_instructions_samples () {
 l2cu_instructions () {
 
 	local status=0
-	local renderer="native"
-	local projection="perspective"
 
 	frobulator.inf "Generating instructions" "[ ${name_model} ]"
 
-	frobulator.background quiet "generate" -- "${list_display[@]}" "${command_lpub}"											\
-		--clear-cache														\
-		--preferred-renderer	"${renderer}"								\
-		--projection			"${projection}"								\
-		--process-export													\
-		--export-option			"${extension_export}"						\
-		--pdf-output-file		"${directory_instructions}/${name_model}.pdf"	\
+	frobulator.background quiet "generate" -- studworx											\
+		--export-pdf	"${directory_instructions}/${name_model}.pdf"	\
 																			"${path_model_instructions}"
 
 	frobulator.track
 
 	l2cu_instructions_clean
 
-	# no document - lpub3d failed
+	# no document - studworx failed
 
 	if [ ! -f "${directory_instructions}/${name_model}.pdf" ]
 	then
@@ -2184,13 +2155,6 @@ then
 	list+=(
 		python3
 		python3-numpy
-	)
-fi
-
-if [ "${option}" = "instructions" ]
-then
-	list+=(
-		"${command_lpub}"
 	)
 fi
 

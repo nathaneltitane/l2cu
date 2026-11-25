@@ -10,7 +10,7 @@ L²CU grew out of scripts written to manage LDraw models in bulk, the work an ed
 
 - **Render.** Eight views around every model, or one view as flat, wireframe, overlay, social card or thumbnail, through StudWorx.
 - **Export.** Collada, 3D Studio, Wavefront, a parts list or an optimized Blender file, with collada or kmz reduced to its visible surface.
-- **Instructions.** Building instructions, piece counts and sample pages with LPub3D.
+- **Instructions.** Building instructions, piece counts and sample pages with StudWorx.
 - **Modify.** Colors, parts and color bound parts changed across every model at once, submodels stepped and files linted.
 - **Download.** The official or unofficial LDraw parts library archive, ready for StudWorx.
 - **List.** The legacy parts.lst index, sorted by description or number.
@@ -37,8 +37,7 @@ bash l2cu --help
 [//]: # (table wrap)
 | Requirement | Used for |
 | --- | --- |
-| <a href="https://studworx.app">StudWorx</a> | Renders, exports and piece counts |
-| <a href="https://github.com/trevorsandy/lpub3d">LPub3D</a> | Instructions and sample pages |
+| <a href="https://studworx.app">StudWorx</a> | Renders, exports, instructions and piece counts |
 | <a href="https://www.blender.org">Blender</a> | The `blender` export |
 | python3, numpy | The `surface` export |
 | curl | The parts library download |
@@ -124,9 +123,9 @@ The exports are ready for web galleries built on WebGL and Three.js, or for site
 
 ## Instructions
 
-[//]: # (instructions | green | INSTRUCTIONS // BUILDING GUIDES WITH LPUB3D)
+[//]: # (instructions | green | INSTRUCTIONS // BUILDING GUIDES WITH STUDWORX)
 
-Building instructions, piece counts and sample pages for every model, generated with LPub3D.
+Building instructions, piece counts and sample pages for every model, generated with StudWorx from one instructions template.
 
 [//]: # (table wrap)
 | Option | Output |

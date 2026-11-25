@@ -8,7 +8,7 @@ lego
 mpd
 ldr
 ldview
-lpub
+studworx
 instructions
 minifig
 blender
